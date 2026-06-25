@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>✨ Sparkle Unicorn Magic ✨</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+body{background:linear-gradient(170deg,#ffe0f0 0%,#ffb6d9 25%,#ff8ec4 50%,#ffc0cb 75%,#fff0f5 100%);font-family:'Fredoka','Baloo 2',sans-serif}
+
+/* HIDE external overlays/watermarks that might distract toddlers */
+iframe:not(#gameFrame),.watermark,[id*="badge"],[class*="watermark"]{display:none!important;pointer-events:none!important;opacity:0!important}
+
+/* CANVASES */
+#glitterCanvas,#paintCanvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none}
+#glitterCanvas{z-index:1}
+#paintCanvas{z-index:2}
+
+/* GAME SCENE - receives all taps */
+#gameScene{position:fixed;top:0;left:0;width:100%;height:100%;z-index:5;cursor:crosshair}
+
+/* === BUBBLE === */
+.bubble{position:absolute;border-radius:50%;cursor:pointer;z-index:10;animation:bubbleRise var(--rise-time,6s) linear forwards}
+.bubble-inner{width:100%;height:100%;border-radius:50%;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.9),rgba(255,182,217,.5) 40%,rgba(255,105,180,.3) 70%,rgba(255,20,147,.2));border:2px solid rgba(255,255,255,.6);box-shadow:0 0 20px rgba(255,105,180,.4),inset 0 0 15px rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:var(--emoji-size,30px);animation:bubbleWobble 2s ease-in-out infinite}
+@keyframes bubbleRise{0%{transform:translateY(0) translateX(0);opacity:0}5%{opacity:1}90%{opacity:.8}100%{transform:translateY(calc(-100vh - 150px)) translateX(var(--sway,30px));opacity:0}}
+@keyframes bubbleWobble{0%,100%{transform:scale(1) rotate(-3deg)}50%{transform:scale(1.05) rotate(3deg)}}
+
+/* === UNICORN === */
+.unicorn{position:absolute;cursor:pointer;z-index:12;font-size:70px;filter:drop-shadow(0 6px 15px rgba(255,20,147,.4));transition:transform .15s}
+.unicorn.walking{animation:unicornWalk var(--walk-speed,8s) linear forwards}
+@keyframes unicornWalk{0%{transform:translateX(-100px) scaleX(var(--dir,1))}100%{transform:translateX(calc(100vw + 100px)) scaleX(var(--dir,1))}}
+.unicorn.caught{transition:all .5s ease-in;opacity:0;transform:scale(2)!important}
+
+/* === EGG === */
+.egg{position:absolute;cursor:pointer;z-index:11;font-size:65px;filter:drop-shadow(0 6px 12px rgba(255,105,180,.4));animation:eggWobble 1.5s ease-in-out infinite}
+@keyframes eggWobble{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
+.egg.shaking{animation:eggShake .3s ease-in-out}
+@keyframes eggShake{0%,100%{transform:rotate(0)}20%{transform:rotate(-15deg)}40%{transform:rotate(15deg)}60%{transform:rotate(-10deg)}80%{transform:rotate(10deg)}}
+
+/* === STAR (tap collectible) === */
+.star{position:absolute;cursor:pointer;z-index:10;font-size:36px;animation:starPulse 1s ease-in-out infinite alternate;filter:drop-shadow(0 0 8px rgba(255,215,0,.6))}
+@keyframes starPulse{0%{transform:scale(1) rotate(-5deg)}100%{transform:scale(1.15) rotate(5deg)}}
+.star.collected{transition:all .4s ease-in;opacity:0;transform:scale(2)!important}
+
+/* === POP RING === */
+.pop-ring{position:absolute;border-radius:50%;border:3px solid;pointer-events:none;z-index:15;animation:popRing .6s ease-out forwards}
+@keyframes popRing{0%{width:10px;height:10px;opacity:1;margin-left:-5px;margin-top:-5px}100%{width:120px;height:120px;opacity:0;margin-left:-60px;margin-top:-60px}}
+
+/* === SCORE === */
+#scoreBar{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:50;display:flex;gap:8px;align-items:center}
+.score-item{font-family:'Baloo 2',sans-serif;font-size:18px;font-weight:800;color:#fff;text-shadow:0 2px 6px rgba(255,20,147,.5);background:linear-gradient(135deg,rgba(255,105,180,.7),rgba(255,20,147,.5));backdrop-filter:blur(10px);padding:5px 14px;border-radius:40px;border:2px solid rgba(255,255,255,.5);box-shadow:0 4px 15px rgba(255,105,180,.3);display:flex;align-items:center;gap:5px;white-space:nowrap}
+.score-val{min-width:20px;text-align:center;transition:transform .15s}
+.score-val.bump{transform:scale(1.4)}
+
+/* === MILESTONE BAR === */
+#milestoneBar{position:fixed;top:52px;left:50%;transform:translateX(-50%);z-index:50;width:min(300px,80vw);height:14px;background:rgba(255,255,255,.3);border-radius:10px;border:2px solid rgba(255,255,255,.5);overflow:hidden}
+#milestoneFill{height:100%;width:0%;background:linear-gradient(90deg,#ff69b4,#ff1493,#ffd700);border-radius:10px;transition:width .4s ease}
+#milestoneLabel{position:fixed;top:54px;left:50%;transform:translateX(-50%);z-index:51;font-family:'Baloo 2',sans-serif;font-size:11px;font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.2);pointer-events:none;width:min(300px,80vw);text-align:center}
+
+/* === MODE BUTTONS === */
+#modeBar{position:fixed;bottom:15px;left:50%;transform:translateX(-50%);z-index:50;display:flex;gap:8px}
+.mode-btn{font-family:'Baloo 2',sans-serif;font-size:14px;font-weight:700;color:#ff1493;background:#fff;border:3px solid #ff69b4;border-radius:40px;padding:8px 16px;cursor:pointer;box-shadow:0 4px 15px rgba(255,20,147,.3);transition:all .2s;white-space:nowrap}
+.mode-btn.active{background:linear-gradient(135deg,#ff69b4,#ff1493);color:#fff;border-color:#fff}
+.mode-btn:active{transform:scale(.92)}
+
+/* === MAGIC BUTTON === */
+#magicBtn{position:fixed;bottom:65px;right:15px;z-index:50;font-family:'Baloo 2',sans-serif;font-size:16px;font-weight:800;color:#fff;background:linear-gradient(135deg,#ff69b4,#ff1493);padding:10px 20px;border-radius:50px;border:3px solid rgba(255,255,255,.6);box-shadow:0 6px 20px rgba(255,20,147,.5);cursor:pointer;transition:all .2s}
+#magicBtn.ready{animation:magicPulse 1s ease-in-out infinite;transform:scale(1.1)}
+@keyframes magicPulse{0%,100%{box-shadow:0 6px 20px rgba(255,20,147,.5)}50%{box-shadow:0 6px 40px rgba(255,20,147,.8),0 0 50px rgba(255,105,180,.5)}}
+#magicBtn:active{transform:scale(.9)}
+
+/* === MEGA BURST === */
+.mega-burst{position:fixed;top:50%;left:50%;width:10px;height:10px;border-radius:50%;background:radial-gradient(circle,#fff,#ff69b4,transparent);transform:translate(-50%,-50%) scale(0);z-index:60;pointer-events:none;animation:megaBurst 1s ease-out forwards}
+@keyframes megaBurst{0%{transform:translate(-50%,-50%) scale(0);opacity:1}50%{transform:translate(-50%,-50%) scale(80);opacity:.6}100%{transform:translate(-50%,-50%) scale(120);opacity:0}}
+
+/* === MILESTONE CELEBRATION === */
+#celebration{position:fixed;inset:0;z-index:70;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(255,105,180,.3);backdrop-filter:blur(5px);opacity:0;pointer-events:none;transition:opacity .5s}
+#celebration.show{opacity:1;pointer-events:auto}
+#celebration .cel-emoji{font-size:100px;animation:celBounce 1s ease-in-out infinite}
+@keyframes celBounce{0%,100%{transform:scale(1) rotate(-5deg)}50%{transform:scale(1.2) rotate(5deg)}}
+#celebration .cel-text{font-family:'Baloo 2',sans-serif;font-size:clamp(28px,6vw,48px);font-weight:800;color:#fff;text-shadow:0 4px 15px rgba(255,20,147,.6);text-align:center;margin-top:10px}
+#celebration .cel-sub{font-family:'Fredoka',sans-serif;font-size:clamp(16px,3vw,22px);color:rgba(255,255,255,.9);margin-top:5px}
+#celebration .cel-dismiss{font-family:'Baloo 2',sans-serif;font-size:18px;font-weight:700;color:#ff1493;background:#fff;border:3px solid #ff69b4;border-radius:40px;padding:10px 30px;cursor:pointer;margin-top:20px;box-shadow:0 4px 15px rgba(255,20,147,.3)}
+
+/* === UNLOCKABLE ACCESSORIES (shown on unicorn) === */
+.accessory{position:absolute;pointer-events:none;z-index:13;font-size:30px;animation:accPop .4s ease-out forwards}
+@keyframes accPop{0%{transform:scale(0)}60%{transform:scale(1.3)}100%{transform:scale(1)}}
+
+/* === TITLE SCREEN === */
+#titleScreen{position:fixed;inset:0;z-index:100;background:linear-gradient(170deg,#fff0f5 0%,#ffb6d9 40%,#ff69b4 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;transition:opacity .8s,transform .8s}
+#titleScreen.hidden{opacity:0;transform:scale(1.1);pointer-events:none}
+#titleScreen h1{font-family:'Baloo 2',sans-serif;font-size:clamp(30px,7vw,58px);font-weight:800;color:#fff;text-shadow:0 4px 15px rgba(255,20,147,.5);text-align:center;line-height:1.1;animation:titleFloat 3s ease-in-out infinite}
+@keyframes titleFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.title-unicorn{font-size:clamp(80px,20vw,140px);animation:titleBob 2s ease-in-out infinite;filter:drop-shadow(0 10px 30px rgba(255,20,147,.5))}
+@keyframes titleBob{0%,100%{transform:rotate(-5deg) scale(1)}50%{transform:rotate(5deg) scale(1.05)}}
+#playBtn{font-family:'Baloo 2',sans-serif;font-size:clamp(20px,5vw,30px);font-weight:800;color:#ff1493;background:#fff;border:4px solid #ff69b4;border-radius:60px;padding:14px 45px;cursor:pointer;box-shadow:0 8px 30px rgba(255,20,147,.4);transition:all .2s;animation:playPulse 1.5s ease-in-out infinite}
+@keyframes playPulse{0%,100%{box-shadow:0 8px 30px rgba(255,20,147,.4)}50%{box-shadow:0 8px 50px rgba(255,20,147,.7),0 0 60px rgba(255,105,180,.4)}}
+#playBtn:active{transform:scale(.92)}
+.title-hint{font-size:clamp(13px,2.5vw,16px);color:rgba(255,255,255,.8);text-align:center;max-width:280px}
+
+/* === BG EFFECTS === */
+.glitter-bg{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:radial-gradient(2px 2px at 20% 30%,rgba(255,255,255,.8),transparent),radial-gradient(2px 2px at 40% 70%,rgba(255,182,217,.6),transparent),radial-gradient(1px 1px at 60% 20%,rgba(255,255,255,.9),transparent),radial-gradient(2px 2px at 80% 50%,rgba(255,105,180,.5),transparent);animation:glitterShift 8s linear infinite}
+@keyframes glitterShift{0%{opacity:.6}50%{opacity:1}100%{opacity:.6}}
+.rainbow{position:fixed;bottom:-80px;left:50%;transform:translateX(-50%);width:600px;height:300px;z-index:0;border-radius:300px 300px 0 0;background:conic-gradient(from 180deg at 50% 100%,#ff0000 0deg,#ff8800 25deg,#ffff00 50deg,#00cc00 75deg,#0088ff 100deg,#8800ff 125deg,#ff0088 150deg,transparent 155deg);opacity:.12;pointer-events:none}
+.cloud{position:fixed;z-index:0;opacity:.4;font-size:50px;animation:cloudDrift var(--speed,30s) linear infinite;pointer-events:none}
+@keyframes cloudDrift{0%{transform:translateX(-100px)}100%{transform:translateX(calc(100vw + 100px))}}
+
+/* === PAINT MODE INDICATOR === */
+#paintIndicator{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:49;font-family:'Baloo 2',sans-serif;font-size:24px;font-weight:800;color:#fff;text-shadow:0 2px 8px rgba(255,20,147,.6);background:rgba(255,105,180,.6);backdrop-filter:blur(8px);padding:8px 24px;border-radius:30px;border:2px solid rgba(255,255,255,.5);opacity:0;transition:opacity .3s;pointer-events:none}
+#paintIndicator.show{opacity:1}
+
+/* === RESPONSIVE === */
+@media(max-width:600px){
+  .score-item{font-size:14px;padding:4px 10px}
+  .mode-btn{font-size:12px;padding:6px 12px}
+  #magicBtn{font-size:14px;padding:8px 16px;bottom:55px;right:10px}
+  .unicorn{font-size:55px}
+  .egg{font-size:50px}
+  #milestoneBar{height:12px}
+}
+</style>
+</head>
+<body>
+
+<div class="glitter-bg"></div>
+<div class="rainbow"></div>
+<canvas id="glitterCanvas"></canvas>
+<canvas id="paintCanvas"></canvas>
+<div id="gameScene"></div>
+
+<!-- Score -->
+<div id="scoreBar">
+  <div class="score-item"><span>✨</span><span class="score-val" id="sparkleCount">0</span></div>
+  <div class="score-item"><span>🦄</span><span class="score-val" id="unicornCount">0</span></div>
+</div>
+
+<!-- Milestone progress -->
+<div id="milestoneBar"><div id="milestoneFill"></div></div>
+<div id="milestoneLabel">Next: 🎀 Bow (10✨)</div>
+
+<!-- Mode buttons -->
+<div id="modeBar">
+  <button class="mode-btn active" data-mode="tap">✨ Tap</button>
+  <button class="mode-btn" data-mode="paint">🎨 Paint</button>
+</div>
+
+<!-- Paint mode indicator -->
+<div id="paintIndicator">🎨 Drawing Mode!</div>
+
+<!-- Magic button -->
+<button id="magicBtn">🦄 MAGIC (0/50)</button>
+
+<!-- Celebration overlay -->
+<div id="celebration">
+  <div class="cel-emoji" id="celEmoji">🎉</div>
+  <div class="cel-text" id="celText">Amazing!</div>
+  <div class="cel-sub" id="celSub">You unlocked something special!</div>
+  <button class="cel-dismiss" id="celDismiss">✨ Keep Playing! ✨</button>
+</div>
+
+<!-- Title -->
+<div id="titleScreen">
+  <div class="title-unicorn">🦄</div>
+  <h1>Sparkle Unicorn<br>Magic Garden</h1>
+  <p class="title-hint">Tap bubbles, catch unicorns, hatch eggs, paint with sparkles!</p>
+  <button id="playBtn">✨ TAP TO PLAY ✨</button>
+</div>
+
+<script>
+/* ================================================
+   SPARKLE UNICORN MAGIC GARDEN - Fixed & Improved
+   ================================================ */
+
+// ── SFX Engine (renamed from Audio to avoid window.Audio conflict) ──
+const SFX = (() => {
+  let ctx;
+  const init = () => {
+    if (!ctx) {
+      ctx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (ctx.state === 'suspended') ctx.resume();
+  };
+  const note = (f, d=0.15, type='sine', vol=0.1) => {
+    if (!ctx) return;
+    try {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = type; o.frequency.value = f;
+      g.gain.setValueAtTime(vol, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + d);
+      o.connect(g).connect(ctx.destination);
+      o.start(); o.stop(ctx.currentTime + d);
+    } catch(e) {}
+  };
+  return {
+    init,
+    pop()     { note(800+Math.random()*400, 0.08, 'sine', 0.08); setTimeout(()=>note(1200+Math.random()*300, 0.06, 'sine', 0.05), 40); },
+    sparkle() { const n=[880,1108,1320,1568,1760][Math.floor(Math.random()*5)]; note(n, 0.2, 'sine', 0.07); setTimeout(()=>note(n*1.5, 0.15, 'sine', 0.04), 60); },
+    unicorn() { [523,659,784,1047].forEach((n,i)=>setTimeout(()=>note(n, 0.2, 'triangle', 0.08), i*80)); },
+    hatch()   { [440,554,659,880,1108].forEach((n,i)=>setTimeout(()=>note(n, 0.25, 'sine', 0.07), i*70)); },
+    magic()   { [440,554,659,880,1108,1320,1568].forEach((n,i)=>setTimeout(()=>note(n, 0.3, 'sine', 0.06), i*50)); },
+    crack()   { note(200+Math.random()*100, 0.05, 'square', 0.04); },
+    paint()   { note(600+Math.random()*600, 0.05, 'sine', 0.03); },
+    milestone(){ [523,659,784,1047,1319].forEach((n,i)=>setTimeout(()=>note(n, 0.4, 'sine', 0.08), i*100)); },
+    collect() { note(1000+Math.random()*500, 0.1, 'sine', 0.06); }
+  };
+})();
+
+// ── Glitter Particle System ──
+const Glitter = (() => {
+  const c = document.getElementById('glitterCanvas'), x = c.getContext('2d');
+  let P = [];
+  const C = ['#fff','#ffb6d9','#ff69b4','#ff1493','#ffc0cb','#ffd700','#fff5ee'];
+  const resize = () => { c.width = innerWidth; c.height = innerHeight; };
+  addEventListener('resize', resize); resize();
+
+  const burst = (bx, by, n=25) => {
+    for (let i=0; i<n; i++) {
+      const a=Math.random()*Math.PI*2, s=1+Math.random()*4;
+      P.push({x:bx, y:by, vx:Math.cos(a)*s, vy:Math.sin(a)*s-2,
+        sz:1+Math.random()*4, c:C[Math.floor(Math.random()*C.length)],
+        l:1, d:0.01+Math.random()*0.015, t:Math.random()*6.28, ts:0.1+Math.random()*0.2});
+    }
+  };
+  const ambient = () => {
+    if (P.length < 50) P.push({x:Math.random()*c.width, y:-5,
+      vx:(Math.random()-0.5)*0.4, vy:0.3+Math.random()*0.6,
+      sz:1+Math.random()*2.5, c:C[Math.floor(Math.random()*C.length)],
+      l:1, d:0.002+Math.random()*0.003, t:Math.random()*6.28, ts:0.05+Math.random()*0.1});
+  };
+  const loop = () => {
+    x.clearRect(0,0,c.width,c.height);
+    ambient();
+    for (let i=P.length-1; i>=0; i--) {
+      const p=P[i]; p.x+=p.vx; p.y+=p.vy; p.vy+=0.02; p.l-=p.d; p.t+=p.ts;
+      if (p.l<=0) { P.splice(i,1); continue; }
+      x.globalAlpha = p.l * (0.5 + 0.5*Math.sin(p.t));
+      x.fillStyle = p.c;
+      x.beginPath(); x.arc(p.x, p.y, p.sz, 0, 6.28); x.fill();
+    }
+    x.globalAlpha = 1;
+    requestAnimationFrame(loop);
+  };
+  loop();
+  return { burst };
+})();
+
+// ── Paint Canvas ──
+const PaintCanvas = (() => {
+  const c = document.getElementById('paintCanvas');
+  const x = c.getContext('2d');
+  const resize = () => { c.width = innerWidth; c.height = innerHeight; };
+  addEventListener('resize', resize); resize();
+
+  let drawing = false;
+  let lastX = 0, lastY = 0;
+  let hue = 330; // start pink
+
+  const COLORS = ['#ff69b4','#ff1493','#ffb6d9','#ff85c8','#ffd700','#ff6b9d','#c44dff','#ff4da6','#ff80bf'];
+
+  const start = (px, py) => {
+    drawing = true;
+    lastX = px; lastY = py;
+    draw(px, py);
+  };
+  const move = (px, py) => {
+    if (!drawing) return;
+    // Draw line from last to current
+    x.beginPath();
+    x.moveTo(lastX, lastY);
+    x.lineTo(px, py);
+    x.strokeStyle = COLORS[Math.floor(Math.random()*COLORS.length)];
+    x.lineWidth = 8 + Math.random() * 12;
+    x.lineCap = 'round';
+    x.lineJoin = 'round';
+    x.globalAlpha = 0.7;
+    x.shadowColor = x.strokeStyle;
+    x.shadowBlur = 15;
+    x.stroke();
+    x.globalAlpha = 1;
+    x.shadowBlur = 0;
+
+    // Also add glitter along the path
+    if (Math.random() < 0.3) Glitter.burst(px, py, 3);
+
+    lastX = px; lastY = py;
+  };
+  const stop = () => { drawing = false; };
+
+  const clear = () => { x.clearRect(0, 0, c.width, c.height); };
+
+  // Fade paint over time so it doesn't accumulate forever
+  setInterval(() => {
+    x.globalCompositeOperation = 'destination-out';
+    x.fillStyle = 'rgba(0,0,0,0.02)';
+    x.fillRect(0, 0, c.width, c.height);
+    x.globalCompositeOperation = 'source-over';
+  }, 100);
+
+  return { start, move, stop, clear, isActive: () => drawing };
+})();
+
+// ── DOM Element Manager (prevents clutter) ──
+const DOMManager = (() => {
+  const MAX_BUBBLES = 8;
+  const MAX_STARS = 6;
+  const MAX_EGGS = 3;
+  const MAX_UNICORNS = 4;
+
+  const counts = { bubbles: 0, stars: 0, eggs: 0, unicorns: 0 };
+
+  const canSpawn = (type) => counts[type] < {bubbles:MAX_BUBBLES, stars:MAX_STARS, eggs:MAX_EGGS, unicorns:MAX_UNICORNS}[type];
+  const add = (type) => counts[type]++;
+  const remove = (type) => counts[type] = Math.max(0, counts[type]-1);
+
+  return { canSpawn, add, remove, counts };
+})();
+
+// ── State ──
+const S = {
+  sparkles: 0,
+  unicorns: 0,
+  started: false,
+  mode: 'tap',
+  magicMeter: 0,
+  currentMilestone: 0,
+  unlockedAccessories: [],
+  celebrationActive: false
+};
+
+// Milestones with unlockables
+const MILESTONES = [
+  { at: 10,  emoji: '🎀', name: 'Bow',         msg: 'Your unicorn got a bow!' },
+  { at: 25,  emoji: '👑', name: 'Crown',       msg: 'A royal crown appeared!' },
+  { at: 50,  emoji: '🌈', name: 'Rainbow',     msg: 'Rainbow magic unlocked!' },
+  { at: 75,  emoji: '💎', name: 'Diamond',     msg: 'A sparkling diamond!' },
+  { at: 100, emoji: '🏆', name: 'Champion',    msg: 'You are a Unicorn Champion!' },
+  { at: 150, emoji: '⭐', name: 'Superstar',   msg: 'SUPERSTAR mode!' },
+  { at: 200, emoji: '🦄', name: 'Unicorn Herd', msg: 'You built a unicorn herd!' },
+];
+
+const scene = document.getElementById('gameScene');
+const sparkleEl = document.getElementById('sparkleCount');
+const unicornEl = document.getElementById('unicornCount');
+const magicBtn = document.getElementById('magicBtn');
+const titleScreen = document.getElementById('titleScreen');
+const milestoneFill = document.getElementById('milestoneFill');
+const milestoneLabel = document.getElementById('milestoneLabel');
+const celebration = document.getElementById('celebration');
+const celEmoji = document.getElementById('celEmoji');
+const celText = document.getElementById('celText');
+const celSub = document.getElementById('celSub');
+const celDismiss = document.getElementById('celDismiss');
+const paintIndicator = document.getElementById('paintIndicator');
+
+function bump(el) { el.classList.add('bump'); setTimeout(()=>el.classList.remove('bump'), 150); }
+function addSparkles(n) {
+  S.sparkles += n;
+  sparkleEl.textContent = S.sparkles;
+  bump(sparkleEl);
+  checkMilestone();
+  updateMagicMeter(n);
+}
+function addUnicorns(n) { S.unicorns += n; unicornEl.textContent = S.unicorns; bump(unicornEl); }
+
+// ── Milestone System ──
+function checkMilestone() {
+  if (S.celebrationActive) return;
+  const next = MILESTONES[S.currentMilestone];
+  if (!next) return;
+
+  // Update progress bar
+  const prevAt = S.currentMilestone > 0 ? MILESTONES[S.currentMilestone-1].at : 0;
+  const progress = ((S.sparkles - prevAt) / (next.at - prevAt)) * 100;
+  milestoneFill.style.width = Math.min(100, Math.max(0, progress)) + '%';
+  milestoneLabel.textContent = `Next: ${next.emoji} ${next.name} (${next.at}✨)`;
+
+  if (S.sparkles >= next.at) {
+    triggerMilestone(next);
+  }
+}
+
+function triggerMilestone(m) {
+  S.currentMilestone++;
+  S.celebrationActive = true;
+  S.unlockedAccessories.push(m.emoji);
+
+  // Show celebration
+  celEmoji.textContent = m.emoji;
+  celText.textContent = m.msg;
+  celSub.textContent = `${S.sparkles} sparkles collected!`;
+  celebration.classList.add('show');
+
+  SFX.milestone();
+
+  // Big glitter burst
+  for (let i = 0; i < 8; i++) {
+    setTimeout(() => {
+      Glitter.burst(Math.random()*innerWidth, Math.random()*innerHeight, 30);
+    }, i * 100);
+  }
+
+  // Update next milestone label
+  const nextM = MILESTONES[S.currentMilestone];
+  if (nextM) {
+    milestoneLabel.textContent = `Next: ${nextM.emoji} ${nextM.name} (${nextM.at}✨)`;
+    milestoneFill.style.width = '0%';
+  } else {
+    milestoneLabel.textContent = '🌟 All unlocked! Keep collecting! 🌟';
+    milestoneFill.style.width = '100%';
+  }
+}
+
+celDismiss.addEventListener('click', (e) => {
+  e.stopPropagation();
+  celebration.classList.remove('show');
+  S.celebrationActive = false;
+  // Spawn celebratory unicorns
+  for (let i = 0; i < 3; i++) setTimeout(() => spawnUnicorn(), i * 300);
+});
+
+// ── Magic Meter ──
+function updateMagicMeter(n) {
+  S.magicMeter += n;
+  if (S.magicMeter >= 50) {
+    magicBtn.classList.add('ready');
+    magicBtn.textContent = '🦄 MEGA MAGIC! 🦄';
+  } else {
+    magicBtn.textContent = `🦄 MAGIC (${S.magicMeter}/50)`;
+  }
+}
+
+function doMagicBurst() {
+  const isMega = S.magicMeter >= 50;
+  
+  if (isMega) {
+    // MEGA BURST - full effect
+    S.magicMeter = 0;
+    magicBtn.classList.remove('ready');
+    magicBtn.textContent = '🦄 MAGIC (0/50)';
+
+    const burst = document.createElement('div');
+    burst.className = 'mega-burst';
+    document.body.appendChild(burst);
+    setTimeout(() => burst.remove(), 1000);
+
+    for (let i = 0; i < 8; i++) {
+      setTimeout(() => Glitter.burst(
+        Math.random()*innerWidth, Math.random()*innerHeight, 30
+      ), i * 50);
+    }
+
+    for (let i = 0; i < 5; i++) setTimeout(() => spawnBubble(), i * 200);
+    for (let i = 0; i < 2; i++) setTimeout(() => spawnUnicorn(), i * 300);
+    for (let i = 0; i < 2; i++) setTimeout(() => spawnEgg(), i * 400 + 500);
+    for (let i = 0; i < 4; i++) setTimeout(() => spawnStar(), i * 250);
+
+    addSparkles(20);
+    SFX.magic();
+  } else {
+    // MINI BURST - smaller effect, still fun
+    for (let i = 0; i < 3; i++) {
+      setTimeout(() => Glitter.burst(
+        Math.random()*innerWidth, Math.random()*innerHeight, 15
+      ), i * 80);
+    }
+    for (let i = 0; i < 2; i++) setTimeout(() => spawnBubble(), i * 200);
+    setTimeout(() => spawnStar(), 300);
+    SFX.sparkle();
+  }
+}
+
+magicBtn.addEventListener('click', (e) => { e.stopPropagation(); doMagicBurst(); });
+magicBtn.addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); doMagicBurst(); }, {passive: false});
+
+// ── BUBBLES ──
+const BUBBLE_EMOJIS = ['💖','⭐','🌟','💫','🦄','🌈','💝','🎀','👑','💎','🧁','🩰','🌸','💕','✨'];
+
+function spawnBubble() {
+  if (!S.started || !DOMManager.canSpawn('bubbles')) return;
+  DOMManager.add('bubbles');
+
+  const size = 60 + Math.random() * 45;
+  const el = document.createElement('div');
+  el.className = 'bubble';
+  const emoji = BUBBLE_EMOJIS[Math.floor(Math.random() * BUBBLE_EMOJIS.length)];
+  el.innerHTML = `<div class="bubble-inner">${emoji}</div>`;
+  el.style.width = el.style.height = size + 'px';
+  el.style.left = (20 + Math.random() * (innerWidth - size - 40)) + 'px';
+  el.style.bottom = '-' + (size + 20) + 'px';
+  el.style.setProperty('--rise-time', (5 + Math.random() * 4) + 's');
+  el.style.setProperty('--sway', (Math.random() * 60 - 30) + 'px');
+  el.style.setProperty('--emoji-size', (size * 0.45) + 'px');
+  scene.appendChild(el);
+
+  const popBubble = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const r = el.getBoundingClientRect();
+    const cx = r.left + r.width/2, cy = r.top + r.height/2;
+    Glitter.burst(cx, cy, 20);
+    SFX.pop();
+    addSparkles(1);
+
+    // Pop ring
+    const ring = document.createElement('div');
+    ring.className = 'pop-ring';
+    ring.style.left = cx + 'px'; ring.style.top = cy + 'px';
+    ring.style.borderColor = `hsl(${330+Math.random()*30},100%,75%)`;
+    scene.appendChild(ring);
+    setTimeout(() => ring.remove(), 600);
+
+    DOMManager.remove('bubbles');
+    el.remove();
+  };
+
+  el.addEventListener('pointerdown', popBubble);
+  el.addEventListener('touchstart', (e) => { e.preventDefault(); popBubble(e); }, {passive:false});
+
+  const dur = parseFloat(el.style.getPropertyValue('--rise-time')) * 1000;
+  setTimeout(() => {
+    if (el.parentNode) { el.remove(); DOMManager.remove('bubbles'); }
+  }, dur + 200);
+}
+
+// ── UNICORNS ──
+function spawnUnicorn() {
+  if (!S.started || !DOMManager.canSpawn('unicorns')) return;
+  DOMManager.add('unicorns');
+
+  const el = document.createElement('div');
+  el.className = 'unicorn';
+  el.textContent = '🦄';
+  const dir = Math.random() > 0.5 ? 1 : -1;
+  const y = 80 + Math.random() * (innerHeight - 250);
+  el.style.top = y + 'px';
+  el.style.setProperty('--dir', dir);
+  el.style.setProperty('--walk-speed', (6 + Math.random() * 5) + 's');
+
+  if (dir === 1) { el.style.left = '-100px'; }
+  else { el.style.right = '-100px'; }
+
+  el.classList.add('walking');
+  scene.appendChild(el);
+  SFX.unicorn();
+
+  const catchUnicorn = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const r = el.getBoundingClientRect();
+    Glitter.burst(r.left + r.width/2, r.top + r.height/2, 30);
+    SFX.sparkle();
+    addSparkles(5);
+    addUnicorns(1);
+    el.classList.remove('walking');
+    el.classList.add('caught');
+    setTimeout(() => { el.remove(); DOMManager.remove('unicorns'); }, 500);
+  };
+
+  el.addEventListener('pointerdown', catchUnicorn);
+  el.addEventListener('touchstart', (e) => { e.preventDefault(); catchUnicorn(e); }, {passive:false});
+
+  const dur = parseFloat(el.style.getPropertyValue('--walk-speed')) * 1000;
+  setTimeout(() => {
+    if (el.parentNode && !el.classList.contains('caught')) {
+      el.remove(); DOMManager.remove('unicorns');
+    }
+  }, dur + 200);
+}
+
+// ── EGGS ──
+function spawnEgg() {
+  if (!S.started || !DOMManager.canSpawn('eggs')) return;
+  DOMManager.add('eggs');
+
+  const el = document.createElement('div');
+  el.className = 'egg';
+  el.textContent = '🥚';
+  el.style.left = (40 + Math.random() * (innerWidth - 120)) + 'px';
+  el.style.top = (100 + Math.random() * (innerHeight - 250)) + 'px';
+  scene.appendChild(el);
+
+  let taps = 0;
+  const maxTaps = 3 + Math.floor(Math.random() * 2);
+
+  const tapEgg = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    taps++;
+    SFX.crack();
+    const r = el.getBoundingClientRect();
+    Glitter.burst(r.left + r.width/2, r.top + r.height/2, 8);
+
+    if (taps < maxTaps) {
+      el.classList.remove('shaking');
+      void el.offsetWidth;
+      el.classList.add('shaking');
+      // Visual progress
+      el.style.filter = `drop-shadow(0 0 ${taps*5}px #ff69b4) drop-shadow(0 6px 12px rgba(255,105,180,.4))`;
+    } else {
+      // HATCH!
+      const cx = r.left + r.width/2, cy = r.top + r.height/2;
+      Glitter.burst(cx, cy, 40);
+      SFX.hatch();
+      addSparkles(10);
+      addUnicorns(1);
+
+      // Show hatched unicorn
+      const hatched = document.createElement('div');
+      hatched.style.cssText = `position:absolute;left:${cx-40}px;top:${cy-40}px;font-size:80px;pointer-events:none;z-index:16;animation:hatchPop .8s ease-out forwards`;
+      hatched.textContent = '🦄';
+      scene.appendChild(hatched);
+      setTimeout(() => hatched.remove(), 800);
+
+      DOMManager.remove('eggs');
+      el.remove();
+    }
+  };
+
+  el.addEventListener('pointerdown', tapEgg);
+  el.addEventListener('touchstart', (e) => { e.preventDefault(); tapEgg(e); }, {passive:false});
+
+  setTimeout(() => {
+    if (el.parentNode) { el.remove(); DOMManager.remove('eggs'); }
+  }, 12000);
+}
+
+// ── STARS (tap to collect) ──
+function spawnStar() {
+  if (!S.started || !DOMManager.canSpawn('stars')) return;
+  DOMManager.add('stars');
+
+  const el = document.createElement('div');
+  el.className = 'star';
+  el.textContent = ['✨','⭐','🌟','💫'][Math.floor(Math.random()*4)];
+  el.style.left = (30 + Math.random() * (innerWidth - 80)) + 'px';
+  el.style.top = (80 + Math.random() * (innerHeight - 200)) + 'px';
+  scene.appendChild(el);
+
+  const collect = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const r = el.getBoundingClientRect();
+    Glitter.burst(r.left + r.width/2, r.top + r.height/2, 15);
+    SFX.collect();
+    addSparkles(3);
+    el.classList.add('collected');
+    setTimeout(() => { el.remove(); DOMManager.remove('stars'); }, 400);
+  };
+
+  el.addEventListener('pointerdown', collect);
+  el.addEventListener('touchstart', (e) => { e.preventDefault(); collect(e); }, {passive:false});
+
+  // Auto-remove after 5 seconds
+  setTimeout(() => {
+    if (el.parentNode && !el.classList.contains('collected')) {
+      el.remove(); DOMManager.remove('stars');
+    }
+  }, 5000);
+}
+
+// ── BACKGROUND TAP (in tap mode) ──
+function tapSparkle(px, py) {
+  Glitter.burst(px, py, 12);
+  SFX.sparkle();
+
+  // Temporary sparkle that fades quickly
+  const star = document.createElement('div');
+  star.style.cssText = `position:absolute;left:${px-18}px;top:${py-18}px;font-size:36px;pointer-events:none;z-index:10;animation:starPulse .5s ease-in-out forwards;opacity:0`;
+  star.textContent = ['✨','💖','⭐'][Math.floor(Math.random()*3)];
+  scene.appendChild(star);
+  // Animate in then out
+  star.animate([
+    { transform: 'scale(0) rotate(0)', opacity: 0 },
+    { transform: 'scale(1.2) rotate(15deg)', opacity: 1, offset: 0.3 },
+    { transform: 'scale(0.8) rotate(-10deg)', opacity: 0.8, offset: 0.7 },
+    { transform: 'scale(0) rotate(30deg)', opacity: 0 }
+  ], { duration: 800, easing: 'ease-out' });
+  setTimeout(() => star.remove(), 800);
+}
+
+// ── MODE SWITCHING ──
+document.querySelectorAll('.mode-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    S.mode = btn.dataset.mode;
+
+    if (S.mode === 'paint') {
+      paintIndicator.classList.add('show');
+      setTimeout(() => paintIndicator.classList.remove('show'), 1500);
+    }
+  });
+});
+
+// ── POINTER EVENTS ──
+let isPointerDown = false;
+
+scene.addEventListener('pointerdown', (e) => {
+  if (!S.started || S.celebrationActive) return;
+  isPointerDown = true;
+
+  if (S.mode === 'paint') {
+    PaintCanvas.start(e.clientX, e.clientY);
+    SFX.paint();
+  } else {
+    tapSparkle(e.clientX, e.clientY);
+  }
+});
+
+scene.addEventListener('pointermove', (e) => {
+  if (!isPointerDown || !S.started || S.celebrationActive) return;
+  if (S.mode === 'paint') {
+    PaintCanvas.move(e.clientX, e.clientY);
+  }
+});
+
+scene.addEventListener('pointerup', () => {
+  isPointerDown = false;
+  PaintCanvas.stop();
+});
+
+scene.addEventListener('pointercancel', () => {
+  isPointerDown = false;
+  PaintCanvas.stop();
+});
+
+// Touch events
+scene.addEventListener('touchstart', (e) => {
+  if (!S.started || S.celebrationActive) return;
+  e.preventDefault();
+  isPointerDown = true;
+  for (const t of e.changedTouches) {
+    if (S.mode === 'paint') {
+      PaintCanvas.start(t.clientX, t.clientY);
+      SFX.paint();
+    } else {
+      tapSparkle(t.clientX, t.clientY);
+    }
+  }
+}, {passive: false});
+
+scene.addEventListener('touchmove', (e) => {
+  if (!isPointerDown || !S.started) return;
+  e.preventDefault();
+  for (const t of e.changedTouches) {
+    if (S.mode === 'paint') {
+      PaintCanvas.move(t.clientX, t.clientY);
+    }
+  }
+}, {passive: false});
+
+scene.addEventListener('touchend', () => {
+  isPointerDown = false;
+  PaintCanvas.stop();
+});
+
+// ── START GAME ──
+document.getElementById('playBtn').addEventListener('click', () => {
+  SFX.init();
+  S.started = true;
+  titleScreen.classList.add('hidden');
+  setTimeout(() => titleScreen.style.display = 'none', 800);
+
+  // Welcome sequence
+  setTimeout(() => {
+    for (let i = 0; i < 4; i++) {
+      setTimeout(() => {
+        Glitter.burst(Math.random()*innerWidth, Math.random()*innerHeight, 20);
+        SFX.sparkle();
+      }, i * 150);
+    }
+  }, 300);
+  setTimeout(() => spawnUnicorn(), 600);
+  setTimeout(() => spawnBubble(), 800);
+  setTimeout(() => spawnBubble(), 1200);
+  setTimeout(() => spawnEgg(), 1500);
+  setTimeout(() => spawnStar(), 1000);
+  setTimeout(() => spawnStar(), 1800);
+});
+
+// ── SPAWNERS (varied timing for variety) ──
+setInterval(() => { if (S.started) spawnBubble(); }, 2000);
+setInterval(() => { if (S.started && Math.random() < 0.5) spawnUnicorn(); }, 8000);
+setInterval(() => { if (S.started && Math.random() < 0.4) spawnEgg(); }, 10000);
+setInterval(() => { if (S.started && Math.random() < 0.6) spawnStar(); }, 4000);
+
+// ── CLOUDS ──
+function spawnCloud() {
+  const c = document.createElement('div');
+  c.className = 'cloud';
+  c.textContent = ['☁️','🌸','💗'][Math.floor(Math.random()*3)];
+  c.style.top = (5 + Math.random() * 25) + '%';
+  const sp = 25 + Math.random() * 20;
+  c.style.setProperty('--speed', sp + 's');
+  c.style.left = '-100px';
+  document.body.appendChild(c);
+  setTimeout(() => c.remove(), sp * 1000);
+}
+setInterval(spawnCloud, 12000);
+setTimeout(spawnCloud, 500);
+
+// ── Hatch pop animation (injected) ──
+const hatchStyle = document.createElement('style');
+hatchStyle.textContent = `@keyframes hatchPop{0%{transform:scale(0) rotate(-20deg);opacity:0}30%{transform:scale(1.5) rotate(10deg);opacity:1}60%{transform:scale(1.2) rotate(-5deg);opacity:1}100%{transform:scale(1) translateY(-30px) rotate(0);opacity:0}}`;
+document.head.appendChild(hatchStyle);
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"75124c326cb447fe934cde04713ae013","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>
