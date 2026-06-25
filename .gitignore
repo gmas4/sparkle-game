@@ -1,0 +1,17 @@
+# Dependencies (only used for local browser testing, not needed to run the game)
+node_modules/
+package.json
+package-lock.json
+
+# OS / editor junk
+.DS_Store
+*.log
+
+# Scratch test artifacts
+*.png
+verify_*.mjs
+test_*.mjs
+
+# …but keep the real deploy image assets
+!social-preview.png
+!apple-touch-icon.png

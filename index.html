@@ -3,12 +3,37 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>✨ Sparkle Unicorn Magic ✨</title>
+<title>✨ Sparkle Unicorn Magic Garden ✨</title>
+<meta name="description" content="A magical tap, paint & sparkle game for little ones — pop bubbles, catch unicorns, hatch eggs, and cast surprise spells in a fantasy garden!">
+<meta name="theme-color" content="#ff69b4">
+
+<!-- Favicon (unicorn emoji, no extra file needed) -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>%F0%9F%A6%84</text></svg>">
+
+<!-- Add to Home Screen (iPad / phone full-screen app) -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Sparkle">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+<!-- Social share preview (iMessage / WhatsApp / Facebook / Twitter) -->
+<meta property="og:title" content="✨ Sparkle Unicorn Magic Garden ✨">
+<meta property="og:description" content="A magical tap, paint & sparkle game for little ones — pop bubbles, catch unicorns, and cast surprise spells!">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://sparklespop.com">
+<meta property="og:image" content="https://sparklespop.com/social-preview.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="✨ Sparkle Unicorn Magic Garden ✨">
+<meta name="twitter:description" content="A magical tap, paint & sparkle game for little ones!">
+<meta name="twitter:image" content="https://sparklespop.com/social-preview.png">
+
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;height:100%;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
-body{background:linear-gradient(170deg,#ffe0f0 0%,#ffb6d9 25%,#ff8ec4 50%,#ffc0cb 75%,#fff0f5 100%);font-family:'Fredoka','Baloo 2',sans-serif}
+body{background:linear-gradient(135deg,#ffe0f0 0%,#ffb6d9 18%,#ff8ec4 36%,#d9a7ff 54%,#a7c8ff 72%,#fff0f5 100%);background-size:400% 400%;animation:auroraShift 20s ease infinite;font-family:'Fredoka','Baloo 2',sans-serif}
+@keyframes auroraShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
 
 /* HIDE external overlays/watermarks that might distract toddlers */
 iframe:not(#gameFrame),.watermark,[id*="badge"],[class*="watermark"]{display:none!important;pointer-events:none!important;opacity:0!important}
@@ -44,6 +69,18 @@ iframe:not(#gameFrame),.watermark,[id*="badge"],[class*="watermark"]{display:non
 @keyframes starPulse{0%{transform:scale(1) rotate(-5deg)}100%{transform:scale(1.15) rotate(5deg)}}
 .star.collected{transition:all .4s ease-in;opacity:0;transform:scale(2)!important}
 
+/* === BUTTERFLY (flutters across, tap to catch) === */
+.butterfly{position:absolute;cursor:pointer;z-index:12;font-size:48px;filter:drop-shadow(0 4px 10px rgba(196,77,255,.4));animation:butterflyFly var(--fly-speed,9s) linear forwards}
+@keyframes butterflyFly{
+  0%{transform:translate(-120px,0) scaleX(var(--dir,1))}
+  20%{transform:translate(20vw,-50px) scaleX(var(--dir,1))}
+  40%{transform:translate(40vw,30px) scaleX(var(--dir,1))}
+  60%{transform:translate(60vw,-40px) scaleX(var(--dir,1))}
+  80%{transform:translate(80vw,25px) scaleX(var(--dir,1))}
+  100%{transform:translate(calc(100vw + 120px),0) scaleX(var(--dir,1))}
+}
+.butterfly.caught{transition:all .5s ease-in;opacity:0;transform:scale(2.2) rotate(40deg)!important}
+
 /* === POP RING === */
 .pop-ring{position:absolute;border-radius:50%;border:3px solid;pointer-events:none;z-index:15;animation:popRing .6s ease-out forwards}
 @keyframes popRing{0%{width:10px;height:10px;opacity:1;margin-left:-5px;margin-top:-5px}100%{width:120px;height:120px;opacity:0;margin-left:-60px;margin-top:-60px}}
@@ -62,11 +99,32 @@ iframe:not(#gameFrame),.watermark,[id*="badge"],[class*="watermark"]{display:non
 /* === MODE BUTTONS === */
 #modeBar{position:fixed;bottom:15px;left:50%;transform:translateX(-50%);z-index:50;display:flex;gap:8px}
 .mode-btn{font-family:'Baloo 2',sans-serif;font-size:14px;font-weight:700;color:#ff1493;background:#fff;border:3px solid #ff69b4;border-radius:40px;padding:8px 16px;cursor:pointer;box-shadow:0 4px 15px rgba(255,20,147,.3);transition:all .2s;white-space:nowrap}
-.mode-btn.active{background:linear-gradient(135deg,#ff69b4,#ff1493);color:#fff;border-color:#fff}
+.mode-btn.active{background:linear-gradient(135deg,#ff69b4,#ff1493);color:#fff;border-color:#fff;animation:modeGlow 1.4s ease-in-out infinite}
+@keyframes modeGlow{0%,100%{box-shadow:0 4px 15px rgba(255,20,147,.4)}50%{box-shadow:0 4px 22px rgba(255,20,147,.7),0 0 26px rgba(255,182,217,.7)}}
 .mode-btn:active{transform:scale(.92)}
 
+/* === MUSIC TOGGLE === */
+#musicBtn{position:fixed;bottom:15px;left:15px;z-index:50;width:46px;height:46px;font-size:20px;border-radius:50%;background:#fff;border:3px solid #ff69b4;box-shadow:0 4px 15px rgba(255,20,147,.3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .2s;line-height:1}
+#musicBtn:active{transform:scale(.9)}
+#musicBtn.off{opacity:.6;border-color:#ffb6d9}
+
+/* === MILESTONE RAINBOW ARC === */
+.rainbow-arc{position:fixed;left:50%;bottom:-42vh;width:150vw;max-width:1300px;aspect-ratio:1;transform-origin:50% 100%;transform:translateX(-50%) scale(.4);border-radius:50%;z-index:1;pointer-events:none;opacity:0;
+  background:radial-gradient(circle,
+    transparent 0 59%,
+    rgba(255,40,60,.6) 59% 62%,
+    rgba(255,140,0,.6) 62% 65%,
+    rgba(255,230,0,.6) 65% 68%,
+    rgba(60,200,60,.55) 68% 71%,
+    rgba(40,150,255,.55) 71% 74%,
+    rgba(150,40,255,.55) 74% 77%,
+    transparent 77%);
+  filter:drop-shadow(0 0 18px rgba(255,255,255,.5));animation:rainbowArc 3.6s ease-out forwards}
+@keyframes rainbowArc{0%{opacity:0;transform:translateX(-50%) scale(.4)}25%{opacity:.95;transform:translateX(-50%) scale(1)}80%{opacity:.9;transform:translateX(-50%) scale(1)}100%{opacity:0;transform:translateX(-50%) scale(1.05)}}
+
 /* === MAGIC BUTTON === */
-#magicBtn{position:fixed;bottom:65px;right:15px;z-index:50;font-family:'Baloo 2',sans-serif;font-size:16px;font-weight:800;color:#fff;background:linear-gradient(135deg,#ff69b4,#ff1493);padding:10px 20px;border-radius:50px;border:3px solid rgba(255,255,255,.6);box-shadow:0 6px 20px rgba(255,20,147,.5);cursor:pointer;transition:all .2s}
+#magicBtn{position:fixed;bottom:65px;right:15px;z-index:50;font-family:'Baloo 2',sans-serif;font-size:16px;font-weight:800;color:#fff;background:linear-gradient(135deg,#ff69b4,#ff1493,#c44dff);background-size:200% 200%;animation:magicShimmer 4s ease infinite;padding:10px 20px;border-radius:50px;border:3px solid rgba(255,255,255,.6);box-shadow:0 6px 20px rgba(255,20,147,.5);cursor:pointer;transition:transform .2s}
+@keyframes magicShimmer{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
 #magicBtn.ready{animation:magicPulse 1s ease-in-out infinite;transform:scale(1.1)}
 @keyframes magicPulse{0%,100%{box-shadow:0 6px 20px rgba(255,20,147,.5)}50%{box-shadow:0 6px 40px rgba(255,20,147,.8),0 0 50px rgba(255,105,180,.5)}}
 #magicBtn:active{transform:scale(.9)}
@@ -107,6 +165,54 @@ iframe:not(#gameFrame),.watermark,[id*="badge"],[class*="watermark"]{display:non
 .cloud{position:fixed;z-index:0;opacity:.4;font-size:50px;animation:cloudDrift var(--speed,30s) linear infinite;pointer-events:none}
 @keyframes cloudDrift{0%{transform:translateX(-100px)}100%{transform:translateX(calc(100vw + 100px))}}
 
+/* === TWINKLING STAR FIELD === */
+.twinkle-stars{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:radial-gradient(1.5px 1.5px at 12% 18%,#fff,transparent),radial-gradient(2px 2px at 28% 62%,#fff5fb,transparent),radial-gradient(1px 1px at 48% 12%,#fff,transparent),radial-gradient(2px 2px at 67% 78%,#ffe9f6,transparent),radial-gradient(1.5px 1.5px at 82% 28%,#fff,transparent),radial-gradient(1px 1px at 90% 64%,#fff,transparent),radial-gradient(2px 2px at 36% 88%,#fff,transparent),radial-gradient(1.5px 1.5px at 58% 44%,#fff,transparent);animation:twinkle 3.5s ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:.35}50%{opacity:1}}
+
+/* === POINTER WAND GLOW (follows finger) === */
+#wandGlow{position:fixed;top:0;left:0;width:120px;height:120px;margin:-60px 0 0 -60px;border-radius:50%;pointer-events:none;z-index:8;opacity:0;background:radial-gradient(circle,rgba(255,255,255,.55),rgba(255,182,217,.35) 40%,rgba(199,77,255,.18) 65%,transparent 75%);transition:opacity .25s;mix-blend-mode:screen}
+#wandGlow.show{opacity:1}
+
+/* === MAGIC FINGER TRAIL === */
+.trail-spark{position:fixed;pointer-events:none;z-index:9;font-size:22px;will-change:transform,opacity;animation:trailFade .7s ease-out forwards}
+@keyframes trailFade{0%{transform:translate(-50%,-50%) scale(.4) rotate(0);opacity:0}20%{opacity:1}100%{transform:translate(-50%,-130%) scale(1.1) rotate(40deg);opacity:0}}
+
+/* === SHOOTING STARS (magic spell) === */
+.shooting-star{position:fixed;top:0;left:0;font-size:34px;pointer-events:none;z-index:62;filter:drop-shadow(0 0 10px #fff);will-change:transform,opacity}
+
+/* === SPELL FLASH (magic button) === */
+#spellFlash{position:fixed;inset:0;z-index:58;pointer-events:none;opacity:0;background:radial-gradient(circle at 50% 60%,rgba(255,255,255,.85),rgba(255,140,210,.5) 35%,rgba(199,77,255,.3) 60%,transparent 80%)}
+#spellFlash.flash{animation:spellFlash .9s ease-out}
+@keyframes spellFlash{0%{opacity:0}15%{opacity:1}100%{opacity:0}}
+
+/* === SCREEN SHAKE === */
+@keyframes screenShake{0%,100%{transform:translate(0,0)}20%{transform:translate(-6px,4px)}40%{transform:translate(6px,-4px)}60%{transform:translate(-4px,-4px)}80%{transform:translate(4px,4px)}}
+body.shake{animation:screenShake .5s ease-in-out}
+
+/* === FLOATING TITLE EMOJIS === */
+.float-emoji{position:absolute;pointer-events:none;font-size:clamp(26px,5vw,42px);opacity:.85;animation:floatUp var(--ft,7s) ease-in-out infinite;filter:drop-shadow(0 4px 10px rgba(255,20,147,.3))}
+@keyframes floatUp{0%{transform:translateY(20px) rotate(-10deg);opacity:0}15%{opacity:.85}85%{opacity:.85}100%{transform:translateY(-40px) rotate(10deg);opacity:0}}
+
+/* === NIGHT-TIME THEME (magic can switch day <-> night) === */
+#nightSky{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0;transition:opacity 1.3s ease;background:linear-gradient(160deg,#140a33 0%,#241258 35%,#3d2270 60%,#5a2d7a 85%,#140a33 100%)}
+body.night #nightSky{opacity:1}
+body.night .twinkle-stars{opacity:1;filter:brightness(1.8) drop-shadow(0 0 3px #fff)}
+body.night .rainbow{opacity:.04}
+#moon{position:fixed;top:7%;right:12%;font-size:64px;z-index:1;opacity:0;transition:opacity 1.3s ease,transform 1.3s ease;transform:scale(.6) rotate(-20deg);pointer-events:none;filter:drop-shadow(0 0 24px rgba(255,255,200,.75))}
+body.night #moon{opacity:1;transform:scale(1) rotate(0)}
+
+/* === FALLING MAGIC (snow / flowers / hearts / candy) === */
+.falling{position:fixed;top:-60px;pointer-events:none;z-index:14;will-change:transform,opacity;animation:fallDown var(--fall,4s) linear forwards}
+@keyframes fallDown{0%{transform:translateY(-60px) translateX(0) rotate(0);opacity:0}10%{opacity:1}88%{opacity:1}100%{transform:translateY(106vh) translateX(var(--drift,40px)) rotate(var(--spin,200deg));opacity:.6}}
+
+/* === FLYING MAGIC (butterflies / unicorns swarm) === */
+.flyacross{position:fixed;pointer-events:none;z-index:14;will-change:transform;animation:flyAcross var(--fly,5s) linear forwards}
+@keyframes flyAcross{0%{transform:translateX(-14vw) translateY(0)}25%{transform:translateX(28vw) translateY(-45px)}50%{transform:translateX(52vw) translateY(35px)}75%{transform:translateX(76vw) translateY(-35px)}100%{transform:translateX(116vw) translateY(0)}}
+
+/* === GIANT BLOOM (spell announcement) === */
+.giant-bloom{position:fixed;top:46%;left:50%;font-size:clamp(90px,22vw,150px);pointer-events:none;z-index:61;transform:translate(-50%,-50%) scale(0);animation:giantBloom 1.5s ease-out forwards;filter:drop-shadow(0 0 32px rgba(255,255,255,.75))}
+@keyframes giantBloom{0%{transform:translate(-50%,-50%) scale(0) rotate(-30deg);opacity:0}40%{transform:translate(-50%,-50%) scale(1.35) rotate(10deg);opacity:1}70%{transform:translate(-50%,-50%) scale(1.1) rotate(-5deg);opacity:1}100%{transform:translate(-50%,-50%) scale(2.1) rotate(0);opacity:0}}
+
 /* === PAINT MODE INDICATOR === */
 #paintIndicator{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:49;font-family:'Baloo 2',sans-serif;font-size:24px;font-weight:800;color:#fff;text-shadow:0 2px 8px rgba(255,20,147,.6);background:rgba(255,105,180,.6);backdrop-filter:blur(8px);padding:8px 24px;border-radius:30px;border:2px solid rgba(255,255,255,.5);opacity:0;transition:opacity .3s;pointer-events:none}
 #paintIndicator.show{opacity:1}
@@ -124,10 +230,15 @@ iframe:not(#gameFrame),.watermark,[id*="badge"],[class*="watermark"]{display:non
 </head>
 <body>
 
+<div id="nightSky"></div>
 <div class="glitter-bg"></div>
+<div class="twinkle-stars"></div>
 <div class="rainbow"></div>
+<div id="moon">🌙</div>
 <canvas id="glitterCanvas"></canvas>
 <canvas id="paintCanvas"></canvas>
+<div id="wandGlow"></div>
+<div id="spellFlash"></div>
 <div id="gameScene"></div>
 
 <!-- Score -->
@@ -138,7 +249,7 @@ iframe:not(#gameFrame),.watermark,[id*="badge"],[class*="watermark"]{display:non
 
 <!-- Milestone progress -->
 <div id="milestoneBar"><div id="milestoneFill"></div></div>
-<div id="milestoneLabel">Next: 🎀 Bow (10✨)</div>
+<div id="milestoneLabel">Next: 🧚 Fairy Friend (5✨)</div>
 
 <!-- Mode buttons -->
 <div id="modeBar">
@@ -148,6 +259,9 @@ iframe:not(#gameFrame),.watermark,[id*="badge"],[class*="watermark"]{display:non
 
 <!-- Paint mode indicator -->
 <div id="paintIndicator">🎨 Drawing Mode!</div>
+
+<!-- Music toggle -->
+<button id="musicBtn" title="Music on/off">🎵</button>
 
 <!-- Magic button -->
 <button id="magicBtn">🦄 MAGIC (0/50)</button>
@@ -162,6 +276,7 @@ iframe:not(#gameFrame),.watermark,[id*="badge"],[class*="watermark"]{display:non
 
 <!-- Title -->
 <div id="titleScreen">
+  <div id="titleFloat" style="position:absolute;inset:0;overflow:hidden;pointer-events:none"></div>
   <div class="title-unicorn">🦄</div>
   <h1>Sparkle Unicorn<br>Magic Garden</h1>
   <p class="title-hint">Tap bubbles, catch unicorns, hatch eggs, paint with sparkles!</p>
@@ -193,8 +308,61 @@ const SFX = (() => {
       o.start(); o.stop(ctx.currentTime + d);
     } catch(e) {}
   };
+
+  // ── Gentle twinkly background music (soft pad + lullaby chimes) ──
+  let musicOn = false, musicTimer = null, musicGain = null, padNodes = [];
+  const SCALE = [523.25,587.33,659.25,783.99,880.00,1046.50,1174.66]; // C-major pentatonic-ish, no dissonance
+  const startMusic = () => {
+    if (!ctx || musicOn) return;
+    musicOn = true;
+    musicGain = ctx.createGain();
+    musicGain.gain.setValueAtTime(0.0001, ctx.currentTime);
+    musicGain.gain.linearRampToValueAtTime(1, ctx.currentTime + 2.5); // gentle fade-in
+    musicGain.connect(ctx.destination);
+
+    // warm soft pad (C + G), slowly breathing
+    const padGain = ctx.createGain(); padGain.gain.value = 0.014; padGain.connect(musicGain);
+    [130.81, 196.00].forEach(f => {
+      const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.value = f;
+      o.connect(padGain); o.start(); padNodes.push(o);
+    });
+    const lfo = ctx.createOscillator(); lfo.frequency.value = 0.08;
+    const lfoGain = ctx.createGain(); lfoGain.gain.value = 0.006;
+    lfo.connect(lfoGain).connect(padGain.gain); lfo.start(); padNodes.push(lfo);
+    padNodes.push(padGain);
+
+    const twinkle = () => {
+      if (!musicOn) return;
+      const f = SCALE[Math.floor(Math.random()*SCALE.length)];
+      try {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = 'sine'; o.frequency.value = f;
+        g.gain.setValueAtTime(0.0001, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.045, ctx.currentTime + 0.06);
+        g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 1.4);
+        o.connect(g).connect(musicGain);
+        o.start(); o.stop(ctx.currentTime + 1.5);
+      } catch(e) {}
+    };
+    twinkle();
+    musicTimer = setInterval(twinkle, 850);
+  };
+  const stopMusic = () => {
+    if (!ctx || !musicOn) return;
+    musicOn = false;
+    clearInterval(musicTimer); musicTimer = null;
+    try { musicGain.gain.cancelScheduledValues(ctx.currentTime);
+      musicGain.gain.setValueAtTime(musicGain.gain.value, ctx.currentTime);
+      musicGain.gain.linearRampToValueAtTime(0.0001, ctx.currentTime + 0.8); } catch(e) {}
+    const nodes = padNodes; padNodes = [];
+    setTimeout(() => nodes.forEach(n => { try { n.stop && n.stop(); } catch(e) {} }), 900);
+  };
+
   return {
     init,
+    startMusic, stopMusic,
+    isMusicOn: () => musicOn,
+    toggleMusic() { musicOn ? stopMusic() : startMusic(); return musicOn; },
     pop()     { note(800+Math.random()*400, 0.08, 'sine', 0.08); setTimeout(()=>note(1200+Math.random()*300, 0.06, 'sine', 0.05), 40); },
     sparkle() { const n=[880,1108,1320,1568,1760][Math.floor(Math.random()*5)]; note(n, 0.2, 'sine', 0.07); setTimeout(()=>note(n*1.5, 0.15, 'sine', 0.04), 60); },
     unicorn() { [523,659,784,1047].forEach((n,i)=>setTimeout(()=>note(n, 0.2, 'triangle', 0.08), i*80)); },
@@ -262,7 +430,7 @@ const PaintCanvas = (() => {
   const start = (px, py) => {
     drawing = true;
     lastX = px; lastY = py;
-    draw(px, py);
+    move(px, py);
   };
   const move = (px, py) => {
     if (!drawing) return;
@@ -307,10 +475,11 @@ const DOMManager = (() => {
   const MAX_STARS = 6;
   const MAX_EGGS = 3;
   const MAX_UNICORNS = 4;
+  const MAX_BUTTERFLIES = 4;
 
-  const counts = { bubbles: 0, stars: 0, eggs: 0, unicorns: 0 };
+  const counts = { bubbles: 0, stars: 0, eggs: 0, unicorns: 0, butterflies: 0 };
 
-  const canSpawn = (type) => counts[type] < {bubbles:MAX_BUBBLES, stars:MAX_STARS, eggs:MAX_EGGS, unicorns:MAX_UNICORNS}[type];
+  const canSpawn = (type) => counts[type] < {bubbles:MAX_BUBBLES, stars:MAX_STARS, eggs:MAX_EGGS, unicorns:MAX_UNICORNS, butterflies:MAX_BUTTERFLIES}[type];
   const add = (type) => counts[type]++;
   const remove = (type) => counts[type] = Math.max(0, counts[type]-1);
 
@@ -331,13 +500,16 @@ const S = {
 
 // Milestones with unlockables
 const MILESTONES = [
+  { at: 5,   emoji: '🧚', name: 'Fairy Friend', msg: 'A fairy came to play!' },
   { at: 10,  emoji: '🎀', name: 'Bow',         msg: 'Your unicorn got a bow!' },
+  { at: 20,  emoji: '🦋', name: 'Butterfly',   msg: 'Magic butterflies appeared!' },
   { at: 25,  emoji: '👑', name: 'Crown',       msg: 'A royal crown appeared!' },
   { at: 50,  emoji: '🌈', name: 'Rainbow',     msg: 'Rainbow magic unlocked!' },
   { at: 75,  emoji: '💎', name: 'Diamond',     msg: 'A sparkling diamond!' },
-  { at: 100, emoji: '🏆', name: 'Champion',    msg: 'You are a Unicorn Champion!' },
-  { at: 150, emoji: '⭐', name: 'Superstar',   msg: 'SUPERSTAR mode!' },
-  { at: 200, emoji: '🦄', name: 'Unicorn Herd', msg: 'You built a unicorn herd!' },
+  { at: 100, emoji: '🏰', name: 'Castle',      msg: 'Your fairytale castle appeared!' },
+  { at: 130, emoji: '🏆', name: 'Champion',    msg: 'You are a Unicorn Champion!' },
+  { at: 170, emoji: '⭐', name: 'Superstar',   msg: 'SUPERSTAR mode!' },
+  { at: 220, emoji: '🦄', name: 'Unicorn Herd', msg: 'You built a unicorn herd!' },
 ];
 
 const scene = document.getElementById('gameScene');
@@ -353,6 +525,165 @@ const celText = document.getElementById('celText');
 const celSub = document.getElementById('celSub');
 const celDismiss = document.getElementById('celDismiss');
 const paintIndicator = document.getElementById('paintIndicator');
+const wandGlow = document.getElementById('wandGlow');
+const spellFlash = document.getElementById('spellFlash');
+
+// ── Magical Pointer FX (wand glow + sparkle trail) ──
+const TRAIL_EMOJIS = ['✨','⭐','💫','🌟','💖','🪄','💕','🌸'];
+let _lastTrail = 0, _wandHide;
+function moveWand(px, py) {
+  wandGlow.style.transform = `translate(${px}px,${py}px)`;
+  wandGlow.classList.add('show');
+  clearTimeout(_wandHide);
+  _wandHide = setTimeout(() => wandGlow.classList.remove('show'), 450);
+}
+function magicTrail(px, py) {
+  const now = performance.now();
+  if (now - _lastTrail < 45) return; // throttle so mashing stays smooth
+  _lastTrail = now;
+  const s = document.createElement('div');
+  s.className = 'trail-spark';
+  s.textContent = TRAIL_EMOJIS[Math.floor(Math.random()*TRAIL_EMOJIS.length)];
+  s.style.left = px + 'px';
+  s.style.top = py + 'px';
+  s.style.fontSize = (14 + Math.random()*16) + 'px';
+  document.body.appendChild(s);
+  setTimeout(() => s.remove(), 700);
+  if (Math.random() < 0.45) Glitter.burst(px, py, 3);
+}
+
+// ── Spell effects (used by the MAGIC button) ──
+const SHOOTING_EMOJIS = ['🌟','💫','⭐','✨','🦄','🌈'];
+function shootingStars(n = 7) {
+  for (let i = 0; i < n; i++) {
+    setTimeout(() => {
+      const s = document.createElement('div');
+      s.className = 'shooting-star';
+      s.textContent = SHOOTING_EMOJIS[Math.floor(Math.random()*SHOOTING_EMOJIS.length)];
+      const fromX = -80, fromY = Math.random() * innerHeight * 0.7;
+      const toX = innerWidth + 80, toY = fromY + (Math.random()*200 - 100);
+      s.style.transform = `translate(${fromX}px,${fromY}px)`;
+      document.body.appendChild(s);
+      s.animate([
+        { transform: `translate(${fromX}px,${fromY}px) scale(.6) rotate(0deg)`, opacity: 0 },
+        { transform: `translate(${(fromX+toX)/2}px,${(fromY+toY)/2}px) scale(1.2) rotate(180deg)`, opacity: 1, offset: .5 },
+        { transform: `translate(${toX}px,${toY}px) scale(.5) rotate(360deg)`, opacity: 0 }
+      ], { duration: 900 + Math.random()*300, easing: 'ease-in-out' });
+      setTimeout(() => s.remove(), 1300);
+    }, i * 90);
+  }
+}
+function castSpell() {
+  spellFlash.classList.remove('flash'); void spellFlash.offsetWidth;
+  spellFlash.classList.add('flash');
+  document.body.classList.remove('shake'); void document.body.offsetWidth;
+  document.body.classList.add('shake');
+  setTimeout(() => document.body.classList.remove('shake'), 500);
+  shootingStars(8);
+}
+
+// ── Rainbow arc that sweeps the sky on a milestone ──
+function showRainbowArc() {
+  const arc = document.createElement('div');
+  arc.className = 'rainbow-arc';
+  document.body.appendChild(arc);
+  // sprinkle glitter along the arc as it appears
+  for (let i = 0; i < 6; i++) {
+    setTimeout(() => Glitter.burst(innerWidth*(0.15+i*0.14), innerHeight*0.35 - Math.sin(i/5*Math.PI)*innerHeight*0.18, 12), 200 + i*120);
+  }
+  setTimeout(() => arc.remove(), 3700);
+}
+
+// ── Falling magic (snow, flowers, hearts, candy…) ──
+function fallingMagic(emojis, n = 26, dur = 4.2) {
+  for (let i = 0; i < n; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'falling';
+      el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+      el.style.left = (Math.random()*100) + 'vw';
+      el.style.fontSize = (16 + Math.random()*26) + 'px';
+      el.style.setProperty('--fall', (dur*(0.7+Math.random()*0.7)) + 's');
+      el.style.setProperty('--drift', (Math.random()*140-70) + 'px');
+      el.style.setProperty('--spin', (Math.random()*720-360) + 'deg');
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), dur*1500);
+    }, i*55);
+  }
+}
+
+// ── Flying magic (butterflies, unicorns drifting across) ──
+function flyingMagic(emojis, n = 10, dur = 5.5) {
+  for (let i = 0; i < n; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'flyacross';
+      el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+      el.style.top = (10 + Math.random()*72) + 'vh';
+      el.style.left = '0';
+      el.style.fontSize = (28 + Math.random()*24) + 'px';
+      el.style.setProperty('--fly', (dur*(0.7+Math.random()*0.6)) + 's');
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), dur*1400);
+    }, i*120);
+  }
+}
+
+// ── Giant emoji bloom that announces a spell ──
+function giantBloom(emoji) {
+  const el = document.createElement('div');
+  el.className = 'giant-bloom';
+  el.textContent = emoji;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1550);
+}
+
+// ── Day <-> Night theme (magic can flip the whole world) ──
+let nightStarTimer = null;
+function setNight(on) {
+  document.body.classList.toggle('night', on);
+  if (on) {
+    if (!nightStarTimer) {
+      nightStarTimer = setInterval(() => {
+        if (document.body.classList.contains('night') && S.started) shootingStars(1 + (Math.random()<0.4?1:0));
+      }, 2200);
+    }
+  } else if (nightStarTimer) {
+    clearInterval(nightStarTimer); nightStarTimer = null;
+  }
+}
+function toggleNight() {
+  const goingNight = !document.body.classList.contains('night');
+  setNight(goingNight);
+  if (goingNight) { shootingStars(10); giantBloom('🌙'); }
+  else { for (let i=0;i<6;i++) setTimeout(()=>Glitter.burst(Math.random()*innerWidth, innerHeight*0.4*Math.random(), 18), i*90); giantBloom('☀️'); }
+}
+
+// ── Surprise spell book — the MAGIC button casts a random one each press ──
+const SPELLS = [
+  { run: () => { flyingMagic(['🦋','🧚','🪽','🦋'], 14, 6); giantBloom('🦋'); } },                 // butterfly swarm
+  { run: () => { fallingMagic(['❄️','✨','🌨️','⛄','❅'], 34, 5); giantBloom('❄️'); } },            // snow
+  { run: () => { fallingMagic(['🌸','🌷','🌺','🌼','🪻','💮'], 30, 5); giantBloom('🌷'); } },       // flower rain
+  { run: () => { fallingMagic(['💖','💕','💗','💝','❤️'], 28, 4.6); giantBloom('💖'); } },          // heart rain
+  { run: () => { shootingStars(12); fallingMagic(['⭐','🌟','✨','💫'], 22, 4); giantBloom('🌟'); } },// star shower
+  { run: () => { showRainbowArc(); giantBloom('🌈'); } },                                            // rainbow
+  { run: () => { flyingMagic(['🦄'], 7, 6); for (let i=0;i<3;i++) setTimeout(spawnUnicorn, i*200); giantBloom('🦄'); } }, // unicorn parade
+  { run: () => { for (let i=0;i<6;i++) setTimeout(spawnBubble, i*120); fallingMagic(['🫧','💫','🔮'], 18, 4.2); giantBloom('🫧'); } }, // bubbles
+  { run: () => { fallingMagic(['🍭','🍬','🧁','🍩','🍰','🍓'], 26, 5); giantBloom('🍭'); } },        // candy rain
+  { run: () => { for (let i=0;i<12;i++) setTimeout(()=>Glitter.burst(Math.random()*innerWidth, Math.random()*innerHeight, 30), i*55); fallingMagic(['✨','💫','⭐'], 20, 4); giantBloom('🪄'); } }, // magic dust
+  { run: () => toggleNight() },                                                                       // NIGHT / DAY switch
+  { run: () => toggleNight() },                                                                       // (weighted: night appears more often)
+];
+let _lastSpell = -1;
+function pickSpells(n) {
+  const picks = [];
+  const pool = SPELLS.map((_, i) => i).filter(i => i !== _lastSpell);
+  while (picks.length < n && pool.length) {
+    const idx = pool.splice(Math.floor(Math.random()*pool.length), 1)[0];
+    picks.push(SPELLS[idx]); _lastSpell = idx;
+  }
+  return picks;
+}
 
 function bump(el) { el.classList.add('bump'); setTimeout(()=>el.classList.remove('bump'), 150); }
 function addSparkles(n) {
@@ -393,6 +724,7 @@ function triggerMilestone(m) {
   celebration.classList.add('show');
 
   SFX.milestone();
+  showRainbowArc();
 
   // Big glitter burst
   for (let i = 0; i < 8; i++) {
@@ -433,9 +765,9 @@ function updateMagicMeter(n) {
 
 function doMagicBurst() {
   const isMega = S.magicMeter >= 50;
-  
+
   if (isMega) {
-    // MEGA BURST - full effect
+    // MEGA BURST — full-screen spell + TWO surprise spells at once
     S.magicMeter = 0;
     magicBtn.classList.remove('ready');
     magicBtn.textContent = '🦄 MAGIC (0/50)';
@@ -445,37 +777,51 @@ function doMagicBurst() {
     document.body.appendChild(burst);
     setTimeout(() => burst.remove(), 1000);
 
+    castSpell(); // flash + shooting stars + shake
+
     for (let i = 0; i < 8; i++) {
-      setTimeout(() => Glitter.burst(
-        Math.random()*innerWidth, Math.random()*innerHeight, 30
-      ), i * 50);
+      setTimeout(() => Glitter.burst(Math.random()*innerWidth, Math.random()*innerHeight, 30), i * 50);
     }
 
-    for (let i = 0; i < 5; i++) setTimeout(() => spawnBubble(), i * 200);
-    for (let i = 0; i < 2; i++) setTimeout(() => spawnUnicorn(), i * 300);
-    for (let i = 0; i < 2; i++) setTimeout(() => spawnEgg(), i * 400 + 500);
-    for (let i = 0; i < 4; i++) setTimeout(() => spawnStar(), i * 250);
+    // Two different surprise spells, staggered so each gets its moment
+    pickSpells(2).forEach((sp, i) => setTimeout(() => sp.run(), i * 450));
+
+    for (let i = 0; i < 3; i++) setTimeout(() => spawnBubble(), i * 200);
+    setTimeout(() => spawnUnicorn(), 250);
+    setTimeout(() => spawnEgg(), 600);
 
     addSparkles(20);
     SFX.magic();
   } else {
-    // MINI BURST - smaller effect, still fun
-    for (let i = 0; i < 3; i++) {
-      setTimeout(() => Glitter.burst(
-        Math.random()*innerWidth, Math.random()*innerHeight, 15
-      ), i * 80);
-    }
+    // EVERY press still casts ONE random surprise spell — never the same twice in a row
+    spellFlash.classList.remove('flash'); void spellFlash.offsetWidth;
+    spellFlash.classList.add('flash');
+    pickSpells(1)[0].run();
     for (let i = 0; i < 2; i++) setTimeout(() => spawnBubble(), i * 200);
-    setTimeout(() => spawnStar(), 300);
-    SFX.sparkle();
+    SFX.magic();
   }
 }
 
 magicBtn.addEventListener('click', (e) => { e.stopPropagation(); doMagicBurst(); });
 magicBtn.addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); doMagicBurst(); }, {passive: false});
 
+// ── MUSIC TOGGLE ──
+const musicBtn = document.getElementById('musicBtn');
+const updateMusicBtn = () => {
+  const on = SFX.isMusicOn();
+  musicBtn.textContent = on ? '🎵' : '🔇';
+  musicBtn.classList.toggle('off', !on);
+};
+musicBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  SFX.init();
+  SFX.toggleMusic();
+  updateMusicBtn();
+});
+
 // ── BUBBLES ──
-const BUBBLE_EMOJIS = ['💖','⭐','🌟','💫','🦄','🌈','💝','🎀','👑','💎','🧁','🩰','🌸','💕','✨'];
+const BUBBLE_EMOJIS = ['💖','⭐','🌟','💫','🦄','🌈','💝','🎀','👑','💎','🧁','🩰','🌸','💕','✨',
+  '🧚','🦋','🔮','🪄','🏰','🍄','🌷','🌺','🌻','🍭','🍬','🍩','🦢','🕊️','🦚','🐬','🐠','🌙','🍓','🍒','🫧','💐','🎠','🐚','🪽','🦩','🌼','🪻','🍰','🪐','🌝'];
 
 function spawnBubble() {
   if (!S.started || !DOMManager.canSpawn('bubbles')) return;
@@ -633,7 +979,7 @@ function spawnStar() {
 
   const el = document.createElement('div');
   el.className = 'star';
-  el.textContent = ['✨','⭐','🌟','💫'][Math.floor(Math.random()*4)];
+  el.textContent = ['✨','⭐','🌟','💫','🌠','🪩','🔆','💖'][Math.floor(Math.random()*8)];
   el.style.left = (30 + Math.random() * (innerWidth - 80)) + 'px';
   el.style.top = (80 + Math.random() * (innerHeight - 200)) + 'px';
   scene.appendChild(el);
@@ -660,15 +1006,64 @@ function spawnStar() {
   }, 5000);
 }
 
+// ── BUTTERFLIES (flutter across, tap to catch) ──
+const BUTTERFLY_EMOJIS = ['🦋','🧚','🪽','🐝','🪲','🌸'];
+
+function spawnButterfly() {
+  if (!S.started || !DOMManager.canSpawn('butterflies')) return;
+  DOMManager.add('butterflies');
+
+  const el = document.createElement('div');
+  el.className = 'butterfly';
+  el.textContent = BUTTERFLY_EMOJIS[Math.floor(Math.random() * BUTTERFLY_EMOJIS.length)];
+  const dir = Math.random() > 0.5 ? 1 : -1;
+  const y = 90 + Math.random() * (innerHeight - 280);
+  el.style.top = y + 'px';
+  el.style.left = '0px';
+  el.style.setProperty('--dir', dir);
+  el.style.setProperty('--fly-speed', (7 + Math.random() * 5) + 's');
+  scene.appendChild(el);
+  SFX.sparkle();
+
+  const catchButterfly = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const r = el.getBoundingClientRect();
+    Glitter.burst(r.left + r.width/2, r.top + r.height/2, 22);
+    SFX.collect();
+    addSparkles(4);
+    el.classList.add('caught');
+    setTimeout(() => { el.remove(); DOMManager.remove('butterflies'); }, 500);
+  };
+
+  el.addEventListener('pointerdown', catchButterfly);
+  el.addEventListener('touchstart', (e) => { e.preventDefault(); catchButterfly(e); }, {passive:false});
+
+  const dur = parseFloat(el.style.getPropertyValue('--fly-speed')) * 1000;
+  setTimeout(() => {
+    if (el.parentNode && !el.classList.contains('caught')) {
+      el.remove(); DOMManager.remove('butterflies');
+    }
+  }, dur + 200);
+}
+
 // ── BACKGROUND TAP (in tap mode) ──
 function tapSparkle(px, py) {
-  Glitter.burst(px, py, 12);
+  Glitter.burst(px, py, 14);
   SFX.sparkle();
+
+  // Colorful magic ring ripple on every tap
+  const ring = document.createElement('div');
+  ring.className = 'pop-ring';
+  ring.style.left = px + 'px'; ring.style.top = py + 'px';
+  ring.style.borderColor = `hsl(${Math.random()*360},100%,72%)`;
+  scene.appendChild(ring);
+  setTimeout(() => ring.remove(), 600);
 
   // Temporary sparkle that fades quickly
   const star = document.createElement('div');
   star.style.cssText = `position:absolute;left:${px-18}px;top:${py-18}px;font-size:36px;pointer-events:none;z-index:10;animation:starPulse .5s ease-in-out forwards;opacity:0`;
-  star.textContent = ['✨','💖','⭐'][Math.floor(Math.random()*3)];
+  star.textContent = ['✨','💖','⭐','🌸','💫','🦋','🌟','💕'][Math.floor(Math.random()*8)];
   scene.appendChild(star);
   // Animate in then out
   star.animate([
@@ -701,6 +1096,7 @@ let isPointerDown = false;
 scene.addEventListener('pointerdown', (e) => {
   if (!S.started || S.celebrationActive) return;
   isPointerDown = true;
+  moveWand(e.clientX, e.clientY);
 
   if (S.mode === 'paint') {
     PaintCanvas.start(e.clientX, e.clientY);
@@ -715,6 +1111,13 @@ scene.addEventListener('pointermove', (e) => {
   if (S.mode === 'paint') {
     PaintCanvas.move(e.clientX, e.clientY);
   }
+});
+
+// Magic wand glow + sparkle dust follow the finger everywhere
+scene.addEventListener('pointermove', (e) => {
+  if (!S.started || S.celebrationActive) return;
+  moveWand(e.clientX, e.clientY);
+  magicTrail(e.clientX, e.clientY);
 });
 
 scene.addEventListener('pointerup', () => {
@@ -733,6 +1136,7 @@ scene.addEventListener('touchstart', (e) => {
   e.preventDefault();
   isPointerDown = true;
   for (const t of e.changedTouches) {
+    moveWand(t.clientX, t.clientY);
     if (S.mode === 'paint') {
       PaintCanvas.start(t.clientX, t.clientY);
       SFX.paint();
@@ -746,6 +1150,8 @@ scene.addEventListener('touchmove', (e) => {
   if (!isPointerDown || !S.started) return;
   e.preventDefault();
   for (const t of e.changedTouches) {
+    moveWand(t.clientX, t.clientY);
+    magicTrail(t.clientX, t.clientY);
     if (S.mode === 'paint') {
       PaintCanvas.move(t.clientX, t.clientY);
     }
@@ -757,12 +1163,35 @@ scene.addEventListener('touchend', () => {
   PaintCanvas.stop();
 });
 
+// ── TITLE SCREEN FLOATING EMOJIS ──
+(function fillTitleFloat() {
+  const box = document.getElementById('titleFloat');
+  if (!box) return;
+  const EM = ['✨','🦄','🌈','💖','⭐','🧚','🦋','👑','💎','🌸','🪄','🌟','🎀','🍭','🏰'];
+  for (let i = 0; i < 14; i++) {
+    const f = document.createElement('div');
+    f.className = 'float-emoji';
+    f.textContent = EM[i % EM.length];
+    f.style.left = (5 + Math.random() * 90) + '%';
+    f.style.top = (10 + Math.random() * 80) + '%';
+    f.style.setProperty('--ft', (5 + Math.random() * 5) + 's');
+    f.style.animationDelay = (-Math.random() * 5) + 's';
+    box.appendChild(f);
+  }
+})();
+
 // ── START GAME ──
 document.getElementById('playBtn').addEventListener('click', () => {
   SFX.init();
+  SFX.startMusic();
   S.started = true;
   titleScreen.classList.add('hidden');
   setTimeout(() => titleScreen.style.display = 'none', 800);
+
+  // Magical "entering the world" moment
+  spellFlash.classList.remove('flash'); void spellFlash.offsetWidth;
+  spellFlash.classList.add('flash');
+  shootingStars(6);
 
   // Welcome sequence
   setTimeout(() => {
@@ -779,6 +1208,8 @@ document.getElementById('playBtn').addEventListener('click', () => {
   setTimeout(() => spawnEgg(), 1500);
   setTimeout(() => spawnStar(), 1000);
   setTimeout(() => spawnStar(), 1800);
+  setTimeout(() => spawnButterfly(), 1300);
+  setTimeout(() => spawnButterfly(), 2100);
 });
 
 // ── SPAWNERS (varied timing for variety) ──
@@ -786,12 +1217,13 @@ setInterval(() => { if (S.started) spawnBubble(); }, 2000);
 setInterval(() => { if (S.started && Math.random() < 0.5) spawnUnicorn(); }, 8000);
 setInterval(() => { if (S.started && Math.random() < 0.4) spawnEgg(); }, 10000);
 setInterval(() => { if (S.started && Math.random() < 0.6) spawnStar(); }, 4000);
+setInterval(() => { if (S.started && Math.random() < 0.55) spawnButterfly(); }, 6000);
 
 // ── CLOUDS ──
 function spawnCloud() {
   const c = document.createElement('div');
   c.className = 'cloud';
-  c.textContent = ['☁️','🌸','💗'][Math.floor(Math.random()*3)];
+  c.textContent = ['☁️','🌸','💗','🧚','🦋','🌈','⭐','🎈','🌷','🪽'][Math.floor(Math.random()*10)];
   c.style.top = (5 + Math.random() * 25) + '%';
   const sp = 25 + Math.random() * 20;
   c.style.setProperty('--speed', sp + 's');
@@ -807,6 +1239,5 @@ const hatchStyle = document.createElement('style');
 hatchStyle.textContent = `@keyframes hatchPop{0%{transform:scale(0) rotate(-20deg);opacity:0}30%{transform:scale(1.5) rotate(10deg);opacity:1}60%{transform:scale(1.2) rotate(-5deg);opacity:1}100%{transform:scale(1) translateY(-30px) rotate(0);opacity:0}}`;
 document.head.appendChild(hatchStyle);
 </script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"75124c326cb447fe934cde04713ae013","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
