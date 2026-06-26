@@ -103,6 +103,8 @@ iframe:not(#gameFrame),.watermark,[id*="badge"],[class*="watermark"]{display:non
 .mode-btn.active{background:linear-gradient(135deg,#ff69b4,#ff1493);color:#fff;border-color:#fff;animation:modeGlow 1.4s ease-in-out infinite}
 @keyframes modeGlow{0%,100%{box-shadow:0 4px 15px rgba(255,20,147,.4)}50%{box-shadow:0 4px 22px rgba(255,20,147,.7),0 0 26px rgba(255,182,217,.7)}}
 .mode-btn:active{transform:scale(.92)}
+.pet-link{font-family:'Baloo 2',sans-serif;font-size:14px;font-weight:700;color:#fff;background:linear-gradient(135deg,#b06aff,#8a4dff);border:3px solid #fff;border-radius:40px;padding:8px 16px;cursor:pointer;box-shadow:0 4px 15px rgba(176,106,255,.45);white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center;animation:modeGlow 1.8s ease-in-out infinite}
+.pet-link:active{transform:scale(.92)}
 
 /* === WORLD TRAVEL === */
 #worldBtn{position:fixed;top:12px;left:12px;z-index:50;width:50px;height:50px;font-size:26px;border-radius:50%;background:#fff;border:3px solid #ff69b4;box-shadow:0 4px 15px rgba(255,20,147,.3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .2s;line-height:1}
@@ -299,6 +301,7 @@ body.night #moon{opacity:1;transform:scale(1) rotate(0)}
 <div id="modeBar">
   <button class="mode-btn active" data-mode="tap">✨ Tap</button>
   <button class="mode-btn" data-mode="paint">🎨 Paint</button>
+  <a class="pet-link" href="pet.html">🦄 My Pet</a>
 </div>
 
 <!-- Paint mode indicator -->
@@ -348,6 +351,7 @@ body.night #moon{opacity:1;transform:scale(1) rotate(0)}
   <h1>Sparkle Unicorn<br>Magic Garden</h1>
   <p class="title-hint">Tap bubbles, catch unicorns, paint with sparkles — and travel to candy, ocean & space worlds! 🌍</p>
   <button id="playBtn">✨ TAP TO PLAY ✨</button>
+  <a class="pet-link" href="pet.html" style="margin-top:10px;font-size:clamp(15px,3.5vw,20px);padding:10px 26px">🦄 Make &amp; Care for a Pet</a>
 </div>
 
 <script>
@@ -483,59 +487,150 @@ const Glitter = (() => {
   return { burst };
 })();
 
+// ── Paint Tool State ──
+const PT = {
+  tool: 'brush',      // brush | spray | stamp | rainbow | eraser
+  color: '#ff1493',
+  stamp: '🌟',
+  rainbowHue: 0,
+  sprayTimer: null,
+  sprayX: 0, sprayY: 0,
+  drawing: false,
+  lastX: 0, lastY: 0
+};
+const PAINT_COLORS = [
+  '#ff1493','#ff6b6b','#ff8c00','#ffd700',
+  '#7fff00','#00d4aa','#4da6ff','#c44dff',
+  '#ffffff','#333333'
+];
+const STAMP_EMOJIS = [
+  '🌟','💖','🌸','🌈','🦄','🦋','⭐','🍭',
+  '🎀','👑','🌺','🐱','🐶','🐝','🏠','🍦',
+  '🎈','🌙','🚀','🦕'
+];
+
 // ── Paint Canvas ──
 const PaintCanvas = (() => {
   const c = document.getElementById('paintCanvas');
-  const x = c.getContext('2d');
+  const ctx = c.getContext('2d');
   const resize = () => { c.width = innerWidth; c.height = innerHeight; };
   addEventListener('resize', resize); resize();
 
-  let drawing = false;
-  let lastX = 0, lastY = 0;
-  let hue = 330; // start pink
+  // ── Brush / Rainbow ──
+  const startBrush = (px, py, rainbow) => {
+    PT.drawing = true;
+    PT.lastX = px; PT.lastY = py;
+    moveBrush(px, py, rainbow);
+  };
+  const moveBrush = (px, py, rainbow) => {
+    if (!PT.drawing) return;
+    ctx.beginPath();
+    ctx.moveTo(PT.lastX, PT.lastY);
+    ctx.lineTo(px, py);
+    if (rainbow) {
+      PT.rainbowHue = (PT.rainbowHue + 4) % 360;
+      ctx.strokeStyle = `hsl(${PT.rainbowHue},100%,58%)`;
+    } else {
+      ctx.strokeStyle = PT.color;
+    }
+    ctx.lineWidth = 22;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.globalAlpha = 0.88;
+    ctx.shadowColor = ctx.strokeStyle;
+    ctx.shadowBlur = 14;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+    ctx.shadowBlur = 0;
+    if (Math.random() < 0.18) Glitter.burst(px, py, 3);
+    PT.lastX = px; PT.lastY = py;
+  };
 
-  const COLORS = ['#ff69b4','#ff1493','#ffb6d9','#ff85c8','#ffd700','#ff6b9d','#c44dff','#ff4da6','#ff80bf'];
+  // ── Spray ──
+  const doSpray = () => {
+    const r = 40, n = 12;
+    for (let i = 0; i < n; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const d = Math.random() * r;
+      ctx.beginPath();
+      ctx.arc(PT.sprayX + Math.cos(a)*d, PT.sprayY + Math.sin(a)*d,
+        1.2 + Math.random()*2.8, 0, Math.PI*2);
+      ctx.fillStyle = PT.color;
+      ctx.globalAlpha = 0.2 + Math.random() * 0.6;
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  };
+  const startSpray = (px, py) => {
+    PT.sprayX = px; PT.sprayY = py;
+    PT.drawing = true;
+    doSpray();
+    PT.sprayTimer = setInterval(doSpray, 40);
+  };
+  const moveSpray = (px, py) => { PT.sprayX = px; PT.sprayY = py; };
+  const stopSpray = () => {
+    clearInterval(PT.sprayTimer); PT.sprayTimer = null; PT.drawing = false;
+  };
 
+  // ── Stamps ──
+  const placeStamp = (px, py) => {
+    const sz = 68;
+    ctx.save();
+    ctx.font = `${sz}px Arial, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = 'rgba(255,105,180,0.7)';
+    ctx.shadowBlur = 20;
+    ctx.globalAlpha = 1;
+    ctx.fillText(PT.stamp, px, py);
+    ctx.restore();
+    Glitter.burst(px, py, 14);
+    SFX.collect();
+  };
+
+  // ── Eraser ──
+  const startEraser = (px, py) => {
+    PT.drawing = true; PT.lastX = px; PT.lastY = py;
+    moveEraser(px, py);
+  };
+  const moveEraser = (px, py) => {
+    if (!PT.drawing) return;
+    ctx.save();
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath();
+    ctx.arc(px, py, 28, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(0,0,0,1)';
+    ctx.fill();
+    ctx.restore();
+    PT.lastX = px; PT.lastY = py;
+  };
+
+  // ── Public API ──
   const start = (px, py) => {
-    drawing = true;
-    lastX = px; lastY = py;
-    move(px, py);
+    switch (PT.tool) {
+      case 'brush':   startBrush(px, py, false); break;
+      case 'rainbow': startBrush(px, py, true);  break;
+      case 'spray':   startSpray(px, py);         break;
+      case 'stamp':   placeStamp(px, py);         break;
+      case 'eraser':  startEraser(px, py);        break;
+    }
   };
   const move = (px, py) => {
-    if (!drawing) return;
-    // Draw line from last to current
-    x.beginPath();
-    x.moveTo(lastX, lastY);
-    x.lineTo(px, py);
-    x.strokeStyle = COLORS[Math.floor(Math.random()*COLORS.length)];
-    x.lineWidth = 8 + Math.random() * 12;
-    x.lineCap = 'round';
-    x.lineJoin = 'round';
-    x.globalAlpha = 0.7;
-    x.shadowColor = x.strokeStyle;
-    x.shadowBlur = 15;
-    x.stroke();
-    x.globalAlpha = 1;
-    x.shadowBlur = 0;
-
-    // Also add glitter along the path
-    if (Math.random() < 0.3) Glitter.burst(px, py, 3);
-
-    lastX = px; lastY = py;
+    switch (PT.tool) {
+      case 'brush':   moveBrush(px, py, false); break;
+      case 'rainbow': moveBrush(px, py, true);  break;
+      case 'spray':   moveSpray(px, py);         break;
+      case 'eraser':  moveEraser(px, py);        break;
+      // stamp: no drag behaviour
+    }
   };
-  const stop = () => { drawing = false; };
+  const stop = () => {
+    if (PT.tool === 'spray') stopSpray();
+    else PT.drawing = false;
+  };
+  const clear = () => { ctx.clearRect(0, 0, c.width, c.height); };
 
-  const clear = () => { x.clearRect(0, 0, c.width, c.height); };
-
-  // Fade paint over time so it doesn't accumulate forever
-  setInterval(() => {
-    x.globalCompositeOperation = 'destination-out';
-    x.fillStyle = 'rgba(0,0,0,0.02)';
-    x.fillRect(0, 0, c.width, c.height);
-    x.globalCompositeOperation = 'source-over';
-  }, 100);
-
-  return { start, move, stop, clear, isActive: () => drawing };
+  return { start, move, stop, clear, isActive: () => PT.drawing };
 })();
 
 // ── DOM Element Manager (prevents clutter) ──
@@ -594,6 +689,7 @@ const celText = document.getElementById('celText');
 const celSub = document.getElementById('celSub');
 const celDismiss = document.getElementById('celDismiss');
 const paintIndicator = document.getElementById('paintIndicator');
+const paintToolbar  = document.getElementById('paintToolbar');
 const wandGlow = document.getElementById('wandGlow');
 const spellFlash = document.getElementById('spellFlash');
 
@@ -1266,6 +1362,64 @@ function tapSparkle(px, py) {
   setTimeout(() => star.remove(), 800);
 }
 
+// ── PAINT TOOLBAR INIT ──
+(function initPaintToolbar() {
+  // Color palette
+  const palette = document.getElementById('colorPalette');
+  PAINT_COLORS.forEach((col, i) => {
+    const sw = document.createElement('div');
+    sw.className = 'c-swatch' + (i === 0 ? ' active' : '');
+    sw.style.background = col;
+    if (col === '#ffffff') sw.style.boxShadow = '0 2px 6px rgba(0,0,0,.2), inset 0 0 0 1px #ffb6d9';
+    sw.addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.querySelectorAll('.c-swatch').forEach(s => s.classList.remove('active'));
+      sw.classList.add('active');
+      PT.color = col;
+    });
+    palette.appendChild(sw);
+  });
+
+  // Stamp picker
+  const picker = document.getElementById('stampPicker');
+  STAMP_EMOJIS.forEach((em, i) => {
+    const btn = document.createElement('span');
+    btn.className = 'stamp-opt' + (i === 0 ? ' active' : '');
+    btn.textContent = em;
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.querySelectorAll('.stamp-opt').forEach(s => s.classList.remove('active'));
+      btn.classList.add('active');
+      PT.stamp = em;
+    });
+    picker.appendChild(btn);
+  });
+
+  // Tool buttons
+  document.querySelectorAll('.tool-btn[data-tool]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      PaintCanvas.stop();
+      document.querySelectorAll('.tool-btn[data-tool]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      PT.tool = btn.dataset.tool;
+      const isStamp   = PT.tool === 'stamp';
+      const isRainbow = PT.tool === 'rainbow';
+      const isEraser  = PT.tool === 'eraser';
+      palette.style.display  = (isStamp || isRainbow || isEraser) ? 'none' : 'flex';
+      picker.classList.toggle('show', isStamp);
+    });
+  });
+
+  // Clear button
+  document.getElementById('clearPaintBtn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    PaintCanvas.clear();
+    SFX.magic();
+    Glitter.burst(innerWidth/2, innerHeight/2, 30);
+  });
+})();
+
 // ── MODE SWITCHING ──
 document.querySelectorAll('.mode-btn').forEach(btn => {
   btn.addEventListener('click', (e) => {
@@ -1275,8 +1429,12 @@ document.querySelectorAll('.mode-btn').forEach(btn => {
     S.mode = btn.dataset.mode;
 
     if (S.mode === 'paint') {
+      paintToolbar.classList.add('show');
       paintIndicator.classList.add('show');
       setTimeout(() => paintIndicator.classList.remove('show'), 1500);
+    } else {
+      paintToolbar.classList.remove('show');
+      PaintCanvas.stop();
     }
   });
 });

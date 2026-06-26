@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>✨ My Magical Unicorn Pet ✨</title>
+<meta name="description" content="Adopt, dress up, and care for your very own magical unicorn pet!">
+<meta name="theme-color" content="#b06aff">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>%F0%9F%A6%84</text></svg>">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Unicorn Pet">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* === RESET & BASE === */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg1: #fce4ff; --bg2: #e0c3fc; --bg3: #d5f5e3;
+  --pink: #ff6fb7; --purple: #b06aff; --blue: #6ac3ff;
+  --yellow: #ffe066; --green: #7ddf64; --orange: #ffb347;
+  --slime: #7ddf64; --coffee: #8B4513;
+  --panel-bg: rgba(255,255,255,0.85);
+  --shadow: 0 8px 32px rgba(176,106,255,0.2);
+}
+html, body { width: 100%; height: 100%; overflow: hidden; }
+body {
+  font-family: 'Fredoka', sans-serif;
+  background: linear-gradient(135deg, var(--bg1), var(--bg2), var(--bg3));
+  background-size: 400% 400%;
+  animation: bgShift 12s ease infinite;
+  display: flex; flex-direction: column;
+  user-select: none; -webkit-user-select: none;
+}
+@keyframes bgShift {
+  0%,100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* === BACK TO PLAY BUTTON === */
+.back-btn {
+  position: fixed; top: 10px; left: 10px; z-index: 60;
+  font-family: 'Baloo 2', cursive; font-size: 0.95rem; font-weight: 700;
+  color: #fff; text-decoration: none;
+  background: linear-gradient(135deg, #ff6fb7, #b06aff);
+  border: 3px solid #fff; border-radius: 30px;
+  padding: 7px 16px; box-shadow: 0 4px 14px rgba(176,106,255,0.4);
+  display: flex; align-items: center; gap: 5px;
+  transition: transform 0.15s;
+}
+.back-btn:active { transform: scale(0.92); }
+
+/* === HEADER === */
+.header {
+  text-align: center; padding: 10px 0 4px;
+  font-family: 'Baloo 2', cursive;
+  position: relative; z-index: 10;
+}
+.header h1 {
+  font-size: clamp(1.4rem, 4vw, 2.2rem);
+  font-weight: 800;
+  background: linear-gradient(90deg, var(--pink), var(--purple), var(--blue), var(--yellow), var(--green));
+  background-size: 300% 100%;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: rainbowText 4s linear infinite;
+  filter: drop-shadow(0 2px 4px rgba(176,106,255,0.3));
+}
+@keyframes rainbowText {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
+}
+.unicorn-name-input {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1rem; font-weight: 500;
+  border: 3px dashed var(--purple);
+  border-radius: 20px; padding: 4px 16px;
+  background: rgba(255,255,255,0.7);
+  color: var(--purple); outline: none;
+  text-align: center; width: 200px;
+  margin-top: 2px;
+}
+.unicorn-name-input::placeholder { color: #c9a0e8; }
+
+/* === MAIN LAYOUT === */
+.main-area {
+  flex: 1; display: flex;
+  position: relative; overflow: hidden;
+  min-height: 0;
+}
+
+/* === CANVAS STAGE === */
+.stage {
+  flex: 1; position: relative;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+#unicornCanvas {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 2; cursor: pointer;
+}
+.unicorn-container {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column;
+  align-items: center;
+  transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+.unicorn-container.bounce {
+  animation: unicornBounce 0.5s ease;
+}
+@keyframes unicornBounce {
+  0%,100% { transform: translateY(0) scale(1); }
+  30% { transform: translateY(-20px) scale(1.05); }
+  60% { transform: translateY(-8px) scale(0.98); }
+}
+.unicorn-container.happy {
+  animation: unicornHappy 0.8s ease;
+}
+@keyframes unicornHappy {
+  0%,100% { transform: rotate(0); }
+  25% { transform: rotate(-8deg) scale(1.1); }
+  75% { transform: rotate(8deg) scale(1.1); }
+}
+.unicorn-container.coffee-drink {
+  animation: coffeeDrink 1s ease;
+}
+@keyframes coffeeDrink {
+  0%,100% { transform: scale(1); }
+  20% { transform: scale(1.15) translateY(-10px); }
+  40% { transform: scale(0.95); }
+  60% { transform: scale(1.2) translateY(-15px); }
+  80% { transform: scale(1.05); }
+}
+
+/* === UNICORN SVG STYLES === */
+.unicorn-svg {
+  width: clamp(200px, 40vw, 340px);
+  height: auto;
+  filter: drop-shadow(0 10px 30px rgba(176,106,255,0.3));
+  transition: filter 0.3s;
+}
+
+/* === MOOD BUBBLE === */
+.mood-bubble {
+  position: absolute; top: -10px; right: -60px;
+  background: white; border-radius: 50%;
+  width: 50px; height: 50px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  opacity: 0; transform: scale(0);
+  transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  z-index: 5;
+}
+.mood-bubble.show {
+  opacity: 1; transform: scale(1);
+}
+.mood-bubble::after {
+  content: ''; position: absolute;
+  bottom: -8px; left: 10px;
+  width: 15px; height: 15px;
+  background: white; border-radius: 50%;
+}
+
+/* === STATUS BARS === */
+.status-bars {
+  position: absolute; top: 10px; left: 10px;
+  display: flex; flex-direction: column; gap: 6px;
+  z-index: 10;
+}
+.status-bar {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--panel-bg);
+  border-radius: 20px; padding: 4px 12px 4px 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  font-size: 0.8rem; font-weight: 600;
+}
+.status-bar .icon { font-size: 1.1rem; }
+.bar-track {
+  width: 80px; height: 10px;
+  background: #eee; border-radius: 10px;
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%; border-radius: 10px;
+  transition: width 0.5s ease;
+}
+.bar-fill.happiness { background: linear-gradient(90deg, var(--pink), var(--purple)); }
+.bar-fill.energy { background: linear-gradient(90deg, var(--yellow), var(--orange)); }
+.bar-fill.sparkle { background: linear-gradient(90deg, var(--blue), var(--purple)); }
+
+/* === TOOLBAR === */
+.toolbar {
+  background: var(--panel-bg);
+  backdrop-filter: blur(20px);
+  border-top: 2px solid rgba(176,106,255,0.2);
+  padding: 8px 12px;
+  display: flex; flex-direction: column;
+  gap: 6px; z-index: 20;
+  box-shadow: 0 -4px 20px rgba(176,106,255,0.1);
+}
+.tab-row {
+  display: flex; gap: 4px;
+  overflow-x: auto; justify-content: center;
+  scrollbar-width: none;
+}
+.tab-row::-webkit-scrollbar { display: none; }
+.tab-btn {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.8rem; font-weight: 600;
+  border: 2px solid transparent;
+  border-radius: 16px; padding: 6px 14px;
+  background: rgba(255,255,255,0.6);
+  cursor: pointer; white-space: nowrap;
+  transition: all 0.25s;
+  display: flex; align-items: center; gap: 4px;
+}
+.tab-btn:hover { background: rgba(255,255,255,0.9); transform: translateY(-2px); }
+.tab-btn.active {
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  color: white; border-color: var(--purple);
+  box-shadow: 0 4px 12px rgba(176,106,255,0.3);
+}
+.tab-btn .tab-icon { font-size: 1.1rem; }
+
+.tool-panel {
+  display: none;
+  gap: 8px; padding: 4px 0;
+  overflow-x: auto; justify-content: center;
+  flex-wrap: wrap;
+  scrollbar-width: none;
+}
+.tool-panel::-webkit-scrollbar { display: none; }
+.tool-panel.active { display: flex; }
+
+.tool-item {
+  font-family: 'Fredoka', sans-serif;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 2px;
+  background: white; border: 2px solid #f0e0ff;
+  border-radius: 16px; padding: 8px 12px;
+  cursor: pointer; transition: all 0.25s;
+  min-width: 64px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.tool-item:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 6px 16px rgba(176,106,255,0.2);
+  border-color: var(--purple);
+}
+.tool-item.equipped {
+  border-color: var(--pink);
+  background: linear-gradient(135deg, #fff0f8, #f8f0ff);
+  box-shadow: 0 0 0 2px var(--pink), 0 4px 12px rgba(255,111,183,0.3);
+}
+.tool-item .item-icon { font-size: 1.5rem; }
+.tool-item .item-label { font-size: 0.65rem; font-weight: 600; color: #888; }
+
+/* Color swatches */
+.color-row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: center; }
+.color-swatch {
+  width: 36px; height: 36px;
+  border-radius: 50%; border: 3px solid white;
+  cursor: pointer; transition: all 0.25s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.color-swatch:hover { transform: scale(1.2); }
+.color-swatch.active {
+  border-color: #333;
+  box-shadow: 0 0 0 3px var(--pink), 0 4px 12px rgba(0,0,0,0.2);
+  transform: scale(1.15);
+}
+
+/* Action buttons */
+.action-btn {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.85rem; font-weight: 600;
+  border: none; border-radius: 20px;
+  padding: 10px 20px; cursor: pointer;
+  transition: all 0.25s;
+  display: flex; align-items: center; gap: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.action-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.15); }
+.action-btn:active { transform: scale(0.95); }
+.action-btn.pet-btn { background: linear-gradient(135deg, #ffb6c1, var(--pink)); color: white; }
+.action-btn.coffee-btn { background: linear-gradient(135deg, #d4a574, var(--coffee)); color: white; }
+.action-btn.slime-btn { background: linear-gradient(135deg, #a8e6a1, #4caf50); color: white; }
+.action-btn.sparkle-btn { background: linear-gradient(135deg, var(--blue), var(--purple)); color: white; }
+.action-btn.save-btn { background: linear-gradient(135deg, var(--yellow), var(--orange)); color: #333; font-weight: 700; }
+
+/* === FLOATING PARTICLES === */
+.particle {
+  position: fixed; pointer-events: none;
+  z-index: 100; font-size: 1.2rem;
+  animation: particleFly 1.5s ease-out forwards;
+}
+@keyframes particleFly {
+  0% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
+  100% { opacity: 0; transform: translateY(-120px) scale(0.3) rotate(360deg); }
+}
+
+/* === SPARKLE OVERLAY === */
+.sparkle-overlay {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 3;
+}
+
+/* === GLITTER EFFECT === */
+.glitter-particle {
+  position: absolute; pointer-events: none;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  animation: glitterFall 2s ease-in forwards;
+}
+@keyframes glitterFall {
+  0% { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); }
+  100% { opacity: 0; transform: translateY(80px) rotate(720deg) scale(0); }
+}
+
+/* === SLIME DRIP === */
+.slime-drip {
+  position: absolute; pointer-events: none;
+  width: 12px; border-radius: 0 0 50% 50%;
+  background: linear-gradient(180deg, #7ddf64, #4caf50);
+  animation: slimeDrip 2s ease-in forwards;
+  z-index: 4;
+}
+@keyframes slimeDrip {
+  0% { opacity: 0.9; height: 0; }
+  30% { opacity: 0.9; height: 40px; }
+  100% { opacity: 0; height: 80px; transform: translateY(60px); }
+}
+
+/* === COFFEE STEAM === */
+.coffee-steam {
+  position: absolute; pointer-events: none;
+  font-size: 1.5rem;
+  animation: steamRise 1.5s ease-out forwards;
+  z-index: 4;
+}
+@keyframes steamRise {
+  0% { opacity: 0.8; transform: translateY(0) scale(0.5); }
+  100% { opacity: 0; transform: translateY(-60px) scale(1.5); }
+}
+
+/* === SAVE MODAL === */
+.save-modal {
+  display: none; position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  align-items: center; justify-content: center;
+}
+.save-modal.show { display: flex; }
+.save-modal-content {
+  background: white; border-radius: 24px;
+  padding: 24px; text-align: center;
+  max-width: 400px; width: 90%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  animation: modalPop 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes modalPop {
+  0% { transform: scale(0.5); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.save-modal-content h2 {
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.5rem; color: var(--purple);
+  margin-bottom: 12px;
+}
+.save-modal-content img {
+  max-width: 100%; border-radius: 16px;
+  border: 3px solid var(--bg2);
+  margin-bottom: 12px;
+}
+.save-modal-content .action-btn {
+  margin: 6px; display: inline-flex;
+}
+
+/* === BG STARS === */
+.bg-star {
+  position: fixed; pointer-events: none;
+  z-index: 0; opacity: 0.4;
+  animation: twinkle 3s ease-in-out infinite;
+}
+@keyframes twinkle {
+  0%,100% { opacity: 0.2; transform: scale(0.8); }
+  50% { opacity: 0.6; transform: scale(1.2); }
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 600px) {
+  .toolbar { padding: 6px 8px; }
+  .tab-btn { padding: 5px 10px; font-size: 0.7rem; }
+  .tool-item { padding: 6px 8px; min-width: 54px; }
+  .status-bars { gap: 4px; }
+  .status-bar { padding: 3px 8px 3px 6px; font-size: 0.7rem; }
+  .bar-track { width: 50px; }
+}
+</style>
+</head>
+<body>
+
+<a href="index.html" class="back-btn">✨ Play Games</a>
+
+<!-- HEADER -->
+<div class="header">
+  <h1>My Magical Unicorn Pet</h1>
+  <input type="text" class="unicorn-name-input" id="unicornName" placeholder="Name your unicorn!" maxlength="16">
+</div>
+
+<!-- MAIN AREA -->
+<div class="main-area">
+  <!-- STATUS BARS -->
+  <div class="status-bars">
+    <div class="status-bar">
+      <span class="icon">💖</span>
+      <div class="bar-track"><div class="bar-fill happiness" id="happyBar" style="width:70%"></div></div>
+    </div>
+    <div class="status-bar">
+      <span class="icon">⚡</span>
+      <div class="bar-track"><div class="bar-fill energy" id="energyBar" style="width:50%"></div></div>
+    </div>
+    <div class="status-bar">
+      <span class="icon">✨</span>
+      <div class="bar-track"><div class="bar-fill sparkle" id="sparkleBar" style="width:30%"></div></div>
+    </div>
+  </div>
+
+  <!-- STAGE -->
+  <div class="stage" id="stage">
+    <canvas id="unicornCanvas"></canvas>
+    <div class="unicorn-container" id="unicornContainer">
+      <!-- MOOD BUBBLE -->
+      <div class="mood-bubble" id="moodBubble">😊</div>
+      <!-- UNICORN SVG PLACEHOLDER - filled in JS -->
+      <div id="unicornSvgWrap"></div>
+    </div>
+    <div class="sparkle-overlay" id="sparkleOverlay"></div>
+  </div>
+</div>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <div class="tab-row" id="tabRow">
+    <!-- TABS FILLED BY JS -->
+  </div>
+  <div id="toolPanels">
+    <!-- PANELS FILLED BY JS -->
+  </div>
+</div>
+
+<!-- SAVE MODAL -->
+<div class="save-modal" id="saveModal">
+  <div class="save-modal-content">
+    <h2>Your Unicorn is Ready! 🦄</h2>
+    <img id="savePreview" src="" alt="Unicorn preview">
+    <p style="color:#888;font-size:0.85rem;margin-bottom:12px" id="saveName"></p>
+    <button class="action-btn save-btn" onclick="downloadUnicorn()">💾 Download Image</button>
+    <button class="action-btn" style="background:#eee;color:#666" onclick="closeSaveModal()">Keep Playing</button>
+  </div>
+</div>
+
+<script>
+// === GAME STATE ===
+const state = {
+  unicornColor: '#ffffff',
+  maneColor: '#ff6fb7',
+  eyeStyle: 0,
+  accessories: [],   // { type, id }
+  happiness: 70,
+  energy: 50,
+  sparkle: 30,
+  hasSlime: false,
+  hasGlitter: false,
+  coffeeCount: 0,
+  petCount: 0,
+};
+
+// === SAVE / LOAD THE PET (so she's still here tomorrow) ===
+const SAVE_KEY = 'sparkleUnicornPet';
+function persistPet() {
+  try {
+    const nameEl = document.getElementById('unicornName');
+    localStorage.setItem(SAVE_KEY, JSON.stringify({ state, name: nameEl ? nameEl.value : '' }));
+  } catch (e) {}
+}
+function loadPet() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) return;
+    const saved = JSON.parse(raw);
+    if (saved && saved.state) Object.assign(state, saved.state);
+    const nameEl = document.getElementById('unicornName');
+    if (nameEl && saved && saved.name) nameEl.value = saved.name;
+  } catch (e) {}
+}
+
+// === UNICORN SVG GENERATOR ===
+function buildUnicornSVG() {
+  const uc = state.unicornColor;
+  const mc = state.maneColor;
+  const eyeStyles = [
+    // Normal cute eyes
+    `<ellipse cx="128" cy="148" rx="10" ry="12" fill="#333"/><ellipse cx="172" cy="148" rx="10" ry="12" fill="#333"/>
+     <ellipse cx="131" cy="144" rx="4" ry="5" fill="white"/><ellipse cx="175" cy="144" rx="4" ry="5" fill="white"/>`,
+    // Happy closed eyes
+    `<path d="M118 148 Q128 138 138 148" stroke="#333" stroke-width="3" fill="none" stroke-linecap="round"/>
+     <path d="M162 148 Q172 138 182 148" stroke="#333" stroke-width="3" fill="none" stroke-linecap="round"/>`,
+    // Star eyes
+    `<text x="120" y="155" font-size="22" text-anchor="middle">⭐</text><text x="180" y="155" font-size="22" text-anchor="middle">⭐</text>`,
+    // Heart eyes
+    `<text x="120" y="155" font-size="22" text-anchor="middle">💖</text><text x="180" y="155" font-size="22" text-anchor="middle">💖</text>`,
+    // Wink
+    `<ellipse cx="128" cy="148" rx="10" ry="12" fill="#333"/><ellipse cx="131" cy="144" rx="4" ry="5" fill="white"/>
+     <path d="M162 148 Q172 138 182 148" stroke="#333" stroke-width="3" fill="none" stroke-linecap="round"/>`,
+  ];
+  const eyes = eyeStyles[state.eyeStyle % eyeStyles.length];
+
+  // Mouth - changes if drinking coffee
+  const mouth = state.coffeeCount > 0
+    ? `<ellipse cx="150" cy="182" rx="8" ry="5" fill="#d4776b"/>`
+    : `<path d="M135 178 Q150 192 165 178" stroke="#e88" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
+
+  // Blush
+  const blush = state.happiness > 60
+    ? `<ellipse cx="112" cy="168" rx="12" ry="7" fill="rgba(255,150,150,0.4)"/>
+       <ellipse cx="188" cy="168" rx="12" ry="7" fill="rgba(255,150,150,0.4)"/>` : '';
+
+  // Accessories layers
+  let accLayers = '';
+  state.accessories.forEach(a => {
+    accLayers += getAccessorySVG(a.type, a.id);
+  });
+
+  // Slime overlay
+  let slimeLayer = '';
+  if (state.hasSlime) {
+    slimeLayer = `
+      <ellipse cx="150" cy="280" rx="60" ry="10" fill="rgba(125,223,100,0.4)"/>
+      <path d="M110 240 Q115 260 108 280" stroke="#7ddf64" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.7"/>
+      <path d="M170 230 Q175 255 168 280" stroke="#7ddf64" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.6"/>
+      <circle cx="115" cy="200" r="6" fill="#7ddf64" opacity="0.5"/>
+      <circle cx="180" cy="210" r="5" fill="#7ddf64" opacity="0.5"/>
+    `;
+  }
+
+  // Glitter overlay
+  let glitterLayer = '';
+  if (state.hasGlitter) {
+    for (let i = 0; i < 20; i++) {
+      const gx = 80 + Math.random() * 140;
+      const gy = 60 + Math.random() * 220;
+      const gs = 1 + Math.random() * 3;
+      const colors = ['#FFD700','#FF69B4','#00BFFF','#FF6FB7','#B06AFF'];
+      const gc = colors[Math.floor(Math.random() * colors.length)];
+      glitterLayer += `<circle cx="${gx}" cy="${gy}" r="${gs}" fill="${gc}" opacity="${0.4+Math.random()*0.5}">
+        <animate attributeName="opacity" values="${0.3};${0.9};${0.3}" dur="${1+Math.random()*2}s" repeatCount="indefinite"/>
+      </circle>`;
+    }
+  }
+
+  return `<svg viewBox="0 0 300 320" class="unicorn-svg" xmlns="http://www.w3.org/2000/svg">
+    <!-- Sparkle aura -->
+    <defs>
+      <radialGradient id="aura" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="${mc}" stop-opacity="0.1"/>
+        <stop offset="100%" stop-color="${mc}" stop-opacity="0"/>
+      </radialGradient>
+      <filter id="softGlow">
+        <feGaussianBlur stdDeviation="2" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+    <circle cx="150" cy="170" r="140" fill="url(#aura)">
+      <animate attributeName="r" values="130;145;130" dur="3s" repeatCount="indefinite"/>
+    </circle>
+
+    <!-- BODY -->
+    <ellipse cx="150" cy="230" rx="65" ry="50" fill="${uc}" stroke="#e0d0f0" stroke-width="1.5"/>
+
+    <!-- LEGS -->
+    <rect x="105" y="260" width="18" height="45" rx="9" fill="${uc}" stroke="#e0d0f0" stroke-width="1"/>
+    <rect x="135" y="265" width="18" height="45" rx="9" fill="${uc}" stroke="#e0d0f0" stroke-width="1"/>
+    <rect x="160" y="265" width="18" height="45" rx="9" fill="${uc}" stroke="#e0d0f0" stroke-width="1"/>
+    <rect x="182" y="260" width="18" height="45" rx="9" fill="${uc}" stroke="#e0d0f0" stroke-width="1"/>
+    <!-- Hooves -->
+    <ellipse cx="114" cy="305" rx="11" ry="6" fill="#e8d0f5"/>
+    <ellipse cx="144" cy="310" rx="11" ry="6" fill="#e8d0f5"/>
+    <ellipse cx="169" cy="310" rx="11" ry="6" fill="#e8d0f5"/>
+    <ellipse cx="191" cy="305" rx="11" ry="6" fill="#e8d0f5"/>
+
+    <!-- TAIL -->
+    <path d="M215 220 Q250 200 240 240 Q260 220 250 260 Q240 280 220 250"
+      fill="${mc}" opacity="0.9" filter="url(#softGlow)">
+      <animateTransform attributeName="transform" type="rotate"
+        values="-3 215 230;3 215 230;-3 215 230" dur="2s" repeatCount="indefinite"/>
+    </path>
+
+    <!-- NECK -->
+    <path d="M115 200 Q110 160 130 120 L170 120 Q180 160 180 200" fill="${uc}" stroke="#e0d0f0" stroke-width="1"/>
+
+    <!-- HEAD -->
+    <ellipse cx="150" cy="130" rx="48" ry="42" fill="${uc}" stroke="#e0d0f0" stroke-width="1.5"/>
+
+    <!-- MANE -->
+    <path d="M105 105 Q95 85 115 80 Q100 70 120 65 Q115 50 140 60 Q135 45 155 55 Q155 40 170 55 Q175 45 180 65 Q195 55 190 80 Q200 85 195 105"
+      fill="${mc}" filter="url(#softGlow)">
+      <animateTransform attributeName="transform" type="rotate"
+        values="-2 150 90;2 150 90;-2 150 90" dur="2.5s" repeatCount="indefinite"/>
+    </path>
+
+    <!-- HORN -->
+    <polygon points="150,28 142,78 158,78" fill="url(#hornGrad)" stroke="#e8c840" stroke-width="1"/>
+    <defs>
+      <linearGradient id="hornGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#FFD700"/>
+        <stop offset="50%" stop-color="#FFF8DC"/>
+        <stop offset="100%" stop-color="#FFD700"/>
+      </linearGradient>
+    </defs>
+    <!-- Horn spiral -->
+    <line x1="147" y1="45" x2="153" y2="45" stroke="#e8c840" stroke-width="1" opacity="0.6"/>
+    <line x1="146" y1="55" x2="154" y2="55" stroke="#e8c840" stroke-width="1" opacity="0.6"/>
+    <line x1="145" y1="65" x2="155" y2="65" stroke="#e8c840" stroke-width="1" opacity="0.6"/>
+
+    <!-- EARS -->
+    <ellipse cx="115" cy="100" rx="12" ry="18" fill="${uc}" stroke="#e0d0f0" stroke-width="1" transform="rotate(-15 115 100)"/>
+    <ellipse cx="115" cy="100" rx="6" ry="12" fill="#ffcce0" transform="rotate(-15 115 100)"/>
+    <ellipse cx="185" cy="100" rx="12" ry="18" fill="${uc}" stroke="#e0d0f0" stroke-width="1" transform="rotate(15 185 100)"/>
+    <ellipse cx="185" cy="100" rx="6" ry="12" fill="#ffcce0" transform="rotate(15 185 100)"/>
+
+    <!-- EYES -->
+    ${eyes}
+
+    <!-- MOUTH -->
+    ${mouth}
+
+    <!-- BLUSH -->
+    ${blush}
+
+    <!-- SLIME OVERLAY -->
+    ${slimeLayer}
+
+    <!-- GLITTER OVERLAY -->
+    ${glitterLayer}
+
+    <!-- ACCESSORIES -->
+    ${accLayers}
+
+    <!-- COFFEE CUP if drunk -->
+    ${state.coffeeCount > 0 ? `
+      <g transform="translate(200,160)">
+        <rect x="0" y="5" width="22" height="26" rx="3" fill="#8B4513"/>
+        <rect x="2" y="2" width="18" height="6" rx="2" fill="#A0522D"/>
+        <path d="M22 12 Q32 12 32 20 Q32 28 22 28" stroke="#8B4513" stroke-width="2.5" fill="none"/>
+        <text x="11" y="24" font-size="8" fill="white" text-anchor="middle">☕</text>
+        <!-- Steam -->
+        <path d="M6 0 Q8 -8 6 -14" stroke="rgba(200,200,200,0.6)" stroke-width="1.5" fill="none">
+          <animate attributeName="d" values="M6 0 Q8 -8 6 -14;M6 0 Q4 -8 6 -14;M6 0 Q8 -8 6 -14" dur="1.5s" repeatCount="indefinite"/>
+        </path>
+        <path d="M14 0 Q16 -10 14 -16" stroke="rgba(200,200,200,0.5)" stroke-width="1.5" fill="none">
+          <animate attributeName="d" values="M14 0 Q16 -10 14 -16;M14 0 Q12 -10 14 -16;M14 0 Q16 -10 14 -16" dur="1.8s" repeatCount="indefinite"/>
+        </path>
+      </g>
+    ` : ''}
+  </svg>`;
+}
+
+function getAccessorySVG(type, id) {
+  switch(type) {
+    case 'hat':
+      if (id === 'crown') return `<g transform="translate(125,15)"><polygon points="25,30 0,30 5,10 12,22 25,0 38,22 45,10 50,30" fill="#FFD700" stroke="#DAA520" stroke-width="1"/><circle cx="12" cy="20" r="3" fill="#FF6B6B"/><circle cx="25" cy="8" r="3" fill="#6BCBFF"/><circle cx="38" cy="20" r="3" fill="#B06AFF"/></g>`;
+      if (id === 'tophat') return `<g transform="translate(122,10)"><rect x="5" y="25" width="50" height="8" rx="3" fill="#333"/><rect x="15" y="-5" width="30" height="32" rx="4" fill="#333"/><rect x="20" y="10" width="20" height="4" rx="2" fill="${state.maneColor}"/></g>`;
+      if (id === 'flower') return `<g transform="translate(108,68)"><circle cx="0" cy="0" r="7" fill="#FF69B4"/><circle cx="10" cy="-5" r="7" fill="#FFB6C1"/><circle cx="20" cy="0" r="7" fill="#FF69B4"/><circle cx="10" cy="5" r="7" fill="#FFB6C1"/><circle cx="10" cy="0" r="5" fill="#FFD700"/></g>`;
+      if (id === 'bow') return `<g transform="translate(165,75)"><ellipse cx="-10" cy="0" rx="12" ry="8" fill="#FF69B4"/><ellipse cx="10" cy="0" rx="12" ry="8" fill="#FF69B4"/><circle cx="0" cy="0" r="4" fill="#FF1493"/></g>`;
+      return '';
+    case 'eyes':
+      // handled by eyeStyle
+      return '';
+    case 'wings':
+      if (id === 'angel') return `<g opacity="0.7"><path d="M85 200 Q50 170 55 210 Q40 190 50 225 Q55 240 85 230" fill="white" stroke="#e0e0ff" stroke-width="1"><animateTransform attributeName="transform" type="rotate" values="-5 85 215;5 85 215;-5 85 215" dur="1.5s" repeatCount="indefinite"/></path><path d="M215 200 Q250 170 245 210 Q260 190 250 225 Q245 240 215 230" fill="white" stroke="#e0e0ff" stroke-width="1"><animateTransform attributeName="transform" type="rotate" values="5 215 215;-5 215 215;5 215 215" dur="1.5s" repeatCount="indefinite"/></path></g>`;
+      if (id === 'fairy') return `<g opacity="0.6"><path d="M80 195 Q40 160 45 220 Q35 200 50 240 Q60 255 85 235" fill="rgba(176,106,255,0.4)" stroke="#b06aff" stroke-width="1"><animateTransform attributeName="transform" type="rotate" values="-8 85 215;8 85 215;-8 85 215" dur="1.2s" repeatCount="indefinite"/></path><path d="M220 195 Q260 160 255 220 Q265 200 250 240 Q240 255 215 235" fill="rgba(176,106,255,0.4)" stroke="#b06aff" stroke-width="1"><animateTransform attributeName="transform" type="rotate" values="8 215 215;-8 215 215;8 215 215" dur="1.2s" repeatCount="indefinite"/></path></g>`;
+      if (id === 'dragon') return `<g><path d="M80 200 Q55 165 50 200 Q35 175 45 230 Q55 250 85 230" fill="#ff6b6b" stroke="#cc4444" stroke-width="1.5" opacity="0.8"><animateTransform attributeName="transform" type="rotate" values="-5 85 215;5 85 215;-5 85 215" dur="1.8s" repeatCount="indefinite"/></path><path d="M220 200 Q245 165 250 200 Q265 175 255 230 Q245 250 215 230" fill="#ff6b6b" stroke="#cc4444" stroke-width="1.5" opacity="0.8"><animateTransform attributeName="transform" type="rotate" values="5 215 215;-5 215 215;5 215 215" dur="1.8s" repeatCount="indefinite"/></path></g>`;
+      return '';
+    case 'neck':
+      if (id === 'necklace') return `<ellipse cx="150" cy="195" rx="30" ry="8" fill="none" stroke="#FFD700" stroke-width="2.5"/><circle cx="150" cy="203" r="6" fill="#FF69B4" stroke="#FFD700" stroke-width="1"/>`;
+      if (id === 'scarf') return `<path d="M110 190 Q130 200 150 195 Q170 200 190 190 Q185 210 170 215 L155 235 L145 235 L130 215 Q115 210 110 190" fill="#FF6B6B" opacity="0.8"/>`;
+      if (id === 'bell') return `<circle cx="150" cy="200" r="8" fill="#FFD700" stroke="#DAA520" stroke-width="1"/><circle cx="150" cy="204" r="2" fill="#DAA520"/><line x1="130" y1="195" x2="170" y2="195" stroke="#FF69B4" stroke-width="3"/>`;
+      return '';
+    case 'back':
+      if (id === 'cape') return `<path d="M105 195 Q100 250 120 290 L150 280 L180 290 Q200 250 195 195" fill="rgba(176,106,255,0.5)" stroke="#b06aff" stroke-width="1"/>`;
+      if (id === 'rainbow') return `<g opacity="0.4"><path d="M85 240 Q150 190 215 240" stroke="#FF0000" stroke-width="4" fill="none"/><path d="M88 245 Q150 198 212 245" stroke="#FF8C00" stroke-width="4" fill="none"/><path d="M91 250 Q150 206 209 250" stroke="#FFD700" stroke-width="4" fill="none"/><path d="M94 255 Q150 214 206 255" stroke="#32CD32" stroke-width="4" fill="none"/><path d="M97 260 Q150 222 203 260" stroke="#1E90FF" stroke-width="4" fill="none"/><path d="M100 265 Q150 230 200 265" stroke="#8A2BE2" stroke-width="4" fill="none"/></g>`;
+      return '';
+    default: return '';
+  }
+}
+
+// === RENDER ===
+function render() {
+  document.getElementById('unicornSvgWrap').innerHTML = buildUnicornSVG();
+  updateBars();
+  persistPet();
+}
+
+function updateBars() {
+  document.getElementById('happyBar').style.width = state.happiness + '%';
+  document.getElementById('energyBar').style.width = state.energy + '%';
+  document.getElementById('sparkleBar').style.width = state.sparkle + '%';
+}
+
+// === TABS & TOOLS CONFIG ===
+const tabs = [
+  { id: 'colors', icon: '🎨', label: 'Colors' },
+  { id: 'hats', icon: '👑', label: 'Hats' },
+  { id: 'wings', icon: '🪽', label: 'Wings' },
+  { id: 'neck', icon: '📿', label: 'Neck' },
+  { id: 'back', icon: '🌈', label: 'Back' },
+  { id: 'eyes', icon: '👀', label: 'Eyes' },
+  { id: 'effects', icon: '✨', label: 'Effects' },
+  { id: 'pet', icon: '🐾', label: 'Pet' },
+  { id: 'save', icon: '💾', label: 'Save' },
+];
+
+const tools = {
+  colors: {
+    type: 'color-grid',
+    bodyColors: ['#ffffff','#FFB6C1','#E6E6FA','#B0E0E6','#FFECD2','#F0FFF0','#FFF8DC','#FFC0CB','#DDA0DD'],
+    maneColors: ['#ff6fb7','#b06aff','#6ac3ff','#ffe066','#7ddf64','#ff6b6b','#FF8C00','#E6E6FA','#333333','#FFD700'],
+  },
+  hats: {
+    type: 'items',
+    items: [
+      { id: 'crown', icon: '👑', label: 'Crown' },
+      { id: 'tophat', icon: '🎩', label: 'Top Hat' },
+      { id: 'flower', icon: '🌸', label: 'Flowers' },
+      { id: 'bow', icon: '🎀', label: 'Bow' },
+    ]
+  },
+  wings: {
+    type: 'items',
+    items: [
+      { id: 'angel', icon: '😇', label: 'Angel' },
+      { id: 'fairy', icon: '🧚', label: 'Fairy' },
+      { id: 'dragon', icon: '🐉', label: 'Dragon' },
+    ]
+  },
+  neck: {
+    type: 'items',
+    items: [
+      { id: 'necklace', icon: '📿', label: 'Necklace' },
+      { id: 'scarf', icon: '🧣', label: 'Scarf' },
+      { id: 'bell', icon: '🔔', label: 'Bell' },
+    ]
+  },
+  back: {
+    type: 'items',
+    items: [
+      { id: 'cape', icon: '🦸', label: 'Cape' },
+      { id: 'rainbow', icon: '🌈', label: 'Rainbow' },
+    ]
+  },
+  eyes: {
+    type: 'items',
+    items: [
+      { id: 'normal', icon: '👁️', label: 'Normal' },
+      { id: 'happy', icon: '😊', label: 'Happy' },
+      { id: 'star', icon: '⭐', label: 'Star' },
+      { id: 'heart', icon: '💖', label: 'Heart' },
+      { id: 'wink', icon: '😉', label: 'Wink' },
+    ]
+  },
+  effects: {
+    type: 'actions',
+    items: [
+      { id: 'sparkle', icon: '✨', label: 'Sparkle!', cls: 'sparkle-btn', action: doSparkle },
+      { id: 'glitter', icon: '💎', label: 'Glitter', cls: 'sparkle-btn', action: doGlitter },
+      { id: 'slime', icon: '🟢', label: 'Slime!', cls: 'slime-btn', action: doSlime },
+    ]
+  },
+  pet: {
+    type: 'actions',
+    items: [
+      { id: 'pet', icon: '🤗', label: 'Pet it!', cls: 'pet-btn', action: doPet },
+      { id: 'coffee', icon: '☕', label: 'Coffee!', cls: 'coffee-btn', action: doCoffee },
+    ]
+  },
+};
+
+function buildToolbar() {
+  const tabRow = document.getElementById('tabRow');
+  const panels = document.getElementById('toolPanels');
+
+  tabs.forEach((tab, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn' + (i === 0 ? ' active' : '');
+    btn.innerHTML = `<span class="tab-icon">${tab.icon}</span>${tab.label}`;
+    btn.dataset.tab = tab.id;
+    btn.onclick = () => switchTab(tab.id);
+    tabRow.appendChild(btn);
+  });
+
+  // Build panels
+  Object.keys(tools).forEach(key => {
+    const tool = tools[key];
+    const panel = document.createElement('div');
+    panel.className = 'tool-panel' + (key === 'colors' ? ' active' : '');
+    panel.id = 'panel-' + key;
+
+    if (tool.type === 'color-grid') {
+      const bodyLabel = document.createElement('div');
+      bodyLabel.style.cssText = 'font-size:0.7rem;font-weight:600;color:#888;width:100%;text-align:center';
+      bodyLabel.textContent = 'Body Color';
+      panel.appendChild(bodyLabel);
+      const bodyRow = document.createElement('div');
+      bodyRow.className = 'color-row';
+      tool.bodyColors.forEach((c, i) => {
+        const sw = document.createElement('div');
+        sw.className = 'color-swatch' + (i === 0 ? ' active' : '');
+        sw.style.background = c;
+        sw.dataset.target = 'body';
+        sw.onclick = () => pickColor('body', c, sw);
+        bodyRow.appendChild(sw);
+      });
+      panel.appendChild(bodyRow);
+
+      const maneLabel = document.createElement('div');
+      maneLabel.style.cssText = 'font-size:0.7rem;font-weight:600;color:#888;width:100%;text-align:center;margin-top:4px';
+      maneLabel.textContent = 'Mane & Tail Color';
+      panel.appendChild(maneLabel);
+      const maneRow = document.createElement('div');
+      maneRow.className = 'color-row';
+      tool.maneColors.forEach((c, i) => {
+        const sw = document.createElement('div');
+        sw.className = 'color-swatch' + (i === 0 ? ' active' : '');
+        sw.style.background = c;
+        sw.dataset.target = 'mane';
+        sw.onclick = () => pickColor('mane', c, sw);
+        maneRow.appendChild(sw);
+      });
+      panel.appendChild(maneRow);
+    }
+
+    if (tool.type === 'items') {
+      tool.items.forEach(item => {
+        const el = document.createElement('div');
+        el.className = 'tool-item';
+        el.innerHTML = `<span class="item-icon">${item.icon}</span><span class="item-label">${item.label}</span>`;
+        el.dataset.itemId = item.id;
+        el.dataset.itemType = key;
+        el.onclick = () => toggleAccessory(key, item.id, el);
+        panel.appendChild(el);
+      });
+    }
+
+    if (tool.type === 'actions') {
+      tool.items.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = 'action-btn ' + item.cls;
+        btn.innerHTML = `${item.icon} ${item.label}`;
+        btn.onclick = item.action;
+        panel.appendChild(btn);
+      });
+    }
+
+    panels.appendChild(panel);
+  });
+}
+
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tabId));
+  document.querySelectorAll('.tool-panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + tabId));
+}
+
+// === COLOR PICKER ===
+function pickColor(target, color, el) {
+  if (target === 'body') {
+    state.unicornColor = color;
+    document.querySelectorAll('.color-swatch[data-target="body"]').forEach(s => s.classList.remove('active'));
+  } else {
+    state.maneColor = color;
+    document.querySelectorAll('.color-swatch[data-target="mane"]').forEach(s => s.classList.remove('active'));
+  }
+  el.classList.add('active');
+  showMood('🎨');
+  spawnParticles(el, ['🎨','🖌️','💜'], 5);
+  render();
+}
+
+// === ACCESSORIES ===
+function toggleAccessory(type, id, el) {
+  const idx = state.accessories.findIndex(a => a.type === type);
+  if (type === 'eyes') {
+    const eyeMap = { normal: 0, happy: 1, star: 2, heart: 3, wink: 4 };
+    state.eyeStyle = eyeMap[id] || 0;
+    document.querySelectorAll('#panel-eyes .tool-item').forEach(e => e.classList.remove('equipped'));
+    el.classList.add('equipped');
+    showMood(id === 'star' ? '⭐' : id === 'heart' ? '😍' : '😊');
+    spawnParticles(el, ['👀','✨'], 4);
+    render();
+    return;
+  }
+
+  if (idx >= 0 && state.accessories[idx].id === id) {
+    state.accessories.splice(idx, 1);
+    el.classList.remove('equipped');
+    showMood('🤔');
+  } else {
+    if (idx >= 0) state.accessories.splice(idx, 1);
+    state.accessories.push({ type, id });
+    document.querySelectorAll(`#panel-${type} .tool-item`).forEach(e => e.classList.remove('equipped'));
+    el.classList.add('equipped');
+    showMood('😍');
+    spawnParticles(el, ['✨','💫','⭐'], 6);
+  }
+  triggerAnim('bounce');
+  render();
+}
+
+// === EFFECTS ===
+function doSparkle() {
+  state.sparkle = Math.min(100, state.sparkle + 15);
+  state.happiness = Math.min(100, state.happiness + 5);
+  showMood('✨');
+  triggerAnim('happy');
+  // Spawn lots of sparkles on stage
+  const stage = document.getElementById('stage');
+  for (let i = 0; i < 30; i++) {
+    setTimeout(() => {
+      const s = document.createElement('div');
+      s.className = 'particle';
+      s.textContent = ['✨','⭐','💫','🌟'][Math.floor(Math.random()*4)];
+      s.style.left = (Math.random() * stage.offsetWidth) + 'px';
+      s.style.top = (Math.random() * stage.offsetHeight) + 'px';
+      s.style.fontSize = (0.8 + Math.random() * 1.2) + 'rem';
+      stage.appendChild(s);
+      setTimeout(() => s.remove(), 1500);
+    }, i * 50);
+  }
+  render();
+}
+
+function doGlitter() {
+  state.hasGlitter = !state.hasGlitter;
+  state.sparkle = Math.min(100, state.sparkle + 20);
+  showMood(state.hasGlitter ? '💎' : '😐');
+  triggerAnim('happy');
+  if (state.hasGlitter) {
+    const stage = document.getElementById('stage');
+    for (let i = 0; i < 40; i++) {
+      setTimeout(() => {
+        const g = document.createElement('div');
+        g.className = 'glitter-particle';
+        const colors = ['#FFD700','#FF69B4','#00BFFF','#FF6FB7','#B06AFF','#7ddf64'];
+        g.style.background = colors[Math.floor(Math.random()*colors.length)];
+        g.style.left = (Math.random() * stage.offsetWidth) + 'px';
+        g.style.top = (Math.random() * stage.offsetHeight * 0.7) + 'px';
+        g.style.width = (4 + Math.random() * 6) + 'px';
+        g.style.height = g.style.width;
+        stage.appendChild(g);
+        setTimeout(() => g.remove(), 2000);
+      }, i * 40);
+    }
+  }
+  render();
+}
+
+function doSlime() {
+  state.hasSlime = !state.hasSlime;
+  state.happiness = Math.min(100, state.happiness + (state.hasSlime ? 10 : -5));
+  showMood(state.hasSlime ? '🤪' : '😅');
+  triggerAnim(state.hasSlime ? 'happy' : 'bounce');
+  if (state.hasSlime) {
+    const stage = document.getElementById('stage');
+    for (let i = 0; i < 15; i++) {
+      setTimeout(() => {
+        const d = document.createElement('div');
+        d.className = 'slime-drip';
+        d.style.left = (stage.offsetWidth * 0.3 + Math.random() * stage.offsetWidth * 0.4) + 'px';
+        d.style.top = (stage.offsetHeight * 0.2 + Math.random() * stage.offsetHeight * 0.3) + 'px';
+        stage.appendChild(d);
+        setTimeout(() => d.remove(), 2500);
+      }, i * 100);
+    }
+  }
+  render();
+}
+
+// === PET INTERACTIONS ===
+function doPet() {
+  state.petCount++;
+  state.happiness = Math.min(100, state.happiness + 12);
+  triggerAnim('happy');
+  const moods = ['🥰','💕','😊','😘','💖','🤗'];
+  showMood(moods[Math.floor(Math.random() * moods.length)]);
+  // Hearts floating
+  const stage = document.getElementById('stage');
+  for (let i = 0; i < 12; i++) {
+    setTimeout(() => {
+      const h = document.createElement('div');
+      h.className = 'particle';
+      h.textContent = ['💖','💕','💗','💓','❤️'][Math.floor(Math.random()*5)];
+      h.style.left = (stage.offsetWidth * 0.3 + Math.random() * stage.offsetWidth * 0.4) + 'px';
+      h.style.top = (stage.offsetHeight * 0.3 + Math.random() * stage.offsetHeight * 0.3) + 'px';
+      stage.appendChild(h);
+      setTimeout(() => h.remove(), 1500);
+    }, i * 80);
+  }
+  // Change eye style to happy temporarily
+  const prevEyes = state.eyeStyle;
+  state.eyeStyle = 1; // happy eyes
+  render();
+  setTimeout(() => { state.eyeStyle = prevEyes; render(); }, 1500);
+}
+
+function doCoffee() {
+  state.coffeeCount++;
+  state.energy = Math.min(100, state.energy + 25);
+  state.happiness = Math.min(100, state.happiness + 5);
+  triggerAnim('coffee-drink');
+  showMood(state.coffeeCount >= 3 ? '🤯' : state.coffeeCount >= 2 ? '😆' : '☕');
+  // Coffee steam particles
+  const stage = document.getElementById('stage');
+  for (let i = 0; i < 8; i++) {
+    setTimeout(() => {
+      const s = document.createElement('div');
+      s.className = 'coffee-steam';
+      s.textContent = ['☕','💨','♨️'][Math.floor(Math.random()*3)];
+      s.style.left = (stage.offsetWidth * 0.4 + Math.random() * stage.offsetWidth * 0.2) + 'px';
+      s.style.top = (stage.offsetHeight * 0.3 + Math.random() * stage.offsetHeight * 0.2) + 'px';
+      stage.appendChild(s);
+      setTimeout(() => s.remove(), 1500);
+    }, i * 120);
+  }
+  // After too much coffee, unicorn goes crazy
+  if (state.coffeeCount >= 3) {
+    setTimeout(() => {
+      triggerAnim('happy');
+      for (let i = 0; i < 20; i++) {
+        setTimeout(() => {
+          const p = document.createElement('div');
+          p.className = 'particle';
+          p.textContent = ['⚡','💥','🔥','✨','☕'][Math.floor(Math.random()*5)];
+          p.style.left = (Math.random() * stage.offsetWidth) + 'px';
+          p.style.top = (Math.random() * stage.offsetHeight) + 'px';
+          stage.appendChild(p);
+          setTimeout(() => p.remove(), 1500);
+        }, i * 60);
+      }
+    }, 500);
+  }
+  render();
+}
+
+// === CLICK ON UNICORN TO PET ===
+document.addEventListener('click', (e) => {
+  if (e.target.closest('.unicorn-svg')) {
+    doPet();
+  }
+});
+
+// === HELPERS ===
+function showMood(emoji) {
+  const bubble = document.getElementById('moodBubble');
+  bubble.textContent = emoji;
+  bubble.classList.add('show');
+  clearTimeout(window._moodTimeout);
+  window._moodTimeout = setTimeout(() => bubble.classList.remove('show'), 2000);
+}
+
+function triggerAnim(cls) {
+  const c = document.getElementById('unicornContainer');
+  c.classList.remove('bounce', 'happy', 'coffee-drink');
+  void c.offsetWidth; // force reflow
+  c.classList.add(cls);
+  setTimeout(() => c.classList.remove(cls), 1000);
+}
+
+function spawnParticles(anchor, emojis, count) {
+  const rect = anchor.getBoundingClientRect();
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      p.style.left = (rect.left + Math.random() * rect.width) + 'px';
+      p.style.top = (rect.top + Math.random() * rect.height) + 'px';
+      document.body.appendChild(p);
+      setTimeout(() => p.remove(), 1500);
+    }, i * 60);
+  }
+}
+
+// === SAVE AS IMAGE ===
+function saveUnicorn() {
+  const svgEl = document.querySelector('.unicorn-svg');
+  if (!svgEl) return;
+  const svgData = new XMLSerializer().serializeToString(svgEl);
+  const canvas = document.getElementById('unicornCanvas');
+  const ctx = canvas.getContext('2d');
+  const img = new Image();
+
+  // Create a nice background
+  const exportCanvas = document.createElement('canvas');
+  exportCanvas.width = 600; exportCanvas.height = 700;
+  const ectx = exportCanvas.getContext('2d');
+
+  // Background gradient
+  const grad = ectx.createLinearGradient(0, 0, 600, 700);
+  grad.addColorStop(0, '#fce4ff');
+  grad.addColorStop(0.5, '#e0c3fc');
+  grad.addColorStop(1, '#d5f5e3');
+  ectx.fillStyle = grad;
+  ectx.fillRect(0, 0, 600, 700);
+
+  // Add some decorative stars
+  ectx.font = '20px serif';
+  for (let i = 0; i < 15; i++) {
+    ectx.globalAlpha = 0.3 + Math.random() * 0.3;
+    ectx.fillText(['✨','⭐','💫','🌟'][Math.floor(Math.random()*4)],
+      Math.random() * 580, Math.random() * 700);
+  }
+  ectx.globalAlpha = 1;
+
+  const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(svgBlob);
+
+  img.onload = () => {
+    const scale = 420 / img.naturalWidth;
+    const w = img.naturalWidth * scale;
+    const h = img.naturalHeight * scale;
+    ectx.drawImage(img, (600 - w) / 2, (650 - h) / 2, w, h);
+
+    // Name
+    const name = document.getElementById('unicornName').value || 'My Unicorn';
+    ectx.font = 'bold 28px Fredoka, sans-serif';
+    ectx.fillStyle = '#b06aff';
+    ectx.textAlign = 'center';
+    ectx.fillText(name, 300, 660);
+
+    // Show modal
+    const dataUrl = exportCanvas.toDataURL('image/png');
+    document.getElementById('savePreview').src = dataUrl;
+    document.getElementById('saveName').textContent = `"${name}" — made with love! 💜`;
+    document.getElementById('saveModal').classList.add('show');
+    window._saveDataUrl = dataUrl;
+    URL.revokeObjectURL(url);
+  };
+  img.src = url;
+}
+
+function downloadUnicorn() {
+  if (!window._saveDataUrl) return;
+  const name = document.getElementById('unicornName').value || 'my-unicorn';
+  const a = document.createElement('a');
+  a.href = window._saveDataUrl;
+  a.download = name.replace(/\s+/g, '-').toLowerCase() + '.png';
+  a.click();
+}
+
+function closeSaveModal() {
+  document.getElementById('saveModal').classList.remove('show');
+}
+
+// === BG STARS ===
+function createBgStars() {
+  for (let i = 0; i < 25; i++) {
+    const s = document.createElement('div');
+    s.className = 'bg-star';
+    s.textContent = ['✦','✧','⋆','˚','·'][Math.floor(Math.random()*5)];
+    s.style.left = Math.random() * 100 + '%';
+    s.style.top = Math.random() * 100 + '%';
+    s.style.fontSize = (8 + Math.random() * 16) + 'px';
+    s.style.color = ['#ff6fb7','#b06aff','#6ac3ff','#ffe066','#7ddf64'][Math.floor(Math.random()*5)];
+    s.style.animationDelay = (Math.random() * 3) + 's';
+    s.style.animationDuration = (2 + Math.random() * 3) + 's';
+    document.body.appendChild(s);
+  }
+}
+
+// === DECAY TIMER ===
+setInterval(() => {
+  state.happiness = Math.max(0, state.happiness - 1);
+  state.energy = Math.max(0, state.energy - 0.5);
+  state.sparkle = Math.max(0, state.sparkle - 0.5);
+  updateBars();
+  if (state.happiness < 20) showMood('😢');
+  else if (state.energy < 20) showMood('😴');
+}, 5000);
+
+// === INIT ===
+loadPet();              // bring back the saved unicorn if there is one
+buildToolbar();
+createBgStars();
+render();
+showMood('🦄');
+// remember the name as she types it
+const nameInput = document.getElementById('unicornName');
+if (nameInput) nameInput.addEventListener('input', persistPet);
+</script>
+</body>
+</html>
