@@ -60,6 +60,14 @@ iframe:not(#gameFrame),.watermark,[id*="badge"],[class*="watermark"]{display:non
 .unicorn.walking{animation:unicornWalk var(--walk-speed,8s) linear forwards}
 @keyframes unicornWalk{0%{transform:translateX(-100px) scaleX(var(--dir,1))}100%{transform:translateX(calc(100vw + 100px)) scaleX(var(--dir,1))}}
 .unicorn.caught{transition:all .5s ease-in;opacity:0;transform:scale(2)!important}
+.unicorn.dancing{animation:unicornDance .5s ease-in-out infinite}
+@keyframes unicornDance{
+  0%{transform:scaleX(var(--dir,1)) rotate(-15deg) scale(1.1)}
+  25%{transform:scaleX(var(--dir,1)) rotate(15deg) scale(1.2)}
+  50%{transform:scaleX(var(--dir,1)) rotate(-10deg) scale(1.1) translateY(-20px)}
+  75%{transform:scaleX(var(--dir,1)) rotate(10deg) scale(1.2)}
+  100%{transform:scaleX(var(--dir,1)) rotate(-15deg) scale(1.1)}
+}
 
 /* === EGG === */
 .egg{position:absolute;cursor:pointer;z-index:11;font-size:65px;filter:drop-shadow(0 6px 12px rgba(255,105,180,.4));animation:eggWobble 1.5s ease-in-out infinite}
@@ -129,6 +137,21 @@ iframe:not(#gameFrame),.watermark,[id*="badge"],[class*="watermark"]{display:non
 #namePrompt .np-go:active{transform:scale(.93)}
 #namePrompt .np-skip{font-family:'Fredoka',sans-serif;font-size:14px;color:rgba(255,255,255,.85);background:none;border:none;cursor:pointer;text-decoration:underline}
 #scoreBar .uni-name{font-family:'Baloo 2',sans-serif;font-weight:800;color:#fff;font-size:15px;text-shadow:0 2px 6px rgba(255,20,147,.5);max-width:34vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;align-self:center}
+
+/* === BABY UNICORN COMPANION === */
+#babyUnicorn{position:fixed;bottom:80px;right:15px;z-index:14;font-size:48px;cursor:pointer;display:none;animation:babyBob 2s ease-in-out infinite;filter:drop-shadow(0 4px 10px rgba(255,20,147,.4))}
+#babyUnicorn.show{display:block}
+@keyframes babyBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+#babyUnicorn.spin{animation:babySpin .6s ease-in-out}
+@keyframes babySpin{0%{transform:rotate(0) scale(1.05)}100%{transform:rotate(360deg) scale(1.05)}}
+#babyUnicorn.jump{animation:babyJump .4s ease}
+@keyframes babyJump{0%,100%{transform:translateY(0)}50%{transform:translateY(-40px)}}
+#babyUnicorn.grow{animation:babyGrow .6s ease}
+@keyframes babyGrow{0%,100%{transform:scale(1)}50%{transform:scale(1.9)}}
+.baby-clap{position:fixed;bottom:132px;right:24px;z-index:15;font-size:26px;pointer-events:none;animation:clapPop .5s ease forwards}
+@keyframes clapPop{0%{opacity:0;transform:scale(.4)}40%{opacity:1;transform:scale(1.1)}100%{opacity:0;transform:scale(.9) translateY(-16px)}}
+.baby-speech{position:fixed;bottom:136px;right:8px;z-index:15;background:#fff;color:#ff1493;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:15px;padding:5px 12px;border-radius:16px;border:2px solid #ff69b4;pointer-events:none;box-shadow:0 3px 10px rgba(255,20,147,.3);animation:speechPop 2.5s ease forwards}
+@keyframes speechPop{0%{opacity:0;transform:scale(.4)}10%{opacity:1;transform:scale(1)}85%{opacity:1}100%{opacity:0}}
 
 /* === POP RING === */
 .pop-ring{position:absolute;border-radius:50%;border:3px solid;pointer-events:none;z-index:15;animation:popRing .6s ease-out forwards}
@@ -275,8 +298,9 @@ body.shake{animation:screenShake .5s ease-in-out}
 body.night #nightSky{opacity:1}
 body.night .twinkle-stars{opacity:1;filter:brightness(1.8) drop-shadow(0 0 3px #fff)}
 body.night .rainbow{opacity:.04}
-#moon{position:fixed;top:7%;right:12%;font-size:64px;z-index:1;opacity:0;transition:opacity 1.3s ease,transform 1.3s ease;transform:scale(.6) rotate(-20deg);pointer-events:none;filter:drop-shadow(0 0 24px rgba(255,255,200,.75))}
-body.night #moon{opacity:1;transform:scale(1) rotate(0)}
+#moon{position:fixed;top:7%;right:12%;font-size:64px;z-index:13;opacity:0;transition:opacity 1.3s ease,transform .3s ease,filter .3s ease;transform:scale(.6) rotate(-20deg);pointer-events:none;filter:drop-shadow(0 0 24px rgba(255,255,200,.75))}
+body.night #moon{opacity:1;transform:scale(1) rotate(0);pointer-events:auto;cursor:pointer}
+#moon.tapped{filter:drop-shadow(0 0 44px rgba(255,255,210,1)) brightness(1.3);transform:scale(1.15)}
 
 /* === FALLING MAGIC (snow / flowers / hearts / candy) === */
 .falling{position:fixed;top:-60px;pointer-events:none;z-index:14;will-change:transform,opacity;animation:fallDown var(--fall,4s) linear forwards}
@@ -333,6 +357,7 @@ body.night #moon{opacity:1;transform:scale(1) rotate(0)}
 <div class="twinkle-stars"></div>
 <div class="rainbow"></div>
 <div id="moon">🌙</div>
+<div id="babyUnicorn">🦄</div>
 <canvas id="glitterCanvas"></canvas>
 <canvas id="paintCanvas"></canvas>
 <div id="wandGlow"></div>
@@ -905,6 +930,22 @@ function toggleNight() {
   else { for (let i=0;i<6;i++) setTimeout(()=>Glitter.burst(Math.random()*innerWidth, innerHeight*0.4*Math.random(), 18), i*90); giantBloom('☀️'); }
 }
 
+// ── Tap the moon to make it snow (Feature 8) ──
+(function () {
+  const moon = document.getElementById('moon');
+  if (!moon) return;
+  const makeSnow = (e) => {
+    e.stopPropagation(); e.preventDefault();
+    fallingMagic(['❄️','⛄','🌨️','💙','🤍'], 40, 6);
+    SFX.milestone();
+    floatText("⛄ It's snowing!", innerWidth/2, innerHeight*0.42, { size:'30px', color:'#dff3ff', duration:2000 });
+    moon.classList.add('tapped');
+    setTimeout(() => moon.classList.remove('tapped'), 350);
+  };
+  moon.addEventListener('pointerdown', makeSnow);
+  moon.addEventListener('touchstart', (e) => { e.preventDefault(); makeSnow(e); }, {passive:false});
+})();
+
 // ── Surprise spell book — the MAGIC button casts a random one each press ──
 const SPELLS = [
   { run: () => { flyingMagic(['🦋','🧚','🪽','🦋'], 14, 6); giantBloom('🦋'); } },                 // butterfly swarm
@@ -940,7 +981,7 @@ function addSparkles(n) {
   checkWorldUnlocks();
   updateMagicMeter(n);
 }
-function addUnicorns(n) { S.unicorns += n; unicornEl.textContent = S.unicorns; bump(unicornEl); }
+function addUnicorns(n) { S.unicorns += n; unicornEl.textContent = S.unicorns; bump(unicornEl); if (S.unicorns >= 1) Baby.show(); }
 
 // ── Floating text helper (NOM NOM, WOOF!, RAWR!, etc.) ──
 function floatText(text, x, y, opts = {}) {
@@ -974,6 +1015,52 @@ function loadUnicornName() {
   try { return localStorage.getItem('sparkleUnicornGardenName') || ''; } catch (e) { return ''; }
 }
 
+// ── Baby Unicorn Companion (Feature 6) ──
+const Baby = (() => {
+  let visible = false;
+  const el = () => document.getElementById('babyUnicorn');
+  const anim = (cls, dur) => {
+    const b = el(); if (!b || !visible) return;
+    b.classList.remove('spin','jump','grow'); void b.offsetWidth;
+    b.classList.add(cls); setTimeout(() => b.classList.remove(cls), dur);
+  };
+  return {
+    show() {
+      if (visible) return; visible = true;
+      const b = el(); b.classList.add('show');
+      const jump = (e) => { e.stopPropagation(); anim('jump', 400); SFX.note(1200, 0.06, 'sine', 0.06); };
+      b.addEventListener('pointerdown', jump);
+      b.addEventListener('touchstart', (e) => { e.preventDefault(); jump(e); }, {passive:false});
+      const speak = () => {
+        if (!visible) return;
+        const msgs = ['🌟!','Yay!','Wow!','✨!','More!'];
+        const s = document.createElement('div');
+        s.className = 'baby-speech';
+        s.textContent = msgs[Math.floor(Math.random()*msgs.length)];
+        document.body.appendChild(s);
+        setTimeout(() => s.remove(), 2500);
+        setTimeout(speak, 20000 + Math.random()*10000);
+      };
+      setTimeout(speak, 20000 + Math.random()*10000);
+    },
+    clap() {
+      if (!visible) return;
+      const c = document.createElement('div');
+      c.className = 'baby-clap'; c.textContent = '👏';
+      document.body.appendChild(c);
+      setTimeout(() => c.remove(), 500);
+    },
+    spin() { anim('spin', 600); },
+    grow() {
+      anim('grow', 600);
+      const b = el(); if (!b) return;
+      const r = b.getBoundingClientRect(), x = r.left + r.width/2, y = r.top + r.height/2;
+      for (let i = 0; i < 3; i++) setTimeout(() => Glitter.burst(x, y, 10), i * 80);
+    },
+    isVisible() { return visible; }
+  };
+})();
+
 // ── Milestone System ──
 function checkMilestone() {
   if (S.celebrationActive) return;
@@ -1006,6 +1093,7 @@ function triggerMilestone(m) {
 
   SFX.milestone();
   showRainbowArc();
+  Baby.spin();
 
   // Big glitter burst
   for (let i = 0; i < 8; i++) {
@@ -1046,6 +1134,7 @@ function updateMagicMeter(n) {
 
 function doMagicBurst() {
   const isMega = S.magicMeter >= 50;
+  Baby.grow();
 
   if (isMega) {
     // MEGA BURST — full-screen spell + TWO surprise spells at once
@@ -1258,6 +1347,7 @@ function spawnBubble() {
     Glitter.burst(cx, cy, 20);
     SFX.pop();
     addSparkles(1);
+    Baby.clap();
 
     // Pop ring
     const ring = document.createElement('div');
@@ -1301,32 +1391,107 @@ function spawnUnicorn() {
   scene.appendChild(el);
   SFX.unicorn();
 
-  const catchUnicorn = (e) => {
-    e.stopPropagation();
-    e.preventDefault();
+  let taps = [], dancing = false, removeTimer = null;
+
+  const doCatch = () => {
+    if (el.classList.contains('caught')) return;
     const r = el.getBoundingClientRect();
     Glitter.burst(r.left + r.width/2, r.top + r.height/2, 30);
     SFX.sparkle();
     addSparkles(5);
     addUnicorns(1);
     floatText(unicornName ? `You caught ${unicornName}!` : 'You caught a unicorn!', r.left + r.width/2, r.top, { color:'#fff' });
-    el.classList.remove('walking');
+    if (el._walkAnim) { try { el._walkAnim.cancel(); } catch(e){} }
+    clearTimeout(removeTimer);
+    el.classList.remove('walking','dancing');
     el.classList.add('caught');
     setTimeout(() => { el.remove(); DOMManager.remove('unicorns'); }, 500);
   };
 
-  el.addEventListener('pointerdown', catchUnicorn);
-  el.addEventListener('touchstart', (e) => { e.preventDefault(); catchUnicorn(e); }, {passive:false});
+  const startDance = () => {
+    if (dancing || el.classList.contains('caught')) return;
+    dancing = true;
+    clearTimeout(el._catchT);
+    clearTimeout(removeTimer);
+    const r = el.getBoundingClientRect();
+    el.style.left = r.left + 'px';   // freeze in place so it doesn't teleport
+    el.style.right = 'auto';
+    el.classList.remove('walking');
+    el.classList.add('dancing');
+    floatText('💃 Dance party! 💃', r.left + r.width/2, r.top, { color:'#fff' });
+    const notes = [523,659,784,1047,784,659,523];
+    let ni = 0;
+    const danceMusic = setInterval(() => { SFX.note(notes[ni % notes.length], 0.12, 'triangle', 0.07); ni++; }, 120);
+    const danceSpark = setInterval(() => addSparkles(2), 1000); // +2/sec → +6 over the dance
+    setTimeout(() => {
+      clearInterval(danceMusic); clearInterval(danceSpark);
+      if (!el.parentNode || el.classList.contains('caught')) return;
+      el.classList.remove('dancing');
+      dancing = false;
+      const startX = parseFloat(el.style.left) || r.left;
+      const speed = parseFloat(el.style.getPropertyValue('--walk-speed')) || 8;
+      el._walkAnim = el.animate(
+        [{ transform:`translateX(0) scaleX(${dir})` }, { transform:`translateX(${innerWidth - startX + 140}px) scaleX(${dir})` }],
+        { duration: speed * 1000 * 0.6, easing:'linear', fill:'forwards' }
+      );
+      el._walkAnim.onfinish = () => { if (el.parentNode && !el.classList.contains('caught')) { el.remove(); DOMManager.remove('unicorns'); } };
+    }, 3000);
+  };
+
+  const tapUnicorn = (e) => {
+    e.stopPropagation(); e.preventDefault();
+    if (el.classList.contains('caught') || dancing) return;
+    const now = performance.now();
+    taps.push(now);
+    taps = taps.filter(t => now - t <= 1500);
+    const r = el.getBoundingClientRect();
+    Glitter.burst(r.left + r.width/2, r.top + r.height/2, 6);
+    SFX.note(900, 0.05, 'sine', 0.04);
+    if (taps.length >= 3) { startDance(); return; }
+    clearTimeout(el._catchT);
+    el._catchT = setTimeout(() => { if (!dancing) doCatch(); }, 450);
+  };
+
+  el.addEventListener('pointerdown', tapUnicorn);
+  el.addEventListener('touchstart', (e) => { e.preventDefault(); tapUnicorn(e); }, {passive:false});
 
   const dur = parseFloat(el.style.getPropertyValue('--walk-speed')) * 1000;
-  setTimeout(() => {
-    if (el.parentNode && !el.classList.contains('caught')) {
+  removeTimer = setTimeout(() => {
+    if (el.parentNode && !el.classList.contains('caught') && !dancing) {
       el.remove(); DOMManager.remove('unicorns');
     }
   }, dur + 200);
 }
 
 // ── EGGS ──
+// ── Egg surprise creatures (Feature 7) ──
+function pinkFlash() {
+  const f = document.createElement('div');
+  f.style.cssText = 'position:fixed;inset:0;z-index:58;pointer-events:none;background:rgba(255,150,210,.5);opacity:0;transition:opacity .15s';
+  document.body.appendChild(f);
+  requestAnimationFrame(() => { f.style.opacity = '1'; setTimeout(() => { f.style.opacity = '0'; setTimeout(() => f.remove(), 300); }, 150); });
+}
+const HATCH_CREATURES = [
+  { emoji:'🦄', reward:10, unicorn:true, msg:'A baby unicorn! 🦄', fx:()=>{} },
+  { emoji:'🐉', reward:12, msg:'A dragon appeared! 🐉', fx:(cx,cy)=>{ dinoRoar(); fallingMagic(['🔥','✨','🔥'],18,4); } },
+  { emoji:'🐰', reward:8,  msg:'A magic bunny! 🐰', fx:()=>{ SFX.slide(600,300,0.15,'sine',0.06); pinkFlash(); } },
+  { emoji:'🐱', reward:8,  msg:'Kitty says hello! 🐱', fx:()=>{ SFX.slide(800,600,0.2,'triangle',0.06); fallingMagic(['💖','💕','😻'],18,4); } },
+  { emoji:'🐣', reward:6,  msg:'Peep peep! 🐣', fx:(cx,cy)=>{ SFX.note(1400,0.08,'sine',0.06); setTimeout(()=>SFX.note(1400,0.08,'sine',0.06),120); Glitter.burst(cx,cy,30); } },
+  { emoji:'🦋', reward:10, msg:'A magical butterfly! 🦋', fx:()=>{ SFX.sparkle(); flyingMagic(['🦋','🌸','💖'],15); } },
+];
+function hatchCreature(cx, cy) {
+  const c = HATCH_CREATURES[Math.floor(Math.random() * HATCH_CREATURES.length)];
+  addSparkles(c.reward);
+  if (c.unicorn) addUnicorns(1);
+  const hatched = document.createElement('div');
+  hatched.style.cssText = `position:absolute;left:${cx-40}px;top:${cy-40}px;font-size:80px;pointer-events:none;z-index:16;animation:hatchPop .8s ease-out forwards`;
+  hatched.textContent = c.emoji;
+  scene.appendChild(hatched);
+  setTimeout(() => hatched.remove(), 800);
+  floatText(c.msg, cx, cy - 40, { color:'#fff' });
+  c.fx(cx, cy);
+}
+
 function spawnEgg() {
   if (!S.started || !DOMManager.canSpawn('eggs')) return;
   DOMManager.add('eggs');
@@ -1356,19 +1521,11 @@ function spawnEgg() {
       // Visual progress
       el.style.filter = `drop-shadow(0 0 ${taps*5}px #ff69b4) drop-shadow(0 6px 12px rgba(255,105,180,.4))`;
     } else {
-      // HATCH!
+      // HATCH into a random surprise creature!
       const cx = r.left + r.width/2, cy = r.top + r.height/2;
       Glitter.burst(cx, cy, 40);
       SFX.hatch();
-      addSparkles(10);
-      addUnicorns(1);
-
-      // Show hatched unicorn
-      const hatched = document.createElement('div');
-      hatched.style.cssText = `position:absolute;left:${cx-40}px;top:${cy-40}px;font-size:80px;pointer-events:none;z-index:16;animation:hatchPop .8s ease-out forwards`;
-      hatched.textContent = '🦄';
-      scene.appendChild(hatched);
-      setTimeout(() => hatched.remove(), 800);
+      hatchCreature(cx, cy);
 
       DOMManager.remove('eggs');
       el.remove();
