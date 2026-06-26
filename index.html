@@ -32,7 +32,8 @@
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;height:100%;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
-body{background:linear-gradient(135deg,#ffe0f0 0%,#ffb6d9 18%,#ff8ec4 36%,#d9a7ff 54%,#a7c8ff 72%,#fff0f5 100%);background-size:400% 400%;animation:auroraShift 20s ease infinite;font-family:'Fredoka','Baloo 2',sans-serif}
+body{--bg:linear-gradient(135deg,#ffe0f0 0%,#ffb6d9 18%,#ff8ec4 36%,#d9a7ff 54%,#a7c8ff 72%,#fff0f5 100%);background-image:var(--bg);background-size:400% 400%;animation:auroraShift 20s ease infinite;font-family:'Fredoka','Baloo 2',sans-serif;transition:none}
+body.dark-world .twinkle-stars{opacity:1;filter:brightness(1.7) drop-shadow(0 0 3px #fff)}
 @keyframes auroraShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
 
 /* HIDE external overlays/watermarks that might distract toddlers */
@@ -102,6 +103,28 @@ iframe:not(#gameFrame),.watermark,[id*="badge"],[class*="watermark"]{display:non
 .mode-btn.active{background:linear-gradient(135deg,#ff69b4,#ff1493);color:#fff;border-color:#fff;animation:modeGlow 1.4s ease-in-out infinite}
 @keyframes modeGlow{0%,100%{box-shadow:0 4px 15px rgba(255,20,147,.4)}50%{box-shadow:0 4px 22px rgba(255,20,147,.7),0 0 26px rgba(255,182,217,.7)}}
 .mode-btn:active{transform:scale(.92)}
+
+/* === WORLD TRAVEL === */
+#worldBtn{position:fixed;top:12px;left:12px;z-index:50;width:50px;height:50px;font-size:26px;border-radius:50%;background:#fff;border:3px solid #ff69b4;box-shadow:0 4px 15px rgba(255,20,147,.3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .2s;line-height:1}
+#worldBtn:active{transform:scale(.9)}
+#worldBtn.glow{animation:worldGlow 1s ease-in-out infinite}
+@keyframes worldGlow{0%,100%{box-shadow:0 4px 15px rgba(255,20,147,.4)}50%{box-shadow:0 0 28px 7px rgba(255,215,0,.95)}}
+
+#worldPicker{position:fixed;inset:0;z-index:80;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:rgba(255,105,180,.35);backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .35s}
+#worldPicker.show{opacity:1;pointer-events:auto}
+#worldPicker h2{font-family:'Baloo 2',sans-serif;color:#fff;font-size:clamp(22px,5vw,34px);font-weight:800;text-shadow:0 3px 10px rgba(255,20,147,.5)}
+.world-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:6px}
+.world-card{width:clamp(120px,38vw,180px);padding:16px 10px;border-radius:24px;background:#fff;border:4px solid #ff69b4;box-shadow:0 6px 20px rgba(255,20,147,.3);cursor:pointer;text-align:center;transition:transform .15s}
+.world-card:active{transform:scale(.94)}
+.world-card.current{border-color:#ffd700;box-shadow:0 0 22px rgba(255,215,0,.7)}
+.world-card.locked{filter:grayscale(.7);opacity:.85}
+.world-card .wc-icon{font-size:54px;line-height:1.1}
+.world-card .wc-name{font-family:'Baloo 2',sans-serif;font-size:15px;font-weight:800;color:#ff1493;margin-top:4px}
+.world-card .wc-lock{font-family:'Baloo 2',sans-serif;font-size:12px;color:#c44dff;font-weight:700;margin-top:2px}
+.world-close{font-family:'Baloo 2',sans-serif;font-size:18px;font-weight:700;color:#ff1493;background:#fff;border:3px solid #ff69b4;border-radius:40px;padding:8px 26px;cursor:pointer;margin-top:6px;box-shadow:0 4px 15px rgba(255,20,147,.3)}
+
+#worldToast{position:fixed;top:88px;left:50%;transform:translateX(-50%) translateY(-12px);z-index:55;font-family:'Baloo 2',sans-serif;font-size:clamp(19px,5vw,28px);font-weight:800;color:#fff;text-shadow:0 3px 10px rgba(255,20,147,.6);background:rgba(255,105,180,.55);backdrop-filter:blur(8px);padding:8px 26px;border-radius:40px;border:2px solid rgba(255,255,255,.6);opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;white-space:nowrap}
+#worldToast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* === MUSIC TOGGLE === */
 #musicBtn{position:fixed;bottom:15px;left:15px;z-index:50;width:46px;height:46px;font-size:20px;border-radius:50%;background:#fff;border:3px solid #ff69b4;box-shadow:0 4px 15px rgba(255,20,147,.3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .2s;line-height:1}
@@ -217,6 +240,23 @@ body.night #moon{opacity:1;transform:scale(1) rotate(0)}
 #paintIndicator{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:49;font-family:'Baloo 2',sans-serif;font-size:24px;font-weight:800;color:#fff;text-shadow:0 2px 8px rgba(255,20,147,.6);background:rgba(255,105,180,.6);backdrop-filter:blur(8px);padding:8px 24px;border-radius:30px;border:2px solid rgba(255,255,255,.5);opacity:0;transition:opacity .3s;pointer-events:none}
 #paintIndicator.show{opacity:1}
 
+/* === PAINT TOOLBAR === */
+#paintToolbar{position:fixed;bottom:72px;left:50%;transform:translateX(-50%);z-index:50;display:none;flex-direction:column;align-items:center;gap:6px;pointer-events:none}
+#paintToolbar.show{display:flex;pointer-events:auto}
+#paintTools{display:flex;gap:5px;justify-content:center;background:rgba(255,255,255,.9);backdrop-filter:blur(12px);padding:7px 10px;border-radius:22px;border:2px solid rgba(255,105,180,.4);box-shadow:0 4px 20px rgba(255,20,147,.2)}
+.tool-btn{font-family:'Baloo 2',sans-serif;font-size:10px;font-weight:700;color:#ff1493;background:transparent;border:2px solid transparent;border-radius:14px;padding:5px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:48px;transition:all .18s;line-height:1}
+.tool-btn .t-ico{font-size:22px;line-height:1.1}
+.tool-btn.active{background:linear-gradient(135deg,#ff69b4,#ff1493);color:#fff;border-color:rgba(255,255,255,.5);box-shadow:0 2px 10px rgba(255,20,147,.4)}
+.tool-btn:active{transform:scale(.88)}
+#colorPalette{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;background:rgba(255,255,255,.9);backdrop-filter:blur(12px);padding:7px 12px;border-radius:20px;border:2px solid rgba(255,105,180,.3);box-shadow:0 4px 16px rgba(255,20,147,.15)}
+.c-swatch{width:28px;height:28px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all .15s;box-shadow:0 2px 6px rgba(0,0,0,.15)}
+.c-swatch.active{border-color:#ff1493;transform:scale(1.28);box-shadow:0 0 10px rgba(255,20,147,.5)}
+#stampPicker{display:none;gap:4px;flex-wrap:wrap;justify-content:center;max-width:310px;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);padding:8px 12px;border-radius:20px;border:2px solid rgba(255,105,180,.4);box-shadow:0 4px 20px rgba(255,20,147,.2)}
+#stampPicker.show{display:flex}
+.stamp-opt{font-size:26px;cursor:pointer;padding:3px;border-radius:8px;transition:transform .15s;line-height:1.1}
+.stamp-opt.active{background:rgba(255,105,180,.25);transform:scale(1.2)}
+.stamp-opt:active{transform:scale(.85)}
+
 /* === RESPONSIVE === */
 @media(max-width:600px){
   .score-item{font-size:14px;padding:4px 10px}
@@ -225,6 +265,10 @@ body.night #moon{opacity:1;transform:scale(1) rotate(0)}
   .unicorn{font-size:55px}
   .egg{font-size:50px}
   #milestoneBar{height:12px}
+  .tool-btn{min-width:40px;font-size:9px;padding:4px 5px}
+  .tool-btn .t-ico{font-size:18px}
+  .c-swatch{width:24px;height:24px}
+  .stamp-opt{font-size:22px}
 }
 </style>
 </head>
@@ -260,6 +304,29 @@ body.night #moon{opacity:1;transform:scale(1) rotate(0)}
 <!-- Paint mode indicator -->
 <div id="paintIndicator">🎨 Drawing Mode!</div>
 
+<!-- Paint Toolbar (visible only in paint mode) -->
+<div id="paintToolbar">
+  <div id="stampPicker"></div>
+  <div id="colorPalette"></div>
+  <div id="paintTools">
+    <button class="tool-btn active" data-tool="brush"><span class="t-ico">🖌️</span>Brush</button>
+    <button class="tool-btn" data-tool="spray"><span class="t-ico">💨</span>Spray</button>
+    <button class="tool-btn" data-tool="stamp"><span class="t-ico">🌟</span>Stamp</button>
+    <button class="tool-btn" data-tool="rainbow"><span class="t-ico">🌈</span>Rainbow</button>
+    <button class="tool-btn" data-tool="eraser"><span class="t-ico">⬜</span>Erase</button>
+    <button class="tool-btn" id="clearPaintBtn"><span class="t-ico">🗑️</span>Clear</button>
+  </div>
+</div>
+
+<!-- World travel -->
+<button id="worldBtn" title="Travel to a world">🌍</button>
+<div id="worldToast"></div>
+<div id="worldPicker">
+  <h2>✨ Choose a World ✨</h2>
+  <div class="world-grid" id="worldGrid"></div>
+  <button class="world-close" id="worldClose">💖 Stay Here</button>
+</div>
+
 <!-- Music toggle -->
 <button id="musicBtn" title="Music on/off">🎵</button>
 
@@ -279,7 +346,7 @@ body.night #moon{opacity:1;transform:scale(1) rotate(0)}
   <div id="titleFloat" style="position:absolute;inset:0;overflow:hidden;pointer-events:none"></div>
   <div class="title-unicorn">🦄</div>
   <h1>Sparkle Unicorn<br>Magic Garden</h1>
-  <p class="title-hint">Tap bubbles, catch unicorns, hatch eggs, paint with sparkles!</p>
+  <p class="title-hint">Tap bubbles, catch unicorns, paint with sparkles — and travel to candy, ocean & space worlds! 🌍</p>
   <button id="playBtn">✨ TAP TO PLAY ✨</button>
 </div>
 
@@ -291,6 +358,7 @@ body.night #moon{opacity:1;transform:scale(1) rotate(0)}
 // ── SFX Engine (renamed from Audio to avoid window.Audio conflict) ──
 const SFX = (() => {
   let ctx;
+  let worldPitch = 1; // each world tints the sound effects a little
   const init = () => {
     if (!ctx) {
       ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -301,7 +369,7 @@ const SFX = (() => {
     if (!ctx) return;
     try {
       const o = ctx.createOscillator(), g = ctx.createGain();
-      o.type = type; o.frequency.value = f;
+      o.type = type; o.frequency.value = f * worldPitch;
       g.gain.setValueAtTime(vol, ctx.currentTime);
       g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + d);
       o.connect(g).connect(ctx.destination);
@@ -360,6 +428,7 @@ const SFX = (() => {
 
   return {
     init,
+    setPitch(p) { worldPitch = p; },
     startMusic, stopMusic,
     isMusicOn: () => musicOn,
     toggleMusic() { musicOn ? stopMusic() : startMusic(); return musicOn; },
@@ -691,6 +760,7 @@ function addSparkles(n) {
   sparkleEl.textContent = S.sparkles;
   bump(sparkleEl);
   checkMilestone();
+  checkWorldUnlocks();
   updateMagicMeter(n);
 }
 function addUnicorns(n) { S.unicorns += n; unicornEl.textContent = S.unicorns; bump(unicornEl); }
@@ -819,10 +889,133 @@ musicBtn.addEventListener('click', (e) => {
   updateMusicBtn();
 });
 
-// ── BUBBLES ──
-const BUBBLE_EMOJIS = ['💖','⭐','🌟','💫','🦄','🌈','💝','🎀','👑','💎','🧁','🩰','🌸','💕','✨',
-  '🧚','🦋','🔮','🪄','🏰','🍄','🌷','🌺','🌻','🍭','🍬','🍩','🦢','🕊️','🦚','🐬','🐠','🌙','🍓','🍒','🫧','💐','🎠','🐚','🪽','🦩','🌼','🪻','🍰','🪐','🌝'];
+// ── WORLDS (each world transforms the whole scene) ──
+const WORLDS = [
+  {
+    id:'garden', name:'Magic Garden', icon:'🌸', unlock:0, dark:false, pitch:1,
+    bg:'linear-gradient(135deg,#ffe0f0 0%,#ffb6d9 18%,#ff8ec4 36%,#d9a7ff 54%,#a7c8ff 72%,#fff0f5 100%)',
+    bubbles:['💖','⭐','🌟','💫','🦄','🌈','💝','🎀','👑','💎','🧁','🩰','🌸','💕','✨','🧚','🦋','🔮','🪄','🏰','🍄','🌷','🌺','🌻','🦢','🕊️','🦚','🐬','🌙','🫧','💐','🎠','🪽','🦩','🌼','🪻'],
+    stars:['✨','⭐','🌟','💫','🌠','🪩','🔆','💖'],
+    creature:'🦄', fliers:['🦋','🧚','🪽','🐝'],
+    drifters:['☁️','🌸','💗','🧚','🦋','🌈','⭐','🎈','🌷','🪽']
+  },
+  {
+    id:'candy', name:'Candy Land', icon:'🍭', unlock:20, dark:false, pitch:1.12,
+    bg:'linear-gradient(135deg,#fff0f5 0%,#ffd9ec 25%,#ffc8e0 45%,#ffe0b3 65%,#ffeaf4 85%,#fff0f5 100%)',
+    bubbles:['🍭','🍬','🧁','🍩','🍰','🍪','🍫','🍓','🍒','🍦','🍮','🍯','🧃','🍡','🍧','🍨','🌈','⭐','🫧','💖','🍌','🍉'],
+    stars:['🍬','⭐','✨','🍭','🌟','🧁','💖','🍩'],
+    creature:'🦄', fliers:['🧁','🍭','🍬','🦋'],
+    drifters:['🍭','🍬','☁️','🍩','🌈','🧁','🍓','🍫']
+  },
+  {
+    id:'sea', name:'Under the Sea', icon:'🌊', unlock:40, dark:false, pitch:0.9,
+    bg:'linear-gradient(160deg,#aef3ff 0%,#7fd8f5 25%,#4fb8e8 50%,#3a9fd6 72%,#bff3ff 100%)',
+    bubbles:['🐠','🐟','🐬','🐙','🦀','🐚','🧜‍♀️','🌊','🐳','🐢','🦑','🪸','🐡','🦭','🦈','⭐','🫧','💎','🏝️','🦞'],
+    stars:['⭐','🐚','✨','🫧','🌟','💎','🐠'],
+    creature:'🧜‍♀️', fliers:['🐠','🐬','🐟','🦋'],
+    drifters:['🫧','🐠','🐚','🌊','🐬','⭐','🐟','🪼']
+  },
+  {
+    id:'space', name:'Outer Space', icon:'🚀', unlock:60, dark:true, pitch:1.05,
+    bg:'linear-gradient(160deg,#140a33 0%,#241258 32%,#3d2270 58%,#5a2d7a 82%,#140a33 100%)',
+    bubbles:['🚀','🪐','⭐','🌙','👽','🛸','☄️','✨','🌟','🌠','💫','🌍','🔭','🌌','🌕','🌑','🪨','👾','🌞','💜'],
+    stars:['⭐','🌟','✨','💫','🌠','🪐','🌙'],
+    creature:'🚀', fliers:['🛸','👽','🚀','⭐'],
+    drifters:['⭐','🪐','🌙','🚀','🛸','☄️','🌟','👽']
+  },
+];
+let W = WORLDS[0]; // current world
 
+function clearScene() {
+  ['.bubble','.unicorn','.egg','.star','.butterfly'].forEach(sel =>
+    document.querySelectorAll(sel).forEach(el => {
+      el.style.transition = 'opacity .3s, transform .3s';
+      el.style.opacity = '0'; el.style.transform = 'scale(.4)';
+      setTimeout(() => el.remove(), 300);
+    }));
+  Object.keys(DOMManager.counts).forEach(k => DOMManager.counts[k] = 0);
+}
+
+function applyWorld(world, announce = true) {
+  W = world;
+  document.body.style.setProperty('--bg', world.bg);
+  document.body.classList.toggle('dark-world', !!world.dark);
+  SFX.setPitch(world.pitch);
+  if (announce) {
+    clearScene(); // sweep away the old world so the new one feels fresh
+    spellFlash.classList.remove('flash'); void spellFlash.offsetWidth;
+    spellFlash.classList.add('flash');
+    giantBloom(world.icon);
+    showWorldToast(`${world.icon} ${world.name}!`);
+    shootingStars(5);
+    for (let i = 0; i < 5; i++) setTimeout(() => Glitter.burst(Math.random()*innerWidth, Math.random()*innerHeight, 22), i*90);
+    // welcome the new world with its own creatures
+    for (let i = 0; i < 4; i++) setTimeout(spawnBubble, 350 + i*170);
+    setTimeout(spawnUnicorn, 550);
+    setTimeout(spawnStar, 750);
+    setTimeout(() => spawnButterfly(), 950);
+  }
+}
+
+// ── WORLD PICKER UI ──
+const worldBtn = document.getElementById('worldBtn');
+const worldToast = document.getElementById('worldToast');
+const worldPicker = document.getElementById('worldPicker');
+const worldGrid = document.getElementById('worldGrid');
+const worldClose = document.getElementById('worldClose');
+S.unlockedWorlds = ['garden'];
+let _toastT;
+function showWorldToast(text) {
+  worldToast.textContent = text;
+  worldToast.classList.add('show');
+  clearTimeout(_toastT);
+  _toastT = setTimeout(() => worldToast.classList.remove('show'), 2300);
+}
+function buildWorldGrid() {
+  worldGrid.innerHTML = '';
+  WORLDS.forEach(w => {
+    const unlocked = S.unlockedWorlds.includes(w.id);
+    const card = document.createElement('div');
+    card.className = 'world-card' + (w.id === W.id ? ' current' : '') + (unlocked ? '' : ' locked');
+    card.innerHTML = `<div class="wc-icon">${unlocked ? w.icon : '🔒'}</div>` +
+      `<div class="wc-name">${w.name}</div>` +
+      (unlocked ? '' : `<div class="wc-lock">${w.unlock}✨ to open</div>`);
+    card.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!S.unlockedWorlds.includes(w.id)) {
+        SFX.crack();
+        card.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}], {duration:300});
+        showWorldToast(`Collect ${w.unlock}✨ to open ${w.name}!`);
+        return;
+      }
+      travel(w);
+    });
+    worldGrid.appendChild(card);
+  });
+}
+function openPicker() { SFX.init(); buildWorldGrid(); worldPicker.classList.add('show'); }
+function closePicker() { worldPicker.classList.remove('show'); }
+function travel(w) {
+  closePicker();
+  worldBtn.classList.remove('glow');
+  applyWorld(w, true);
+}
+function checkWorldUnlocks() {
+  WORLDS.forEach(w => {
+    if (w.unlock > 0 && S.sparkles >= w.unlock && !S.unlockedWorlds.includes(w.id)) {
+      S.unlockedWorlds.push(w.id);
+      worldBtn.classList.add('glow');
+      showWorldToast(`${w.icon} ${w.name} unlocked! Tap 🌍`);
+      SFX.milestone();
+      shootingStars(6);
+    }
+  });
+}
+worldBtn.addEventListener('click', (e) => { e.stopPropagation(); openPicker(); });
+worldClose.addEventListener('click', (e) => { e.stopPropagation(); closePicker(); });
+worldPicker.addEventListener('click', (e) => { if (e.target === worldPicker) closePicker(); });
+
+// ── BUBBLES ──
 function spawnBubble() {
   if (!S.started || !DOMManager.canSpawn('bubbles')) return;
   DOMManager.add('bubbles');
@@ -830,7 +1023,7 @@ function spawnBubble() {
   const size = 60 + Math.random() * 45;
   const el = document.createElement('div');
   el.className = 'bubble';
-  const emoji = BUBBLE_EMOJIS[Math.floor(Math.random() * BUBBLE_EMOJIS.length)];
+  const emoji = W.bubbles[Math.floor(Math.random() * W.bubbles.length)];
   el.innerHTML = `<div class="bubble-inner">${emoji}</div>`;
   el.style.width = el.style.height = size + 'px';
   el.style.left = (20 + Math.random() * (innerWidth - size - 40)) + 'px';
@@ -877,7 +1070,7 @@ function spawnUnicorn() {
 
   const el = document.createElement('div');
   el.className = 'unicorn';
-  el.textContent = '🦄';
+  el.textContent = W.creature;
   const dir = Math.random() > 0.5 ? 1 : -1;
   const y = 80 + Math.random() * (innerHeight - 250);
   el.style.top = y + 'px';
@@ -979,7 +1172,7 @@ function spawnStar() {
 
   const el = document.createElement('div');
   el.className = 'star';
-  el.textContent = ['✨','⭐','🌟','💫','🌠','🪩','🔆','💖'][Math.floor(Math.random()*8)];
+  el.textContent = W.stars[Math.floor(Math.random()*W.stars.length)];
   el.style.left = (30 + Math.random() * (innerWidth - 80)) + 'px';
   el.style.top = (80 + Math.random() * (innerHeight - 200)) + 'px';
   scene.appendChild(el);
@@ -1007,15 +1200,13 @@ function spawnStar() {
 }
 
 // ── BUTTERFLIES (flutter across, tap to catch) ──
-const BUTTERFLY_EMOJIS = ['🦋','🧚','🪽','🐝','🪲','🌸'];
-
 function spawnButterfly() {
   if (!S.started || !DOMManager.canSpawn('butterflies')) return;
   DOMManager.add('butterflies');
 
   const el = document.createElement('div');
   el.className = 'butterfly';
-  el.textContent = BUTTERFLY_EMOJIS[Math.floor(Math.random() * BUTTERFLY_EMOJIS.length)];
+  el.textContent = W.fliers[Math.floor(Math.random() * W.fliers.length)];
   const dir = Math.random() > 0.5 ? 1 : -1;
   const y = 90 + Math.random() * (innerHeight - 280);
   el.style.top = y + 'px';
@@ -1063,7 +1254,7 @@ function tapSparkle(px, py) {
   // Temporary sparkle that fades quickly
   const star = document.createElement('div');
   star.style.cssText = `position:absolute;left:${px-18}px;top:${py-18}px;font-size:36px;pointer-events:none;z-index:10;animation:starPulse .5s ease-in-out forwards;opacity:0`;
-  star.textContent = ['✨','💖','⭐','🌸','💫','🦋','🌟','💕'][Math.floor(Math.random()*8)];
+  star.textContent = W.stars[Math.floor(Math.random()*W.stars.length)];
   scene.appendChild(star);
   // Animate in then out
   star.animate([
@@ -1223,7 +1414,7 @@ setInterval(() => { if (S.started && Math.random() < 0.55) spawnButterfly(); }, 
 function spawnCloud() {
   const c = document.createElement('div');
   c.className = 'cloud';
-  c.textContent = ['☁️','🌸','💗','🧚','🦋','🌈','⭐','🎈','🌷','🪽'][Math.floor(Math.random()*10)];
+  c.textContent = W.drifters[Math.floor(Math.random()*W.drifters.length)];
   c.style.top = (5 + Math.random() * 25) + '%';
   const sp = 25 + Math.random() * 20;
   c.style.setProperty('--speed', sp + 's');
