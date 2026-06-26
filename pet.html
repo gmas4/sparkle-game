@@ -15,7 +15,7 @@
 /* === RESET & BASE === */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --bg1: #fce4ff; --bg2: #e0c3fc; --bg3: #d5f5e3;
+  --bg1: #ffc2ec; --bg2: #e0a9ff; --bg3: #b89bff;
   --pink: #ff6fb7; --purple: #b06aff; --blue: #6ac3ff;
   --yellow: #ffe066; --green: #7ddf64; --orange: #ffb347;
   --slime: #7ddf64; --coffee: #8B4513;
@@ -25,33 +25,44 @@
 html, body { width: 100%; height: 100%; overflow: hidden; }
 body {
   font-family: 'Fredoka', sans-serif;
-  background: linear-gradient(135deg, var(--bg1), var(--bg2), var(--bg3));
+  background: linear-gradient(135deg, #ffc2ec 0%, #f0a8f5 22%, #d9a7ff 44%, #b89bff 66%, #9cc7ff 84%, #ffd6f5 100%);
   background-size: 400% 400%;
-  animation: bgShift 12s ease infinite;
+  animation: bgShift 16s ease infinite;
   display: flex; flex-direction: column;
   user-select: none; -webkit-user-select: none;
+  position: relative;
 }
+/* dreamy aurora glow overlay */
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(60% 50% at 25% 20%, rgba(255,140,210,0.35), transparent),
+    radial-gradient(55% 45% at 80% 70%, rgba(150,120,255,0.30), transparent),
+    radial-gradient(50% 40% at 60% 30%, rgba(120,200,255,0.22), transparent);
+  animation: auroraPulse 9s ease-in-out infinite;
+}
+@keyframes auroraPulse { 0%,100% { opacity: .65; } 50% { opacity: 1; } }
 @keyframes bgShift {
   0%,100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
 }
 
-/* === BACK TO PLAY BUTTON === */
+/* === HOME BUTTON (round icon, clears the title) === */
 .back-btn {
   position: fixed; top: 10px; left: 10px; z-index: 60;
-  font-family: 'Baloo 2', cursive; font-size: 0.95rem; font-weight: 700;
+  width: 46px; height: 46px; font-size: 1.4rem;
   color: #fff; text-decoration: none;
   background: linear-gradient(135deg, #ff6fb7, #b06aff);
-  border: 3px solid #fff; border-radius: 30px;
-  padding: 7px 16px; box-shadow: 0 4px 14px rgba(176,106,255,0.4);
-  display: flex; align-items: center; gap: 5px;
-  transition: transform 0.15s;
+  border: 3px solid #fff; border-radius: 50%;
+  box-shadow: 0 4px 14px rgba(176,106,255,0.4);
+  display: flex; align-items: center; justify-content: center;
+  line-height: 1; transition: transform 0.15s;
 }
-.back-btn:active { transform: scale(0.92); }
+.back-btn:active { transform: scale(0.9); }
 
 /* === HEADER === */
 .header {
-  text-align: center; padding: 10px 0 4px;
+  text-align: center; padding: 10px 64px 4px;
   font-family: 'Baloo 2', cursive;
   position: relative; z-index: 10;
 }
@@ -97,7 +108,7 @@ body {
 #unicornCanvas {
   position: absolute; top: 0; left: 0;
   width: 100%; height: 100%;
-  z-index: 2; cursor: pointer;
+  z-index: 2; pointer-events: none;
 }
 .unicorn-container {
   position: relative; z-index: 1;
@@ -378,15 +389,66 @@ body {
   margin: 6px; display: inline-flex;
 }
 
+/* === MAGIC AURA + GLOWING PEDESTAL behind the unicorn === */
+.magic-aura {
+  position: absolute; top: 50%; left: 50%;
+  width: min(82vw, 380px); height: min(82vw, 380px);
+  transform: translate(-50%, -50%); border-radius: 50%;
+  z-index: 0; pointer-events: none;
+  background: radial-gradient(circle, rgba(255,255,255,0.55), rgba(255,170,225,0.35) 38%, rgba(180,140,255,0.18) 60%, transparent 72%);
+  animation: auraPulse 4s ease-in-out infinite;
+}
+@keyframes auraPulse {
+  0%,100% { transform: translate(-50%,-50%) scale(1); opacity: .75; }
+  50% { transform: translate(-50%,-50%) scale(1.12); opacity: 1; }
+}
+.pedestal {
+  position: absolute; left: 50%; bottom: 16%;
+  width: min(58vw, 250px); height: 44px;
+  transform: translateX(-50%); border-radius: 50%;
+  z-index: 0; pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(255,255,255,0.6), rgba(199,155,255,0.35) 45%, transparent 70%);
+  animation: pedestalGlow 3s ease-in-out infinite;
+}
+@keyframes pedestalGlow {
+  0%,100% { opacity: .6; transform: translateX(-50%) scale(1); }
+  50% { opacity: 1; transform: translateX(-50%) scale(1.06); }
+}
+
+/* === FLOATING MAGIC EMOJIS === */
+#petFloaters { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.pet-floater {
+  position: absolute; font-size: clamp(20px, 5vw, 34px); opacity: .8;
+  animation: petFloat var(--pf, 8s) ease-in-out infinite;
+  filter: drop-shadow(0 4px 10px rgba(176,106,255,0.35));
+}
+@keyframes petFloat {
+  0% { transform: translateY(25px) rotate(-8deg); opacity: 0; }
+  15% { opacity: .8; } 85% { opacity: .8; }
+  100% { transform: translateY(-55px) rotate(8deg); opacity: 0; }
+}
+
+/* === AMBIENT RISING SPARKLES === */
+.ambient-spark {
+  position: absolute; bottom: -24px; z-index: 1; pointer-events: none;
+  font-size: 14px; animation: ambientRise var(--ar, 4s) linear forwards;
+}
+@keyframes ambientRise {
+  0% { transform: translateY(0) scale(.5); opacity: 0; }
+  15% { opacity: 1; }
+  100% { transform: translateY(-72vh) translateX(var(--ax, 20px)) scale(1.1) rotate(180deg); opacity: 0; }
+}
+
 /* === BG STARS === */
 .bg-star {
   position: fixed; pointer-events: none;
-  z-index: 0; opacity: 0.4;
+  z-index: 0; opacity: 0.7;
+  filter: drop-shadow(0 0 4px #fff);
   animation: twinkle 3s ease-in-out infinite;
 }
 @keyframes twinkle {
-  0%,100% { opacity: 0.2; transform: scale(0.8); }
-  50% { opacity: 0.6; transform: scale(1.2); }
+  0%,100% { opacity: 0.3; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.3); }
 }
 
 /* === RESPONSIVE === */
@@ -402,7 +464,7 @@ body {
 </head>
 <body>
 
-<a href="index.html" class="back-btn">🏠 Home</a>
+<a href="index.html" class="back-btn" title="Home">🏠</a>
 
 <!-- HEADER -->
 <div class="header">
@@ -430,6 +492,9 @@ body {
 
   <!-- STAGE -->
   <div class="stage" id="stage">
+    <div id="petFloaters"></div>
+    <div class="magic-aura"></div>
+    <div class="pedestal"></div>
     <canvas id="unicornCanvas"></canvas>
     <div class="unicorn-container" id="unicornContainer">
       <!-- MOOD BUBBLE -->
@@ -456,8 +521,9 @@ body {
   <div class="save-modal-content">
     <h2>Your Unicorn is Ready! 🦄</h2>
     <img id="savePreview" src="" alt="Unicorn preview">
-    <p style="color:#888;font-size:0.85rem;margin-bottom:12px" id="saveName"></p>
-    <button class="action-btn save-btn" onclick="downloadUnicorn()">💾 Download Image</button>
+    <p style="color:#888;font-size:0.85rem;margin-bottom:6px" id="saveName"></p>
+    <p style="color:#b06aff;font-size:0.72rem;margin-bottom:12px">📱 On a tablet/phone: tap <b>Save Picture</b>, then “Save Image” — or press &amp; hold the picture 💜</p>
+    <button class="action-btn save-btn" onclick="downloadUnicorn()">💾 Save Picture</button>
     <button class="action-btn" style="background:#eee;color:#666" onclick="closeSaveModal()">Keep Playing</button>
   </div>
 </div>
@@ -928,6 +994,7 @@ function toggleAccessory(type, id, el) {
 function doSparkle() {
   state.sparkle = Math.min(100, state.sparkle + 15);
   state.happiness = Math.min(100, state.happiness + 5);
+  sndSparkle();
   showMood('✨');
   triggerAnim('happy');
   // Spawn lots of sparkles on stage
@@ -950,6 +1017,7 @@ function doSparkle() {
 function doGlitter() {
   state.hasGlitter = !state.hasGlitter;
   state.sparkle = Math.min(100, state.sparkle + 20);
+  sndSparkle();
   showMood(state.hasGlitter ? '💎' : '😐');
   triggerAnim('happy');
   if (state.hasGlitter) {
@@ -1063,8 +1131,63 @@ function doCoffee() {
 document.addEventListener('click', (e) => {
   if (e.target.closest('.unicorn-svg')) {
     doPet();
+    sndPet();
+    const wrap = document.getElementById('unicornSvgWrap');
+    if (wrap) spawnParticles(wrap, ['✨','💖','⭐','🌟','💫','🦄'], 9);
   }
 });
+
+// === GENTLE MAGIC SOUND ===
+let _ac;
+function chime(freqs, type='sine', vol=0.08, gap=70) {
+  try {
+    if (!_ac) _ac = new (window.AudioContext || window.webkitAudioContext)();
+    if (_ac.state === 'suspended') _ac.resume();
+    freqs.forEach((f, i) => setTimeout(() => {
+      const o = _ac.createOscillator(), g = _ac.createGain();
+      o.type = type; o.frequency.value = f;
+      g.gain.setValueAtTime(vol, _ac.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, _ac.currentTime + 0.32);
+      o.connect(g).connect(_ac.destination);
+      o.start(); o.stop(_ac.currentTime + 0.32);
+    }, i * gap));
+  } catch (e) {}
+}
+const sndPet = () => chime([660, 880], 'sine', 0.07);
+const sndSparkle = () => chime([880, 1108, 1320, 1568], 'sine', 0.06, 55);
+const sndSave = () => chime([523, 659, 784, 1047, 1319], 'triangle', 0.07, 90);
+
+// === FLOATING MAGIC EMOJIS (behind the unicorn) ===
+(function () {
+  const box = document.getElementById('petFloaters');
+  if (!box) return;
+  const EM = ['✨','🌈','💖','⭐','🧚','🦋','👑','💎','🌸','🪄','🌟','🎀','💫','🦄'];
+  for (let i = 0; i < 12; i++) {
+    const f = document.createElement('div');
+    f.className = 'pet-floater';
+    f.textContent = EM[i % EM.length];
+    f.style.left = (5 + Math.random() * 90) + '%';
+    f.style.top = (8 + Math.random() * 84) + '%';
+    f.style.setProperty('--pf', (6 + Math.random() * 5) + 's');
+    f.style.animationDelay = (-Math.random() * 6) + 's';
+    box.appendChild(f);
+  }
+})();
+
+// === AMBIENT RISING SPARKLES ===
+setInterval(() => {
+  const stage = document.getElementById('stage');
+  if (!stage || document.hidden) return;
+  const s = document.createElement('div');
+  s.className = 'ambient-spark';
+  s.textContent = ['✨','💫','⭐','🌟','💖'][Math.floor(Math.random() * 5)];
+  s.style.left = (Math.random() * 100) + '%';
+  s.style.fontSize = (10 + Math.random() * 14) + 'px';
+  s.style.setProperty('--ar', (3.5 + Math.random() * 2.5) + 's');
+  s.style.setProperty('--ax', (Math.random() * 60 - 30) + 'px');
+  stage.appendChild(s);
+  setTimeout(() => s.remove(), 6500);
+}, 650);
 
 // === HELPERS ===
 function showMood(emoji) {
@@ -1158,6 +1281,8 @@ function saveUnicorn() {
       document.getElementById('saveName').textContent = `"${name}" — made with love! 💜`;
       document.getElementById('saveModal').classList.add('show');
       window._saveDataUrl = dataUrl;
+      exportCanvas.toBlob(b => { window._saveBlob = b; }, 'image/png');
+      if (typeof sndSave === 'function') sndSave();
     } catch (err) {
       showMood('😢');
     } finally {
@@ -1168,13 +1293,33 @@ function saveUnicorn() {
   img.src = url;
 }
 
-function downloadUnicorn() {
-  if (!window._saveDataUrl) return;
-  const name = document.getElementById('unicornName').value || 'my-unicorn';
-  const a = document.createElement('a');
-  a.href = window._saveDataUrl;
-  a.download = name.replace(/\s+/g, '-').toLowerCase() + '.png';
-  a.click();
+async function downloadUnicorn() {
+  const name = (document.getElementById('unicornName').value || 'my-unicorn').replace(/\s+/g, '-').toLowerCase();
+  const blob = window._saveBlob;
+
+  // Best on phones/tablets: native share sheet -> "Save Image" to Photos
+  if (blob && navigator.canShare) {
+    try {
+      const file = new File([blob], name + '.png', { type: 'image/png' });
+      if (navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: 'My Magical Unicorn 🦄' });
+        return;
+      }
+    } catch (e) { /* user cancelled or unsupported — fall through to download */ }
+  }
+
+  // Desktop / fallback: blob URL download (more reliable than a data: URL)
+  try {
+    const url = blob ? URL.createObjectURL(blob) : window._saveDataUrl;
+    if (!url) return;
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name + '.png';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    if (blob) setTimeout(() => URL.revokeObjectURL(url), 1500);
+  } catch (e) {}
 }
 
 function closeSaveModal() {
