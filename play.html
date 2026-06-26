@@ -52,6 +52,8 @@ iframe:not(#gameFrame),.watermark,[id*="badge"],[class*="watermark"]{display:non
 .bubble-inner{width:100%;height:100%;border-radius:50%;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.9),rgba(255,182,217,.5) 40%,rgba(255,105,180,.3) 70%,rgba(255,20,147,.2));border:2px solid rgba(255,255,255,.6);box-shadow:0 0 20px rgba(255,105,180,.4),inset 0 0 15px rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:var(--emoji-size,30px);animation:bubbleWobble 2s ease-in-out infinite}
 @keyframes bubbleRise{0%{transform:translateY(0) translateX(0);opacity:0}5%{opacity:1}90%{opacity:.8}100%{transform:translateY(calc(-100vh - 150px)) translateX(var(--sway,30px));opacity:0}}
 @keyframes bubbleWobble{0%,100%{transform:scale(1) rotate(-3deg)}50%{transform:scale(1.05) rotate(3deg)}}
+.bubble.ending .bubble-inner{animation:bubbleWobble 1.1s ease-in-out infinite, bubbleEndGlow .6s ease-in-out infinite}
+@keyframes bubbleEndGlow{0%,100%{box-shadow:0 0 20px rgba(255,105,180,.4),inset 0 0 15px rgba(255,255,255,.3)}50%{box-shadow:0 0 36px rgba(255,215,0,.95),inset 0 0 18px rgba(255,255,255,.6)}}
 
 /* === UNICORN === */
 .unicorn{position:absolute;cursor:pointer;z-index:12;font-size:70px;filter:drop-shadow(0 6px 15px rgba(255,20,147,.4));transition:transform .15s}
@@ -81,6 +83,52 @@ iframe:not(#gameFrame),.watermark,[id*="badge"],[class*="watermark"]{display:non
   100%{transform:translate(calc(100vw + 120px),0) scaleX(var(--dir,1))}
 }
 .butterfly.caught{transition:all .5s ease-in;opacity:0;transform:scale(2.2) rotate(40deg)!important}
+
+/* === FLOATING TEXT (NOM NOM, WOOF!, RAWR!, etc.) === */
+.float-text{position:absolute;z-index:16;pointer-events:none;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:26px;color:#fff;text-shadow:0 2px 8px rgba(255,20,147,.6);white-space:nowrap;transform:translate(-50%,-50%)}
+
+/* === DINOSAUR (sparkly winged) === */
+.dino{position:absolute;cursor:pointer;z-index:12;font-size:54px;filter:hue-rotate(280deg) saturate(2) drop-shadow(0 4px 10px rgba(196,77,255,.5));animation:dinoFly var(--fly-speed,8s) linear forwards}
+@keyframes dinoFly{
+  0%{transform:translate(-120px,0) scaleX(var(--dir,1))}
+  20%{transform:translate(20vw,-55px) scaleX(var(--dir,1))}
+  40%{transform:translate(40vw,35px) scaleX(var(--dir,1))}
+  60%{transform:translate(60vw,-45px) scaleX(var(--dir,1))}
+  80%{transform:translate(80vw,30px) scaleX(var(--dir,1))}
+  100%{transform:translate(calc(100vw + 120px),0) scaleX(var(--dir,1))}
+}
+.dino.caught{transition:all .5s ease-in;opacity:0;transform:scale(2) rotate(-30deg)!important}
+
+/* === PUPPY (runs along the bottom) === */
+.puppy{position:absolute;cursor:pointer;z-index:12;font-size:50px;filter:drop-shadow(0 5px 10px rgba(255,150,90,.4));animation:puppyRun var(--walk-speed,5s) linear forwards}
+@keyframes puppyRun{
+  0%{transform:translateX(-110px) translateY(0) scaleX(var(--dir,1))}
+  10%{transform:translateX(8vw) translateY(-14px) scaleX(var(--dir,1))}
+  20%{transform:translateX(18vw) translateY(0) scaleX(var(--dir,1))}
+  30%{transform:translateX(28vw) translateY(-14px) scaleX(var(--dir,1))}
+  40%{transform:translateX(38vw) translateY(0) scaleX(var(--dir,1))}
+  50%{transform:translateX(50vw) translateY(-14px) scaleX(var(--dir,1))}
+  60%{transform:translateX(60vw) translateY(0) scaleX(var(--dir,1))}
+  70%{transform:translateX(72vw) translateY(-14px) scaleX(var(--dir,1))}
+  80%{transform:translateX(82vw) translateY(0) scaleX(var(--dir,1))}
+  90%{transform:translateX(92vw) translateY(-14px) scaleX(var(--dir,1))}
+  100%{transform:translateX(calc(100vw + 110px)) translateY(0) scaleX(var(--dir,1))}
+}
+.puppy.caught{transition:all .4s ease-in;opacity:0;transform:scale(1.8)!important}
+.paw-print{position:absolute;z-index:9;pointer-events:none;font-size:24px;animation:pawFade 1s ease-out forwards}
+@keyframes pawFade{0%{opacity:.9;transform:scale(.6)}100%{opacity:0;transform:scale(1.1)}}
+
+/* === NAME PROMPT === */
+#namePrompt{position:fixed;inset:0;z-index:95;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(255,105,180,.35);backdrop-filter:blur(8px);padding:20px}
+#namePrompt.show{display:flex}
+#namePrompt .np-uni{font-size:clamp(60px,16vw,100px);animation:titleBob 2s ease-in-out infinite}
+#namePrompt h2{font-family:'Baloo 2',sans-serif;font-weight:800;color:#fff;font-size:clamp(22px,5vw,34px);text-shadow:0 3px 10px rgba(255,20,147,.5);text-align:center}
+#nameInput{font-family:'Baloo 2',sans-serif;font-size:clamp(20px,5vw,28px);font-weight:700;color:#ff1493;text-align:center;width:min(320px,86vw);padding:12px 18px;border:4px solid #fff;border-radius:40px;background:rgba(255,255,255,.92);outline:none}
+#nameInput::placeholder{color:#ffa6d4}
+#namePrompt .np-go{font-family:'Baloo 2',sans-serif;font-size:clamp(18px,4.5vw,24px);font-weight:800;color:#ff1493;background:#fff;border:4px solid #ff69b4;border-radius:50px;padding:12px 36px;cursor:pointer;box-shadow:0 6px 20px rgba(255,20,147,.4)}
+#namePrompt .np-go:active{transform:scale(.93)}
+#namePrompt .np-skip{font-family:'Fredoka',sans-serif;font-size:14px;color:rgba(255,255,255,.85);background:none;border:none;cursor:pointer;text-decoration:underline}
+#scoreBar .uni-name{font-family:'Baloo 2',sans-serif;font-weight:800;color:#fff;font-size:15px;text-shadow:0 2px 6px rgba(255,20,147,.5);max-width:34vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;align-self:center}
 
 /* === POP RING === */
 .pop-ring{position:absolute;border-radius:50%;border:3px solid;pointer-events:none;z-index:15;animation:popRing .6s ease-out forwards}
@@ -293,6 +341,7 @@ body.night #moon{opacity:1;transform:scale(1) rotate(0)}
 
 <!-- Score -->
 <div id="scoreBar">
+  <span class="uni-name" id="uniNameLabel"></span>
   <div class="score-item"><span>✨</span><span class="score-val" id="sparkleCount">0</span></div>
   <div class="score-item"><span>🦄</span><span class="score-val" id="unicornCount">0</span></div>
 </div>
@@ -349,6 +398,15 @@ body.night #moon{opacity:1;transform:scale(1) rotate(0)}
   <div class="cel-text" id="celText">Amazing!</div>
   <div class="cel-sub" id="celSub">You unlocked something special!</div>
   <button class="cel-dismiss" id="celDismiss">✨ Keep Playing! ✨</button>
+</div>
+
+<!-- Name prompt -->
+<div id="namePrompt">
+  <div class="np-uni">🦄</div>
+  <h2>What's your unicorn's name?</h2>
+  <input type="text" id="nameInput" maxlength="20" placeholder="Type a name…" autocomplete="off">
+  <button class="np-go" id="nameGo">Let's go! ✨</button>
+  <button class="np-skip" id="nameSkip">No name yet</button>
 </div>
 
 <!-- Title -->
@@ -439,6 +497,20 @@ const SFX = (() => {
 
   return {
     init,
+    note,
+    slide(from, to, d=0.3, type='sine', vol=0.06) {
+      if (!ctx) return;
+      try {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = type;
+        o.frequency.setValueAtTime(Math.max(1, from*worldPitch), ctx.currentTime);
+        o.frequency.exponentialRampToValueAtTime(Math.max(1, to*worldPitch), ctx.currentTime + d);
+        g.gain.setValueAtTime(vol, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + d);
+        o.connect(g).connect(ctx.destination);
+        o.start(); o.stop(ctx.currentTime + d);
+      } catch(e) {}
+    },
     setPitch(p) { worldPitch = p; },
     startMusic, stopMusic,
     isMusicOn: () => musicOn,
@@ -647,10 +719,12 @@ const DOMManager = (() => {
   const MAX_EGGS = 3;
   const MAX_UNICORNS = 4;
   const MAX_BUTTERFLIES = 4;
+  const MAX_DINOS = 2;
+  const MAX_PUPPIES = 2;
 
-  const counts = { bubbles: 0, stars: 0, eggs: 0, unicorns: 0, butterflies: 0 };
+  const counts = { bubbles: 0, stars: 0, eggs: 0, unicorns: 0, butterflies: 0, dinos: 0, puppies: 0 };
 
-  const canSpawn = (type) => counts[type] < {bubbles:MAX_BUBBLES, stars:MAX_STARS, eggs:MAX_EGGS, unicorns:MAX_UNICORNS, butterflies:MAX_BUTTERFLIES}[type];
+  const canSpawn = (type) => counts[type] < {bubbles:MAX_BUBBLES, stars:MAX_STARS, eggs:MAX_EGGS, unicorns:MAX_UNICORNS, butterflies:MAX_BUTTERFLIES, dinos:MAX_DINOS, puppies:MAX_PUPPIES}[type];
   const add = (type) => counts[type]++;
   const remove = (type) => counts[type] = Math.max(0, counts[type]-1);
 
@@ -868,6 +942,38 @@ function addSparkles(n) {
 }
 function addUnicorns(n) { S.unicorns += n; unicornEl.textContent = S.unicorns; bump(unicornEl); }
 
+// ── Floating text helper (NOM NOM, WOOF!, RAWR!, etc.) ──
+function floatText(text, x, y, opts = {}) {
+  const el = document.createElement('div');
+  el.className = 'float-text';
+  el.textContent = text;
+  el.style.left = x + 'px';
+  el.style.top = y + 'px';
+  if (opts.color) el.style.color = opts.color;
+  if (opts.size) el.style.fontSize = opts.size;
+  scene.appendChild(el);
+  const dur = opts.duration || 1400;
+  el.animate([
+    { transform: 'translate(-50%,-50%) scale(.4)', opacity: 0 },
+    { transform: 'translate(-50%,-95%) scale(1.12)', opacity: 1, offset: .3 },
+    { transform: 'translate(-50%,-165%) scale(1)', opacity: 1, offset: .7 },
+    { transform: 'translate(-50%,-235%) scale(.9)', opacity: 0 }
+  ], { duration: dur, easing: 'ease-out' });
+  setTimeout(() => el.remove(), dur);
+}
+
+// ── Unicorn name (Feature 1) ──
+let unicornName = '';
+function setUnicornName(name) {
+  unicornName = (name || '').trim().slice(0, 20);
+  try { localStorage.setItem('sparkleUnicornGardenName', unicornName); } catch (e) {}
+  const lbl = document.getElementById('uniNameLabel');
+  if (lbl) lbl.textContent = unicornName ? `${unicornName} 🦄` : '';
+}
+function loadUnicornName() {
+  try { return localStorage.getItem('sparkleUnicornGardenName') || ''; } catch (e) { return ''; }
+}
+
 // ── Milestone System ──
 function checkMilestone() {
   if (S.celebrationActive) return;
@@ -890,10 +996,12 @@ function triggerMilestone(m) {
   S.celebrationActive = true;
   S.unlockedAccessories.push(m.emoji);
 
-  // Show celebration
+  // Show celebration (personalized with the unicorn's name if set)
   celEmoji.textContent = m.emoji;
-  celText.textContent = m.msg;
-  celSub.textContent = `${S.sparkles} sparkles collected!`;
+  celText.textContent = unicornName ? m.msg.replace(/Your unicorn/i, unicornName) : m.msg;
+  celSub.textContent = unicornName
+    ? `${unicornName} now has ${S.sparkles} sparkles! ✨`
+    : `${S.sparkles} sparkles collected!`;
   celebration.classList.add('show');
 
   SFX.milestone();
@@ -1123,18 +1231,24 @@ function spawnBubble() {
   if (!S.started || !DOMManager.canSpawn('bubbles')) return;
   DOMManager.add('bubbles');
 
-  const size = 60 + Math.random() * 45;
+  const size = 55 + Math.random() * 40;        // visual 55–95px
+  const hit = size + 30;                        // +15px tap padding all around
   const el = document.createElement('div');
   el.className = 'bubble';
   const emoji = W.bubbles[Math.floor(Math.random() * W.bubbles.length)];
   el.innerHTML = `<div class="bubble-inner">${emoji}</div>`;
-  el.style.width = el.style.height = size + 'px';
-  el.style.left = (20 + Math.random() * (innerWidth - size - 40)) + 'px';
-  el.style.bottom = '-' + (size + 20) + 'px';
-  el.style.setProperty('--rise-time', (5 + Math.random() * 4) + 's');
-  el.style.setProperty('--sway', (Math.random() * 60 - 30) + 'px');
+  el.style.width = el.style.height = hit + 'px';
+  el.style.padding = '15px';
+  el.style.left = (10 + Math.random() * Math.max(10, innerWidth - hit - 20)) + 'px';
+  el.style.bottom = '-' + (hit + 20) + 'px';
+  el.style.setProperty('--rise-time', (10 + Math.random() * 4) + 's');  // slow: 10–14s
+  el.style.setProperty('--sway', (Math.random() * 100 - 50) + 'px');    // gentle wide drift
   el.style.setProperty('--emoji-size', (size * 0.45) + 'px');
   scene.appendChild(el);
+
+  // Pulse invitingly in the last 2 seconds
+  const riseMs = parseFloat(el.style.getPropertyValue('--rise-time')) * 1000;
+  setTimeout(() => { if (el.parentNode) el.classList.add('ending'); }, Math.max(0, riseMs - 2000));
 
   const popBubble = (e) => {
     e.stopPropagation();
@@ -1195,6 +1309,7 @@ function spawnUnicorn() {
     SFX.sparkle();
     addSparkles(5);
     addUnicorns(1);
+    floatText(unicornName ? `You caught ${unicornName}!` : 'You caught a unicorn!', r.left + r.width/2, r.top, { color:'#fff' });
     el.classList.remove('walking');
     el.classList.add('caught');
     setTimeout(() => { el.remove(); DOMManager.remove('unicorns'); }, 500);
@@ -1339,6 +1454,112 @@ function spawnButterfly() {
       el.remove(); DOMManager.remove('butterflies');
     }
   }, dur + 200);
+}
+
+// ── SPARKLY WINGED DINOSAUR (Feature 2) ──
+function dinoRoar() {
+  SFX.slide(80, 600, 0.3, 'sawtooth', 0.06);
+  setTimeout(() => SFX.slide(600, 200, 0.12, 'sine', 0.05), 320);
+}
+function spawnDino() {
+  if (!S.started || !DOMManager.canSpawn('dinos')) return;
+  DOMManager.add('dinos');
+  const el = document.createElement('div');
+  el.className = 'dino';
+  el.textContent = '🐲';
+  const dir = Math.random() > 0.5 ? 1 : -1;
+  el.style.top = (80 + Math.random() * (innerHeight - 280)) + 'px';
+  el.style.left = '0px';
+  el.style.setProperty('--dir', dir);
+  el.style.setProperty('--fly-speed', (7 + Math.random() * 2.5) + 's');
+  scene.appendChild(el);
+
+  const catchDino = (e) => {
+    e.stopPropagation(); e.preventDefault();
+    const r = el.getBoundingClientRect();
+    Glitter.burst(r.left + r.width/2, r.top + r.height/2, 28);
+    dinoRoar();
+    addSparkles(5);
+    floatText('RAWR! ✨', r.left + r.width/2, r.top, { color:'#d56bff' });
+    el.classList.add('caught');
+    setTimeout(() => { el.remove(); DOMManager.remove('dinos'); }, 500);
+  };
+  el.addEventListener('pointerdown', catchDino);
+  el.addEventListener('touchstart', (e) => { e.preventDefault(); catchDino(e); }, {passive:false});
+
+  const dur = parseFloat(el.style.getPropertyValue('--fly-speed')) * 1000;
+  setTimeout(() => { if (el.parentNode && !el.classList.contains('caught')) { el.remove(); DOMManager.remove('dinos'); } }, dur + 200);
+}
+
+// ── PUPPY (Feature 12) ──
+let puppiesCaught = 0;
+function bark() { SFX.slide(300, 200, 0.1, 'square', 0.06); }
+function pawPrints(x, y) {
+  for (let i = 0; i < 3; i++) {
+    setTimeout(() => {
+      const p = document.createElement('div');
+      p.className = 'paw-print';
+      p.textContent = '🐾';
+      p.style.left = (x + (Math.random()*40-20)) + 'px';
+      p.style.top = (y + (Math.random()*30-10)) + 'px';
+      scene.appendChild(p);
+      setTimeout(() => p.remove(), 1000);
+    }, i * 90);
+  }
+}
+function spawnPuppy() {
+  if (!S.started || !DOMManager.canSpawn('puppies')) return;
+  DOMManager.add('puppies');
+  const el = document.createElement('div');
+  el.className = 'puppy';
+  el.textContent = '🐶';
+  const dir = Math.random() > 0.5 ? 1 : -1;
+  el.style.top = (innerHeight * 0.74 + Math.random() * (innerHeight * 0.16)) + 'px';
+  el.style.left = '0px';
+  el.style.setProperty('--dir', dir);
+  el.style.setProperty('--walk-speed', (4.5 + Math.random() * 1.5) + 's');
+  scene.appendChild(el);
+
+  const catchPuppy = (e) => {
+    e.stopPropagation(); e.preventDefault();
+    const r = el.getBoundingClientRect();
+    const cx = r.left + r.width/2, cy = r.top + r.height/2;
+    Glitter.burst(cx, cy, 20);
+    bark();
+    addSparkles(4);
+    floatText('WOOF! 🐾', cx, r.top, { color:'#ffd76b' });
+    pawPrints(cx, cy);
+    el.classList.add('caught');
+    setTimeout(() => { el.remove(); DOMManager.remove('puppies'); }, 400);
+    puppiesCaught++;
+    if (puppiesCaught % 3 === 0) puppyParty();
+  };
+  el.addEventListener('pointerdown', catchPuppy);
+  el.addEventListener('touchstart', (e) => { e.preventDefault(); catchPuppy(e); }, {passive:false});
+
+  const dur = parseFloat(el.style.getPropertyValue('--walk-speed')) * 1000;
+  setTimeout(() => { if (el.parentNode && !el.classList.contains('caught')) { el.remove(); DOMManager.remove('puppies'); } }, dur + 200);
+}
+function puppyParty() {
+  floatText('PUPPY PARTY! 🐶🐾', innerWidth/2, innerHeight*0.4, { size:'34px', color:'#fff', duration:2000 });
+  fallingMagic(['🐶','🐾','💕'], 25);
+  SFX.milestone();
+  for (let i = 0; i < 10; i++) {
+    setTimeout(() => {
+      // decorative puppies that just run across (bypass the cap)
+      const el = document.createElement('div');
+      el.className = 'puppy';
+      el.textContent = '🐶';
+      const dir = Math.random() > 0.5 ? 1 : -1;
+      el.style.top = (innerHeight * 0.6 + Math.random() * (innerHeight * 0.3)) + 'px';
+      el.style.left = '0px';
+      el.style.setProperty('--dir', dir);
+      el.style.setProperty('--walk-speed', (3.5 + Math.random() * 2) + 's');
+      el.style.pointerEvents = 'none';
+      scene.appendChild(el);
+      setTimeout(() => el.remove(), 6000);
+    }, i * 120);
+  }
 }
 
 // ── BACKGROUND TAP (in tap mode) ──
@@ -1540,16 +1761,26 @@ scene.addEventListener('touchend', () => {
 document.getElementById('playBtn').addEventListener('click', () => {
   SFX.init();
   SFX.startMusic();
-  S.started = true;
   titleScreen.classList.add('hidden');
   setTimeout(() => titleScreen.style.display = 'none', 800);
+  // Show the name prompt (Feature 1) before the game begins
+  const np = document.getElementById('namePrompt');
+  const inp = document.getElementById('nameInput');
+  inp.value = loadUnicornName();
+  setTimeout(() => { np.classList.add('show'); inp.focus(); }, 350);
+});
+
+function beginGame() {
+  const np = document.getElementById('namePrompt');
+  np.classList.remove('show');
+  if (S.started) return;
+  S.started = true;
 
   // Magical "entering the world" moment
   spellFlash.classList.remove('flash'); void spellFlash.offsetWidth;
   spellFlash.classList.add('flash');
   shootingStars(6);
 
-  // Welcome sequence
   setTimeout(() => {
     for (let i = 0; i < 4; i++) {
       setTimeout(() => {
@@ -1566,7 +1797,13 @@ document.getElementById('playBtn').addEventListener('click', () => {
   setTimeout(() => spawnStar(), 1800);
   setTimeout(() => spawnButterfly(), 1300);
   setTimeout(() => spawnButterfly(), 2100);
-});
+}
+
+// Name prompt actions
+document.getElementById('nameGo').addEventListener('click', () => { setUnicornName(document.getElementById('nameInput').value); beginGame(); });
+document.getElementById('nameSkip').addEventListener('click', () => { setUnicornName(''); beginGame(); });
+document.getElementById('nameInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') { setUnicornName(e.target.value); beginGame(); } });
+setUnicornName(loadUnicornName()); // restore saved name on load
 
 // ── SPAWNERS (varied timing for variety) ──
 setInterval(() => { if (S.started) spawnBubble(); }, 2000);
@@ -1574,6 +1811,8 @@ setInterval(() => { if (S.started && Math.random() < 0.5) spawnUnicorn(); }, 800
 setInterval(() => { if (S.started && Math.random() < 0.4) spawnEgg(); }, 10000);
 setInterval(() => { if (S.started && Math.random() < 0.6) spawnStar(); }, 4000);
 setInterval(() => { if (S.started && Math.random() < 0.55) spawnButterfly(); }, 6000);
+setInterval(() => { if (S.started && Math.random() < 0.40) spawnDino(); }, 8000);
+setInterval(() => { if (S.started && Math.random() < 0.35) spawnPuppy(); }, 9000);
 
 // ── CLOUDS ──
 function spawnCloud() {
