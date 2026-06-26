@@ -153,6 +153,22 @@ iframe:not(#gameFrame),.watermark,[id*="badge"],[class*="watermark"]{display:non
 .baby-speech{position:fixed;bottom:136px;right:8px;z-index:15;background:#fff;color:#ff1493;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:15px;padding:5px 12px;border-radius:16px;border:2px solid #ff69b4;pointer-events:none;box-shadow:0 3px 10px rgba(255,20,147,.3);animation:speechPop 2.5s ease forwards}
 @keyframes speechPop{0%{opacity:0;transform:scale(.4)}10%{opacity:1;transform:scale(1)}85%{opacity:1}100%{opacity:0}}
 
+/* === ENTERABLE CASTLE (Feature 10) === */
+#castle{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:13;font-size:78px;cursor:pointer;display:none;filter:drop-shadow(0 6px 16px rgba(176,106,255,.5));animation:castleBob 3s ease-in-out infinite}
+#castle.show{display:block}
+@keyframes castleBob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-6px)}}
+#castle.cooldown{animation:castleBob 3s ease-in-out infinite, castleShimmer 1s ease-in-out infinite;opacity:.7}
+@keyframes castleShimmer{0%,100%{filter:drop-shadow(0 6px 16px rgba(176,106,255,.5))}50%{filter:drop-shadow(0 0 22px rgba(255,215,120,.9))}}
+#castleBg{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0;transition:opacity 1s ease;background:linear-gradient(160deg,#3a1c71 0%,#6a3093 35%,#a044ff 60%,#ffd86b 85%,#3a1c71 100%)}
+body.castle-mode #castleBg{opacity:.85}
+#castlePortal{position:fixed;z-index:59;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(255,235,150,.85),rgba(160,68,255,.7) 60%,transparent 75%)}
+
+/* === FEED THE UNICORN (Feature 4) === */
+.food-item{position:fixed;z-index:41;font-size:44px;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;display:none;filter:drop-shadow(0 4px 8px rgba(255,105,180,.45))}
+.food-item.visible{display:block}
+.food-item.dragging{z-index:60;cursor:grabbing}
+.food-item.spring{transition:left .4s cubic-bezier(.34,1.56,.64,1),top .4s cubic-bezier(.34,1.56,.64,1)}
+
 /* === POP RING === */
 .pop-ring{position:absolute;border-radius:50%;border:3px solid;pointer-events:none;z-index:15;animation:popRing .6s ease-out forwards}
 @keyframes popRing{0%{width:10px;height:10px;opacity:1;margin-left:-5px;margin-top:-5px}100%{width:120px;height:120px;opacity:0;margin-left:-60px;margin-top:-60px}}
@@ -358,6 +374,8 @@ body.night #moon{opacity:1;transform:scale(1) rotate(0);pointer-events:auto;curs
 <div class="rainbow"></div>
 <div id="moon">🌙</div>
 <div id="babyUnicorn">🦄</div>
+<div id="castleBg"></div>
+<div id="castle">🏰</div>
 <canvas id="glitterCanvas"></canvas>
 <canvas id="paintCanvas"></canvas>
 <div id="wandGlow"></div>
@@ -396,6 +414,7 @@ body.night #moon{opacity:1;transform:scale(1) rotate(0);pointer-events:auto;curs
     <button class="tool-btn" data-tool="rainbow"><span class="t-ico">🌈</span>Rainbow</button>
     <button class="tool-btn" data-tool="eraser"><span class="t-ico">⬜</span>Erase</button>
     <button class="tool-btn" id="clearPaintBtn"><span class="t-ico">🗑️</span>Clear</button>
+    <button class="tool-btn" id="shareDrawingBtn"><span class="t-ico">📤</span><span id="shareLabel">Show Mummy!</span></button>
   </div>
 </div>
 
@@ -647,6 +666,14 @@ const PaintCanvas = (() => {
     ctx.globalAlpha = 1;
     ctx.shadowBlur = 0;
     if (Math.random() < 0.18) Glitter.burst(px, py, 3);
+    // tool sounds (Feature 5)
+    const now = performance.now();
+    if (rainbow) {
+      const band = Math.floor(PT.rainbowHue / 30);
+      if (band !== PT._lastHueBand) { PT._lastHueBand = band; SFX.slide(400, 1200, 0.2, 'sine', 0.04); }
+    } else if (now - (PT._brushSnd || 0) > 80) {
+      PT._brushSnd = now; SFX.note(300, 0.06, 'sine', 0.03);
+    }
     PT.lastX = px; PT.lastY = py;
   };
 
@@ -664,6 +691,8 @@ const PaintCanvas = (() => {
       ctx.fill();
     }
     ctx.globalAlpha = 1;
+    const now = performance.now();
+    if (now - (PT._spraySnd || 0) > 60) { PT._spraySnd = now; SFX.note(400, 0.08, 'sawtooth', 0.03); }
   };
   const startSpray = (px, py) => {
     PT.sprayX = px; PT.sprayY = py;
@@ -690,6 +719,7 @@ const PaintCanvas = (() => {
     ctx.restore();
     Glitter.burst(px, py, 14);
     SFX.collect();
+    SFX.slide(600, 300, 0.15, 'sine', 0.05); // musical boing
   };
 
   // ── Eraser ──
@@ -706,6 +736,8 @@ const PaintCanvas = (() => {
     ctx.fillStyle = 'rgba(0,0,0,1)';
     ctx.fill();
     ctx.restore();
+    const now = performance.now();
+    if (now - (PT._eraseSnd || 0) > 90) { PT._eraseSnd = now; SFX.note(200, 0.08, 'sawtooth', 0.02); }
     PT.lastX = px; PT.lastY = py;
   };
 
@@ -946,6 +978,100 @@ function toggleNight() {
   moon.addEventListener('touchstart', (e) => { e.preventDefault(); makeSnow(e); }, {passive:false});
 })();
 
+// ── Enterable castle (Feature 10) ──
+let castleCooldown = false;
+function enterCastle() {
+  if (castleCooldown) return;
+  castleCooldown = true;
+  const castle = document.getElementById('castle');
+  const r = castle.getBoundingClientRect();
+  const cx = r.left + r.width/2, cy = r.top + r.height/2;
+  // portal wipe
+  const portal = document.createElement('div');
+  portal.id = 'castlePortal';
+  const big = Math.max(innerWidth, innerHeight) * 2.4;
+  portal.style.width = portal.style.height = big + 'px';
+  portal.style.left = (cx - big/2) + 'px';
+  portal.style.top = (cy - big/2) + 'px';
+  document.body.appendChild(portal);
+  portal.animate([{ transform:'scale(0)', opacity:.95 }, { transform:'scale(1)', opacity:.6, offset:.6 }, { transform:'scale(1)', opacity:0 }], { duration:1400, easing:'ease-out' });
+  setTimeout(() => portal.remove(), 1400);
+
+  document.body.classList.add('castle-mode');
+  SFX.milestone();
+  floatText('Welcome to the Magic Castle! 👑', innerWidth/2, innerHeight*0.34, { size:'27px', color:'#fff', duration:2000 });
+  fallingMagic(['👑','✨','💛','🌟','💎'], 30);
+  for (let i = 0; i < 5; i++) setTimeout(spawnUnicorn, i * 160);
+
+  setTimeout(() => document.body.classList.remove('castle-mode'), 3000);
+  castle.classList.add('cooldown');
+  setTimeout(() => { castleCooldown = false; castle.classList.remove('cooldown'); }, 10000);
+}
+(function () {
+  const castle = document.getElementById('castle');
+  const tap = (e) => { e.stopPropagation(); e.preventDefault(); enterCastle(); };
+  castle.addEventListener('pointerdown', tap);
+  castle.addEventListener('touchstart', (e) => { e.preventDefault(); tap(e); }, {passive:false});
+})();
+
+// ── Feed the Unicorn (Feature 4) ──
+(function () {
+  const foods = [];
+  function feedUnicorn(u) {
+    const r = u.getBoundingClientRect(), cx = r.left + r.width/2, cy = r.top + r.height/2;
+    [220,200,180].forEach((f,i) => setTimeout(() => SFX.note(f, 0.08, 'sine', 0.07), i*100)); // bwom bwom bwom
+    addSparkles(3);
+    floatText('NOM NOM', cx, r.top, { color:'#fff' });
+    floatText('💖', cx - 8, cy, { duration:1200 });
+    Glitter.burst(cx, cy, 14);
+    try { u.animate([{ transform:'scale(1)' },{ transform:'scale(1.3)' },{ transform:'scale(1)' }], { duration:500, composite:'add' }); } catch(e) {}
+  }
+  function tryFeed(x, y) {
+    const unis = [...document.querySelectorAll('.unicorn')].filter(u => !u.classList.contains('caught'));
+    for (const u of unis) {
+      const r = u.getBoundingClientRect();
+      if (x >= r.left-24 && x <= r.right+24 && y >= r.top-24 && y <= r.bottom+24) { feedUnicorn(u); return true; }
+    }
+    return false;
+  }
+  ['🧁','🍎'].forEach((emoji, idx) => {
+    const el = document.createElement('div');
+    el.className = 'food-item';
+    el.textContent = emoji;
+    document.body.appendChild(el);
+    const home = () => ({ x: 16, y: innerHeight - 165 - idx*60 });
+    const place = () => { const h = home(); el.style.left = h.x + 'px'; el.style.top = h.y + 'px'; };
+    place();
+    let dragging = false, eaten = false, ox = 0, oy = 0;
+    el.addEventListener('pointerdown', (e) => {
+      if (eaten) return;
+      e.preventDefault(); e.stopPropagation();
+      dragging = true; el.classList.add('dragging'); el.classList.remove('spring');
+      const r = el.getBoundingClientRect(); ox = e.clientX - r.left; oy = e.clientY - r.top;
+      try { el.setPointerCapture(e.pointerId); } catch(_) {}
+    });
+    el.addEventListener('pointermove', (e) => { if (!dragging) return; el.style.left = (e.clientX - ox) + 'px'; el.style.top = (e.clientY - oy) + 'px'; });
+    const end = (e) => {
+      if (!dragging) return; dragging = false; el.classList.remove('dragging');
+      if (tryFeed(e.clientX, e.clientY)) {
+        eaten = true; el.style.opacity = '0';
+        setTimeout(() => { eaten = false; el.style.opacity = '1'; place(); }, 3000); // replenish
+      } else {
+        el.classList.add('spring'); place(); setTimeout(() => el.classList.remove('spring'), 430);
+      }
+    };
+    el.addEventListener('pointerup', end);
+    el.addEventListener('pointercancel', end);
+    foods.push({ el, place, isBusy: () => dragging || eaten });
+  });
+  // show food only when an (uncaught) unicorn is on screen
+  setInterval(() => {
+    if (!S.started) return;
+    const present = [...document.querySelectorAll('.unicorn')].some(u => !u.classList.contains('caught'));
+    foods.forEach(f => { if (!f.isBusy()) f.el.classList.toggle('visible', present); });
+  }, 300);
+})();
+
 // ── Surprise spell book — the MAGIC button casts a random one each press ──
 const SPELLS = [
   { run: () => { flyingMagic(['🦋','🧚','🪽','🦋'], 14, 6); giantBloom('🦋'); } },                 // butterfly swarm
@@ -1094,6 +1220,7 @@ function triggerMilestone(m) {
   SFX.milestone();
   showRainbowArc();
   Baby.spin();
+  if (m.emoji === '🏰') document.getElementById('castle').classList.add('show');
 
   // Big glitter burst
   for (let i = 0; i < 8; i++) {
@@ -1802,6 +1929,48 @@ function tapSparkle(px, py) {
     PaintCanvas.clear();
     SFX.magic();
     Glitter.burst(innerWidth/2, innerHeight/2, 30);
+  });
+
+  // Show Mummy / Save Drawing button (Feature 11)
+  const isTouch = navigator.maxTouchPoints > 0;
+  const shareLbl = document.getElementById('shareLabel');
+  if (shareLbl) shareLbl.textContent = isTouch ? 'Show Mummy!' : 'Save Drawing';
+  document.getElementById('shareDrawingBtn').addEventListener('click', async (e) => {
+    e.stopPropagation();
+    const src = document.getElementById('paintCanvas');
+    const W = src.width, H = src.height;
+    // Composite onto a decorated canvas
+    const out = document.createElement('canvas');
+    out.width = W; out.height = H;
+    const o = out.getContext('2d');
+    o.fillStyle = '#fff'; o.fillRect(0, 0, W, H);
+    o.drawImage(src, 0, 0);
+    // emoji border
+    o.font = '26px Arial, sans-serif'; o.textBaseline = 'middle'; o.textAlign = 'center';
+    const border = ['🌸','✨','🦄'];
+    const step = 44;
+    for (let x = step/2; x < W; x += step) { o.fillText(border[(x/step|0)%3], x, 22); o.fillText(border[(x/step|0)%3], x, H-46); }
+    for (let y = step/2; y < H; y += step) { o.fillText(border[(y/step|0)%3], 22, y); o.fillText(border[(y/step|0)%3], W-22, y); }
+    // bottom caption
+    o.fillStyle = '#ff1493'; o.font = "bold 22px 'Baloo 2', sans-serif";
+    o.fillText('Made with ✨ Sparkle Unicorn Magic Garden · sparklespop.com', W/2, H - 20);
+    if (unicornName) { o.fillStyle = '#9a4dff'; o.font = "bold 26px 'Baloo 2', sans-serif"; o.fillText(`Painted by ${unicornName} 🎨`, W/2, 60); }
+
+    const finish = () => { SFX.milestone(); floatText('Sent to Mummy! 💖', innerWidth/2, innerHeight*0.4, { color:'#fff', duration:1500 }); };
+    out.toBlob(async (blob) => {
+      if (!blob) return;
+      const file = new File([blob], 'sparkle-drawing.png', { type:'image/png' });
+      if (isTouch && navigator.canShare && navigator.canShare({ files:[file] })) {
+        try { await navigator.share({ files:[file], title:'My Sparkle Drawing', text:'Look what I made! ✨🦄' }); finish(); return; }
+        catch (err) { /* cancelled — fall through to download */ }
+      }
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'sparkle-drawing.png';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1500);
+      finish();
+    }, 'image/png');
   });
 })();
 
