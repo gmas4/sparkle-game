@@ -1,9 +1,48 @@
 # 🚀 Deploying Sparkle Unicorn Magic Garden
 
 The whole game is one self-contained file: **`index.html`**. No build step, no server code.
-To put it online you just need to (1) host that file and (2) point a domain at it.
+
+## ✅ CURRENT STATUS — already hosted on GitHub Pages
+
+- Repo: **gmas4/sparkle-game**, served from `main` branch (root).
+- GitHub Pages is **enabled**, custom domain set to **sparklespop.com** (via the `CNAME` file).
+- The ONLY remaining step is **DNS at your registrar** (the company you bought sparklespop.com from).
+
+### 👉 The one thing left to do: add these DNS records
+
+In your registrar's **DNS / Manage DNS** panel, add these records for **sparklespop.com**:
+
+**A records** (apex domain → GitHub Pages). Add all four, Host/Name = `@`:
+```
+@   A   185.199.108.153
+@   A   185.199.109.153
+@   A   185.199.110.153
+@   A   185.199.111.153
+```
+
+**Optional but recommended — AAAA records** (IPv6), Host/Name = `@`:
+```
+@   AAAA   2606:50c0:8000::153
+@   AAAA   2606:50c0:8001::153
+@   AAAA   2606:50c0:8002::153
+@   AAAA   2606:50c0:8003::153
+```
+
+**www → site** (so www.sparklespop.com works too):
+```
+www   CNAME   gmas4.github.io
+```
+
+After saving: DNS can take ~10 min–24 hr to propagate. Then in the repo go to
+**Settings → Pages** and tick **"Enforce HTTPS"** (GitHub auto-issues a free SSL cert
+once DNS resolves). Your game will be live at **https://sparklespop.com** 🎉
+
+> If your registrar won't let you add A records on the apex (some don't), use their
+> "ALIAS"/"ANAME"/"flattened CNAME" feature pointing to `gmas4.github.io` instead.
 
 ---
+
+## Alternative hosts (only if you'd rather not use GitHub Pages)
 
 ## Option A — Netlify (easiest, free, custom domain + HTTPS)
 
