@@ -1,0 +1,1599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>✨ Sparkle Unicorn Magic Garden ✨</title>
+<meta name="description" content="A magical tap, paint & sparkle game for little ones — pop bubbles, catch unicorns, hatch eggs, and cast surprise spells in a fantasy garden!">
+<meta name="theme-color" content="#ff69b4">
+
+<!-- Favicon (unicorn emoji, no extra file needed) -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>%F0%9F%A6%84</text></svg>">
+
+<!-- Add to Home Screen (iPad / phone full-screen app) -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Sparkle">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+<!-- Social share preview (iMessage / WhatsApp / Facebook / Twitter) -->
+<meta property="og:title" content="✨ Sparkle Unicorn Magic Garden ✨">
+<meta property="og:description" content="A magical tap, paint & sparkle game for little ones — pop bubbles, catch unicorns, and cast surprise spells!">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://sparklespop.com">
+<meta property="og:image" content="https://sparklespop.com/social-preview.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="✨ Sparkle Unicorn Magic Garden ✨">
+<meta name="twitter:description" content="A magical tap, paint & sparkle game for little ones!">
+<meta name="twitter:image" content="https://sparklespop.com/social-preview.png">
+
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+body{--bg:linear-gradient(135deg,#ffe0f0 0%,#ffb6d9 18%,#ff8ec4 36%,#d9a7ff 54%,#a7c8ff 72%,#fff0f5 100%);background-image:var(--bg);background-size:400% 400%;animation:auroraShift 20s ease infinite;font-family:'Fredoka','Baloo 2',sans-serif;transition:none}
+body.dark-world .twinkle-stars{opacity:1;filter:brightness(1.7) drop-shadow(0 0 3px #fff)}
+@keyframes auroraShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+
+/* HIDE external overlays/watermarks that might distract toddlers */
+iframe:not(#gameFrame),.watermark,[id*="badge"],[class*="watermark"]{display:none!important;pointer-events:none!important;opacity:0!important}
+
+/* CANVASES */
+#glitterCanvas,#paintCanvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none}
+#glitterCanvas{z-index:1}
+#paintCanvas{z-index:2}
+
+/* GAME SCENE - receives all taps */
+#gameScene{position:fixed;top:0;left:0;width:100%;height:100%;z-index:5;cursor:crosshair}
+
+/* === BUBBLE === */
+.bubble{position:absolute;border-radius:50%;cursor:pointer;z-index:10;animation:bubbleRise var(--rise-time,6s) linear forwards}
+.bubble-inner{width:100%;height:100%;border-radius:50%;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.9),rgba(255,182,217,.5) 40%,rgba(255,105,180,.3) 70%,rgba(255,20,147,.2));border:2px solid rgba(255,255,255,.6);box-shadow:0 0 20px rgba(255,105,180,.4),inset 0 0 15px rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:var(--emoji-size,30px);animation:bubbleWobble 2s ease-in-out infinite}
+@keyframes bubbleRise{0%{transform:translateY(0) translateX(0);opacity:0}5%{opacity:1}90%{opacity:.8}100%{transform:translateY(calc(-100vh - 150px)) translateX(var(--sway,30px));opacity:0}}
+@keyframes bubbleWobble{0%,100%{transform:scale(1) rotate(-3deg)}50%{transform:scale(1.05) rotate(3deg)}}
+
+/* === UNICORN === */
+.unicorn{position:absolute;cursor:pointer;z-index:12;font-size:70px;filter:drop-shadow(0 6px 15px rgba(255,20,147,.4));transition:transform .15s}
+.unicorn.walking{animation:unicornWalk var(--walk-speed,8s) linear forwards}
+@keyframes unicornWalk{0%{transform:translateX(-100px) scaleX(var(--dir,1))}100%{transform:translateX(calc(100vw + 100px)) scaleX(var(--dir,1))}}
+.unicorn.caught{transition:all .5s ease-in;opacity:0;transform:scale(2)!important}
+
+/* === EGG === */
+.egg{position:absolute;cursor:pointer;z-index:11;font-size:65px;filter:drop-shadow(0 6px 12px rgba(255,105,180,.4));animation:eggWobble 1.5s ease-in-out infinite}
+@keyframes eggWobble{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
+.egg.shaking{animation:eggShake .3s ease-in-out}
+@keyframes eggShake{0%,100%{transform:rotate(0)}20%{transform:rotate(-15deg)}40%{transform:rotate(15deg)}60%{transform:rotate(-10deg)}80%{transform:rotate(10deg)}}
+
+/* === STAR (tap collectible) === */
+.star{position:absolute;cursor:pointer;z-index:10;font-size:36px;animation:starPulse 1s ease-in-out infinite alternate;filter:drop-shadow(0 0 8px rgba(255,215,0,.6))}
+@keyframes starPulse{0%{transform:scale(1) rotate(-5deg)}100%{transform:scale(1.15) rotate(5deg)}}
+.star.collected{transition:all .4s ease-in;opacity:0;transform:scale(2)!important}
+
+/* === BUTTERFLY (flutters across, tap to catch) === */
+.butterfly{position:absolute;cursor:pointer;z-index:12;font-size:48px;filter:drop-shadow(0 4px 10px rgba(196,77,255,.4));animation:butterflyFly var(--fly-speed,9s) linear forwards}
+@keyframes butterflyFly{
+  0%{transform:translate(-120px,0) scaleX(var(--dir,1))}
+  20%{transform:translate(20vw,-50px) scaleX(var(--dir,1))}
+  40%{transform:translate(40vw,30px) scaleX(var(--dir,1))}
+  60%{transform:translate(60vw,-40px) scaleX(var(--dir,1))}
+  80%{transform:translate(80vw,25px) scaleX(var(--dir,1))}
+  100%{transform:translate(calc(100vw + 120px),0) scaleX(var(--dir,1))}
+}
+.butterfly.caught{transition:all .5s ease-in;opacity:0;transform:scale(2.2) rotate(40deg)!important}
+
+/* === POP RING === */
+.pop-ring{position:absolute;border-radius:50%;border:3px solid;pointer-events:none;z-index:15;animation:popRing .6s ease-out forwards}
+@keyframes popRing{0%{width:10px;height:10px;opacity:1;margin-left:-5px;margin-top:-5px}100%{width:120px;height:120px;opacity:0;margin-left:-60px;margin-top:-60px}}
+
+/* === SCORE === */
+#scoreBar{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:50;display:flex;gap:8px;align-items:center}
+.score-item{font-family:'Baloo 2',sans-serif;font-size:18px;font-weight:800;color:#fff;text-shadow:0 2px 6px rgba(255,20,147,.5);background:linear-gradient(135deg,rgba(255,105,180,.7),rgba(255,20,147,.5));backdrop-filter:blur(10px);padding:5px 14px;border-radius:40px;border:2px solid rgba(255,255,255,.5);box-shadow:0 4px 15px rgba(255,105,180,.3);display:flex;align-items:center;gap:5px;white-space:nowrap}
+.score-val{min-width:20px;text-align:center;transition:transform .15s}
+.score-val.bump{transform:scale(1.4)}
+
+/* === MILESTONE BAR === */
+#milestoneBar{position:fixed;top:52px;left:50%;transform:translateX(-50%);z-index:50;width:min(300px,80vw);height:14px;background:rgba(255,255,255,.3);border-radius:10px;border:2px solid rgba(255,255,255,.5);overflow:hidden}
+#milestoneFill{height:100%;width:0%;background:linear-gradient(90deg,#ff69b4,#ff1493,#ffd700);border-radius:10px;transition:width .4s ease}
+#milestoneLabel{position:fixed;top:54px;left:50%;transform:translateX(-50%);z-index:51;font-family:'Baloo 2',sans-serif;font-size:11px;font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.2);pointer-events:none;width:min(300px,80vw);text-align:center}
+
+/* === MODE BUTTONS === */
+#modeBar{position:fixed;bottom:15px;left:50%;transform:translateX(-50%);z-index:50;display:flex;gap:8px}
+.mode-btn{font-family:'Baloo 2',sans-serif;font-size:14px;font-weight:700;color:#ff1493;background:#fff;border:3px solid #ff69b4;border-radius:40px;padding:8px 16px;cursor:pointer;box-shadow:0 4px 15px rgba(255,20,147,.3);transition:all .2s;white-space:nowrap}
+.mode-btn.active{background:linear-gradient(135deg,#ff69b4,#ff1493);color:#fff;border-color:#fff;animation:modeGlow 1.4s ease-in-out infinite}
+@keyframes modeGlow{0%,100%{box-shadow:0 4px 15px rgba(255,20,147,.4)}50%{box-shadow:0 4px 22px rgba(255,20,147,.7),0 0 26px rgba(255,182,217,.7)}}
+.mode-btn:active{transform:scale(.92)}
+.pet-link{font-family:'Baloo 2',sans-serif;font-size:14px;font-weight:700;color:#fff;background:linear-gradient(135deg,#b06aff,#8a4dff);border:3px solid #fff;border-radius:40px;padding:8px 16px;cursor:pointer;box-shadow:0 4px 15px rgba(176,106,255,.45);white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center;animation:modeGlow 1.8s ease-in-out infinite}
+.pet-link:active{transform:scale(.92)}
+
+/* === HOME BUTTON === */
+#homeBtn{position:fixed;top:12px;right:12px;z-index:101;width:50px;height:50px;font-size:24px;border-radius:50%;background:#fff;border:3px solid #ff69b4;box-shadow:0 4px 15px rgba(255,20,147,.3);cursor:pointer;display:flex;align-items:center;justify-content:center;text-decoration:none;line-height:1;transition:transform .2s}
+#homeBtn:active{transform:scale(.9)}
+
+/* === WORLD TRAVEL === */
+#worldBtn{position:fixed;top:12px;left:12px;z-index:50;width:50px;height:50px;font-size:26px;border-radius:50%;background:#fff;border:3px solid #ff69b4;box-shadow:0 4px 15px rgba(255,20,147,.3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .2s;line-height:1}
+#worldBtn:active{transform:scale(.9)}
+#worldBtn.glow{animation:worldGlow 1s ease-in-out infinite}
+@keyframes worldGlow{0%,100%{box-shadow:0 4px 15px rgba(255,20,147,.4)}50%{box-shadow:0 0 28px 7px rgba(255,215,0,.95)}}
+
+#worldPicker{position:fixed;inset:0;z-index:80;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:rgba(255,105,180,.35);backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .35s}
+#worldPicker.show{opacity:1;pointer-events:auto}
+#worldPicker h2{font-family:'Baloo 2',sans-serif;color:#fff;font-size:clamp(22px,5vw,34px);font-weight:800;text-shadow:0 3px 10px rgba(255,20,147,.5)}
+.world-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:6px}
+.world-card{width:clamp(120px,38vw,180px);padding:16px 10px;border-radius:24px;background:#fff;border:4px solid #ff69b4;box-shadow:0 6px 20px rgba(255,20,147,.3);cursor:pointer;text-align:center;transition:transform .15s}
+.world-card:active{transform:scale(.94)}
+.world-card.current{border-color:#ffd700;box-shadow:0 0 22px rgba(255,215,0,.7)}
+.world-card.locked{filter:grayscale(.7);opacity:.85}
+.world-card .wc-icon{font-size:54px;line-height:1.1}
+.world-card .wc-name{font-family:'Baloo 2',sans-serif;font-size:15px;font-weight:800;color:#ff1493;margin-top:4px}
+.world-card .wc-lock{font-family:'Baloo 2',sans-serif;font-size:12px;color:#c44dff;font-weight:700;margin-top:2px}
+.world-close{font-family:'Baloo 2',sans-serif;font-size:18px;font-weight:700;color:#ff1493;background:#fff;border:3px solid #ff69b4;border-radius:40px;padding:8px 26px;cursor:pointer;margin-top:6px;box-shadow:0 4px 15px rgba(255,20,147,.3)}
+
+#worldToast{position:fixed;top:88px;left:50%;transform:translateX(-50%) translateY(-12px);z-index:55;font-family:'Baloo 2',sans-serif;font-size:clamp(19px,5vw,28px);font-weight:800;color:#fff;text-shadow:0 3px 10px rgba(255,20,147,.6);background:rgba(255,105,180,.55);backdrop-filter:blur(8px);padding:8px 26px;border-radius:40px;border:2px solid rgba(255,255,255,.6);opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;white-space:nowrap}
+#worldToast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* === MUSIC TOGGLE === */
+#musicBtn{position:fixed;bottom:15px;left:15px;z-index:50;width:46px;height:46px;font-size:20px;border-radius:50%;background:#fff;border:3px solid #ff69b4;box-shadow:0 4px 15px rgba(255,20,147,.3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .2s;line-height:1}
+#musicBtn:active{transform:scale(.9)}
+#musicBtn.off{opacity:.6;border-color:#ffb6d9}
+
+/* === MILESTONE RAINBOW ARC === */
+.rainbow-arc{position:fixed;left:50%;bottom:-42vh;width:150vw;max-width:1300px;aspect-ratio:1;transform-origin:50% 100%;transform:translateX(-50%) scale(.4);border-radius:50%;z-index:1;pointer-events:none;opacity:0;
+  background:radial-gradient(circle,
+    transparent 0 59%,
+    rgba(255,40,60,.6) 59% 62%,
+    rgba(255,140,0,.6) 62% 65%,
+    rgba(255,230,0,.6) 65% 68%,
+    rgba(60,200,60,.55) 68% 71%,
+    rgba(40,150,255,.55) 71% 74%,
+    rgba(150,40,255,.55) 74% 77%,
+    transparent 77%);
+  filter:drop-shadow(0 0 18px rgba(255,255,255,.5));animation:rainbowArc 3.6s ease-out forwards}
+@keyframes rainbowArc{0%{opacity:0;transform:translateX(-50%) scale(.4)}25%{opacity:.95;transform:translateX(-50%) scale(1)}80%{opacity:.9;transform:translateX(-50%) scale(1)}100%{opacity:0;transform:translateX(-50%) scale(1.05)}}
+
+/* === MAGIC BUTTON === */
+#magicBtn{position:fixed;bottom:65px;right:15px;z-index:50;font-family:'Baloo 2',sans-serif;font-size:16px;font-weight:800;color:#fff;background:linear-gradient(135deg,#ff69b4,#ff1493,#c44dff);background-size:200% 200%;animation:magicShimmer 4s ease infinite;padding:10px 20px;border-radius:50px;border:3px solid rgba(255,255,255,.6);box-shadow:0 6px 20px rgba(255,20,147,.5);cursor:pointer;transition:transform .2s}
+@keyframes magicShimmer{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+#magicBtn.ready{animation:magicPulse 1s ease-in-out infinite;transform:scale(1.1)}
+@keyframes magicPulse{0%,100%{box-shadow:0 6px 20px rgba(255,20,147,.5)}50%{box-shadow:0 6px 40px rgba(255,20,147,.8),0 0 50px rgba(255,105,180,.5)}}
+#magicBtn:active{transform:scale(.9)}
+
+/* === MEGA BURST === */
+.mega-burst{position:fixed;top:50%;left:50%;width:10px;height:10px;border-radius:50%;background:radial-gradient(circle,#fff,#ff69b4,transparent);transform:translate(-50%,-50%) scale(0);z-index:60;pointer-events:none;animation:megaBurst 1s ease-out forwards}
+@keyframes megaBurst{0%{transform:translate(-50%,-50%) scale(0);opacity:1}50%{transform:translate(-50%,-50%) scale(80);opacity:.6}100%{transform:translate(-50%,-50%) scale(120);opacity:0}}
+
+/* === MILESTONE CELEBRATION === */
+#celebration{position:fixed;inset:0;z-index:70;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(255,105,180,.3);backdrop-filter:blur(5px);opacity:0;pointer-events:none;transition:opacity .5s}
+#celebration.show{opacity:1;pointer-events:auto}
+#celebration .cel-emoji{font-size:100px;animation:celBounce 1s ease-in-out infinite}
+@keyframes celBounce{0%,100%{transform:scale(1) rotate(-5deg)}50%{transform:scale(1.2) rotate(5deg)}}
+#celebration .cel-text{font-family:'Baloo 2',sans-serif;font-size:clamp(28px,6vw,48px);font-weight:800;color:#fff;text-shadow:0 4px 15px rgba(255,20,147,.6);text-align:center;margin-top:10px}
+#celebration .cel-sub{font-family:'Fredoka',sans-serif;font-size:clamp(16px,3vw,22px);color:rgba(255,255,255,.9);margin-top:5px}
+#celebration .cel-dismiss{font-family:'Baloo 2',sans-serif;font-size:18px;font-weight:700;color:#ff1493;background:#fff;border:3px solid #ff69b4;border-radius:40px;padding:10px 30px;cursor:pointer;margin-top:20px;box-shadow:0 4px 15px rgba(255,20,147,.3)}
+
+/* === UNLOCKABLE ACCESSORIES (shown on unicorn) === */
+.accessory{position:absolute;pointer-events:none;z-index:13;font-size:30px;animation:accPop .4s ease-out forwards}
+@keyframes accPop{0%{transform:scale(0)}60%{transform:scale(1.3)}100%{transform:scale(1)}}
+
+/* === TITLE SCREEN === */
+#titleScreen{position:fixed;inset:0;z-index:100;background:linear-gradient(170deg,#fff0f5 0%,#ffb6d9 40%,#ff69b4 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;transition:opacity .8s,transform .8s}
+#titleScreen.hidden{opacity:0;transform:scale(1.1);pointer-events:none}
+#titleScreen h1{font-family:'Baloo 2',sans-serif;font-size:clamp(30px,7vw,58px);font-weight:800;color:#fff;text-shadow:0 4px 15px rgba(255,20,147,.5);text-align:center;line-height:1.1;animation:titleFloat 3s ease-in-out infinite}
+@keyframes titleFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.title-unicorn{font-size:clamp(80px,20vw,140px);animation:titleBob 2s ease-in-out infinite;filter:drop-shadow(0 10px 30px rgba(255,20,147,.5))}
+@keyframes titleBob{0%,100%{transform:rotate(-5deg) scale(1)}50%{transform:rotate(5deg) scale(1.05)}}
+#playBtn{font-family:'Baloo 2',sans-serif;font-size:clamp(20px,5vw,30px);font-weight:800;color:#ff1493;background:#fff;border:4px solid #ff69b4;border-radius:60px;padding:14px 45px;cursor:pointer;box-shadow:0 8px 30px rgba(255,20,147,.4);transition:all .2s;animation:playPulse 1.5s ease-in-out infinite}
+@keyframes playPulse{0%,100%{box-shadow:0 8px 30px rgba(255,20,147,.4)}50%{box-shadow:0 8px 50px rgba(255,20,147,.7),0 0 60px rgba(255,105,180,.4)}}
+#playBtn:active{transform:scale(.92)}
+.title-hint{font-size:clamp(13px,2.5vw,16px);color:rgba(255,255,255,.8);text-align:center;max-width:280px}
+
+/* === BG EFFECTS === */
+.glitter-bg{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:radial-gradient(2px 2px at 20% 30%,rgba(255,255,255,.8),transparent),radial-gradient(2px 2px at 40% 70%,rgba(255,182,217,.6),transparent),radial-gradient(1px 1px at 60% 20%,rgba(255,255,255,.9),transparent),radial-gradient(2px 2px at 80% 50%,rgba(255,105,180,.5),transparent);animation:glitterShift 8s linear infinite}
+@keyframes glitterShift{0%{opacity:.6}50%{opacity:1}100%{opacity:.6}}
+.rainbow{position:fixed;bottom:-80px;left:50%;transform:translateX(-50%);width:600px;height:300px;z-index:0;border-radius:300px 300px 0 0;background:conic-gradient(from 180deg at 50% 100%,#ff0000 0deg,#ff8800 25deg,#ffff00 50deg,#00cc00 75deg,#0088ff 100deg,#8800ff 125deg,#ff0088 150deg,transparent 155deg);opacity:.12;pointer-events:none}
+.cloud{position:fixed;z-index:0;opacity:.4;font-size:50px;animation:cloudDrift var(--speed,30s) linear infinite;pointer-events:none}
+@keyframes cloudDrift{0%{transform:translateX(-100px)}100%{transform:translateX(calc(100vw + 100px))}}
+
+/* === TWINKLING STAR FIELD === */
+.twinkle-stars{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:radial-gradient(1.5px 1.5px at 12% 18%,#fff,transparent),radial-gradient(2px 2px at 28% 62%,#fff5fb,transparent),radial-gradient(1px 1px at 48% 12%,#fff,transparent),radial-gradient(2px 2px at 67% 78%,#ffe9f6,transparent),radial-gradient(1.5px 1.5px at 82% 28%,#fff,transparent),radial-gradient(1px 1px at 90% 64%,#fff,transparent),radial-gradient(2px 2px at 36% 88%,#fff,transparent),radial-gradient(1.5px 1.5px at 58% 44%,#fff,transparent);animation:twinkle 3.5s ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:.35}50%{opacity:1}}
+
+/* === POINTER WAND GLOW (follows finger) === */
+#wandGlow{position:fixed;top:0;left:0;width:120px;height:120px;margin:-60px 0 0 -60px;border-radius:50%;pointer-events:none;z-index:8;opacity:0;background:radial-gradient(circle,rgba(255,255,255,.55),rgba(255,182,217,.35) 40%,rgba(199,77,255,.18) 65%,transparent 75%);transition:opacity .25s;mix-blend-mode:screen}
+#wandGlow.show{opacity:1}
+
+/* === MAGIC FINGER TRAIL === */
+.trail-spark{position:fixed;pointer-events:none;z-index:9;font-size:22px;will-change:transform,opacity;animation:trailFade .7s ease-out forwards}
+@keyframes trailFade{0%{transform:translate(-50%,-50%) scale(.4) rotate(0);opacity:0}20%{opacity:1}100%{transform:translate(-50%,-130%) scale(1.1) rotate(40deg);opacity:0}}
+
+/* === SHOOTING STARS (magic spell) === */
+.shooting-star{position:fixed;top:0;left:0;font-size:34px;pointer-events:none;z-index:62;filter:drop-shadow(0 0 10px #fff);will-change:transform,opacity}
+
+/* === SPELL FLASH (magic button) === */
+#spellFlash{position:fixed;inset:0;z-index:58;pointer-events:none;opacity:0;background:radial-gradient(circle at 50% 60%,rgba(255,255,255,.85),rgba(255,140,210,.5) 35%,rgba(199,77,255,.3) 60%,transparent 80%)}
+#spellFlash.flash{animation:spellFlash .9s ease-out}
+@keyframes spellFlash{0%{opacity:0}15%{opacity:1}100%{opacity:0}}
+
+/* === SCREEN SHAKE === */
+@keyframes screenShake{0%,100%{transform:translate(0,0)}20%{transform:translate(-6px,4px)}40%{transform:translate(6px,-4px)}60%{transform:translate(-4px,-4px)}80%{transform:translate(4px,4px)}}
+body.shake{animation:screenShake .5s ease-in-out}
+
+/* === FLOATING TITLE EMOJIS === */
+.float-emoji{position:absolute;pointer-events:none;font-size:clamp(26px,5vw,42px);opacity:.85;animation:floatUp var(--ft,7s) ease-in-out infinite;filter:drop-shadow(0 4px 10px rgba(255,20,147,.3))}
+@keyframes floatUp{0%{transform:translateY(20px) rotate(-10deg);opacity:0}15%{opacity:.85}85%{opacity:.85}100%{transform:translateY(-40px) rotate(10deg);opacity:0}}
+
+/* === NIGHT-TIME THEME (magic can switch day <-> night) === */
+#nightSky{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0;transition:opacity 1.3s ease;background:linear-gradient(160deg,#140a33 0%,#241258 35%,#3d2270 60%,#5a2d7a 85%,#140a33 100%)}
+body.night #nightSky{opacity:1}
+body.night .twinkle-stars{opacity:1;filter:brightness(1.8) drop-shadow(0 0 3px #fff)}
+body.night .rainbow{opacity:.04}
+#moon{position:fixed;top:7%;right:12%;font-size:64px;z-index:1;opacity:0;transition:opacity 1.3s ease,transform 1.3s ease;transform:scale(.6) rotate(-20deg);pointer-events:none;filter:drop-shadow(0 0 24px rgba(255,255,200,.75))}
+body.night #moon{opacity:1;transform:scale(1) rotate(0)}
+
+/* === FALLING MAGIC (snow / flowers / hearts / candy) === */
+.falling{position:fixed;top:-60px;pointer-events:none;z-index:14;will-change:transform,opacity;animation:fallDown var(--fall,4s) linear forwards}
+@keyframes fallDown{0%{transform:translateY(-60px) translateX(0) rotate(0);opacity:0}10%{opacity:1}88%{opacity:1}100%{transform:translateY(106vh) translateX(var(--drift,40px)) rotate(var(--spin,200deg));opacity:.6}}
+
+/* === FLYING MAGIC (butterflies / unicorns swarm) === */
+.flyacross{position:fixed;pointer-events:none;z-index:14;will-change:transform;animation:flyAcross var(--fly,5s) linear forwards}
+@keyframes flyAcross{0%{transform:translateX(-14vw) translateY(0)}25%{transform:translateX(28vw) translateY(-45px)}50%{transform:translateX(52vw) translateY(35px)}75%{transform:translateX(76vw) translateY(-35px)}100%{transform:translateX(116vw) translateY(0)}}
+
+/* === GIANT BLOOM (spell announcement) === */
+.giant-bloom{position:fixed;top:46%;left:50%;font-size:clamp(90px,22vw,150px);pointer-events:none;z-index:61;transform:translate(-50%,-50%) scale(0);animation:giantBloom 1.5s ease-out forwards;filter:drop-shadow(0 0 32px rgba(255,255,255,.75))}
+@keyframes giantBloom{0%{transform:translate(-50%,-50%) scale(0) rotate(-30deg);opacity:0}40%{transform:translate(-50%,-50%) scale(1.35) rotate(10deg);opacity:1}70%{transform:translate(-50%,-50%) scale(1.1) rotate(-5deg);opacity:1}100%{transform:translate(-50%,-50%) scale(2.1) rotate(0);opacity:0}}
+
+/* === PAINT MODE INDICATOR === */
+#paintIndicator{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:49;font-family:'Baloo 2',sans-serif;font-size:24px;font-weight:800;color:#fff;text-shadow:0 2px 8px rgba(255,20,147,.6);background:rgba(255,105,180,.6);backdrop-filter:blur(8px);padding:8px 24px;border-radius:30px;border:2px solid rgba(255,255,255,.5);opacity:0;transition:opacity .3s;pointer-events:none}
+#paintIndicator.show{opacity:1}
+
+/* === PAINT TOOLBAR === */
+#paintToolbar{position:fixed;bottom:72px;left:50%;transform:translateX(-50%);z-index:50;display:none;flex-direction:column;align-items:center;gap:6px;pointer-events:none}
+#paintToolbar.show{display:flex;pointer-events:auto}
+#paintTools{display:flex;gap:5px;justify-content:center;background:rgba(255,255,255,.9);backdrop-filter:blur(12px);padding:7px 10px;border-radius:22px;border:2px solid rgba(255,105,180,.4);box-shadow:0 4px 20px rgba(255,20,147,.2)}
+.tool-btn{font-family:'Baloo 2',sans-serif;font-size:10px;font-weight:700;color:#ff1493;background:transparent;border:2px solid transparent;border-radius:14px;padding:5px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:48px;transition:all .18s;line-height:1}
+.tool-btn .t-ico{font-size:22px;line-height:1.1}
+.tool-btn.active{background:linear-gradient(135deg,#ff69b4,#ff1493);color:#fff;border-color:rgba(255,255,255,.5);box-shadow:0 2px 10px rgba(255,20,147,.4)}
+.tool-btn:active{transform:scale(.88)}
+#colorPalette{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;background:rgba(255,255,255,.9);backdrop-filter:blur(12px);padding:7px 12px;border-radius:20px;border:2px solid rgba(255,105,180,.3);box-shadow:0 4px 16px rgba(255,20,147,.15)}
+.c-swatch{width:28px;height:28px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all .15s;box-shadow:0 2px 6px rgba(0,0,0,.15)}
+.c-swatch.active{border-color:#ff1493;transform:scale(1.28);box-shadow:0 0 10px rgba(255,20,147,.5)}
+#stampPicker{display:none;gap:4px;flex-wrap:wrap;justify-content:center;max-width:310px;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);padding:8px 12px;border-radius:20px;border:2px solid rgba(255,105,180,.4);box-shadow:0 4px 20px rgba(255,20,147,.2)}
+#stampPicker.show{display:flex}
+.stamp-opt{font-size:26px;cursor:pointer;padding:3px;border-radius:8px;transition:transform .15s;line-height:1.1}
+.stamp-opt.active{background:rgba(255,105,180,.25);transform:scale(1.2)}
+.stamp-opt:active{transform:scale(.85)}
+
+/* === RESPONSIVE === */
+@media(max-width:600px){
+  .score-item{font-size:14px;padding:4px 10px}
+  .mode-btn{font-size:12px;padding:6px 12px}
+  #magicBtn{font-size:14px;padding:8px 16px;bottom:55px;right:10px}
+  .unicorn{font-size:55px}
+  .egg{font-size:50px}
+  #milestoneBar{height:12px}
+  .tool-btn{min-width:40px;font-size:9px;padding:4px 5px}
+  .tool-btn .t-ico{font-size:18px}
+  .c-swatch{width:24px;height:24px}
+  .stamp-opt{font-size:22px}
+}
+</style>
+</head>
+<body>
+
+<div id="nightSky"></div>
+<div class="glitter-bg"></div>
+<div class="twinkle-stars"></div>
+<div class="rainbow"></div>
+<div id="moon">🌙</div>
+<canvas id="glitterCanvas"></canvas>
+<canvas id="paintCanvas"></canvas>
+<div id="wandGlow"></div>
+<div id="spellFlash"></div>
+<div id="gameScene"></div>
+
+<!-- Score -->
+<div id="scoreBar">
+  <div class="score-item"><span>✨</span><span class="score-val" id="sparkleCount">0</span></div>
+  <div class="score-item"><span>🦄</span><span class="score-val" id="unicornCount">0</span></div>
+</div>
+
+<!-- Milestone progress -->
+<div id="milestoneBar"><div id="milestoneFill"></div></div>
+<div id="milestoneLabel">Next: 🧚 Fairy Friend (5✨)</div>
+
+<!-- Mode buttons -->
+<div id="modeBar">
+  <button class="mode-btn active" data-mode="tap">✨ Tap</button>
+  <button class="mode-btn" data-mode="paint">🎨 Paint</button>
+  <a class="pet-link" href="pet.html">🦄 My Pet</a>
+</div>
+
+<!-- Paint mode indicator -->
+<div id="paintIndicator">🎨 Drawing Mode!</div>
+
+<!-- Paint Toolbar (visible only in paint mode) -->
+<div id="paintToolbar">
+  <div id="stampPicker"></div>
+  <div id="colorPalette"></div>
+  <div id="paintTools">
+    <button class="tool-btn active" data-tool="brush"><span class="t-ico">🖌️</span>Brush</button>
+    <button class="tool-btn" data-tool="spray"><span class="t-ico">💨</span>Spray</button>
+    <button class="tool-btn" data-tool="stamp"><span class="t-ico">🌟</span>Stamp</button>
+    <button class="tool-btn" data-tool="rainbow"><span class="t-ico">🌈</span>Rainbow</button>
+    <button class="tool-btn" data-tool="eraser"><span class="t-ico">⬜</span>Erase</button>
+    <button class="tool-btn" id="clearPaintBtn"><span class="t-ico">🗑️</span>Clear</button>
+  </div>
+</div>
+
+<!-- Home (back to launcher) -->
+<a id="homeBtn" href="index.html" title="Home">🏠</a>
+
+<!-- World travel -->
+<button id="worldBtn" title="Travel to a world">🌍</button>
+<div id="worldToast"></div>
+<div id="worldPicker">
+  <h2>✨ Choose a World ✨</h2>
+  <div class="world-grid" id="worldGrid"></div>
+  <button class="world-close" id="worldClose">💖 Stay Here</button>
+</div>
+
+<!-- Music toggle -->
+<button id="musicBtn" title="Music on/off">🎵</button>
+
+<!-- Magic button -->
+<button id="magicBtn">🦄 MAGIC (0/50)</button>
+
+<!-- Celebration overlay -->
+<div id="celebration">
+  <div class="cel-emoji" id="celEmoji">🎉</div>
+  <div class="cel-text" id="celText">Amazing!</div>
+  <div class="cel-sub" id="celSub">You unlocked something special!</div>
+  <button class="cel-dismiss" id="celDismiss">✨ Keep Playing! ✨</button>
+</div>
+
+<!-- Title -->
+<div id="titleScreen">
+  <div id="titleFloat" style="position:absolute;inset:0;overflow:hidden;pointer-events:none"></div>
+  <div class="title-unicorn">🦄</div>
+  <h1>Sparkle Unicorn<br>Magic Garden</h1>
+  <p class="title-hint">Tap bubbles, catch unicorns, paint with sparkles — and travel to candy, ocean & space worlds! 🌍</p>
+  <button id="playBtn">✨ TAP TO PLAY ✨</button>
+  <a class="pet-link" href="pet.html" style="margin-top:10px;font-size:clamp(15px,3.5vw,20px);padding:10px 26px">🦄 Make &amp; Care for a Pet</a>
+</div>
+
+<script>
+/* ================================================
+   SPARKLE UNICORN MAGIC GARDEN - Fixed & Improved
+   ================================================ */
+
+// ── SFX Engine (renamed from Audio to avoid window.Audio conflict) ──
+const SFX = (() => {
+  let ctx;
+  let worldPitch = 1; // each world tints the sound effects a little
+  const init = () => {
+    if (!ctx) {
+      ctx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (ctx.state === 'suspended') ctx.resume();
+  };
+  const note = (f, d=0.15, type='sine', vol=0.1) => {
+    if (!ctx) return;
+    try {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = type; o.frequency.value = f * worldPitch;
+      g.gain.setValueAtTime(vol, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + d);
+      o.connect(g).connect(ctx.destination);
+      o.start(); o.stop(ctx.currentTime + d);
+    } catch(e) {}
+  };
+
+  // ── Gentle twinkly background music (soft pad + lullaby chimes) ──
+  let musicOn = false, musicTimer = null, musicGain = null, padNodes = [];
+  const SCALE = [523.25,587.33,659.25,783.99,880.00,1046.50,1174.66]; // C-major pentatonic-ish, no dissonance
+  const startMusic = () => {
+    if (!ctx || musicOn) return;
+    musicOn = true;
+    musicGain = ctx.createGain();
+    musicGain.gain.setValueAtTime(0.0001, ctx.currentTime);
+    musicGain.gain.linearRampToValueAtTime(1, ctx.currentTime + 2.5); // gentle fade-in
+    musicGain.connect(ctx.destination);
+
+    // warm soft pad (C + G), slowly breathing
+    const padGain = ctx.createGain(); padGain.gain.value = 0.014; padGain.connect(musicGain);
+    [130.81, 196.00].forEach(f => {
+      const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.value = f;
+      o.connect(padGain); o.start(); padNodes.push(o);
+    });
+    const lfo = ctx.createOscillator(); lfo.frequency.value = 0.08;
+    const lfoGain = ctx.createGain(); lfoGain.gain.value = 0.006;
+    lfo.connect(lfoGain).connect(padGain.gain); lfo.start(); padNodes.push(lfo);
+    padNodes.push(padGain);
+
+    const twinkle = () => {
+      if (!musicOn) return;
+      const f = SCALE[Math.floor(Math.random()*SCALE.length)];
+      try {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = 'sine'; o.frequency.value = f;
+        g.gain.setValueAtTime(0.0001, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.045, ctx.currentTime + 0.06);
+        g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 1.4);
+        o.connect(g).connect(musicGain);
+        o.start(); o.stop(ctx.currentTime + 1.5);
+      } catch(e) {}
+    };
+    twinkle();
+    musicTimer = setInterval(twinkle, 850);
+  };
+  const stopMusic = () => {
+    if (!ctx || !musicOn) return;
+    musicOn = false;
+    clearInterval(musicTimer); musicTimer = null;
+    try { musicGain.gain.cancelScheduledValues(ctx.currentTime);
+      musicGain.gain.setValueAtTime(musicGain.gain.value, ctx.currentTime);
+      musicGain.gain.linearRampToValueAtTime(0.0001, ctx.currentTime + 0.8); } catch(e) {}
+    const nodes = padNodes; padNodes = [];
+    setTimeout(() => nodes.forEach(n => { try { n.stop && n.stop(); } catch(e) {} }), 900);
+  };
+
+  return {
+    init,
+    setPitch(p) { worldPitch = p; },
+    startMusic, stopMusic,
+    isMusicOn: () => musicOn,
+    toggleMusic() { musicOn ? stopMusic() : startMusic(); return musicOn; },
+    pop()     { note(800+Math.random()*400, 0.08, 'sine', 0.08); setTimeout(()=>note(1200+Math.random()*300, 0.06, 'sine', 0.05), 40); },
+    sparkle() { const n=[880,1108,1320,1568,1760][Math.floor(Math.random()*5)]; note(n, 0.2, 'sine', 0.07); setTimeout(()=>note(n*1.5, 0.15, 'sine', 0.04), 60); },
+    unicorn() { [523,659,784,1047].forEach((n,i)=>setTimeout(()=>note(n, 0.2, 'triangle', 0.08), i*80)); },
+    hatch()   { [440,554,659,880,1108].forEach((n,i)=>setTimeout(()=>note(n, 0.25, 'sine', 0.07), i*70)); },
+    magic()   { [440,554,659,880,1108,1320,1568].forEach((n,i)=>setTimeout(()=>note(n, 0.3, 'sine', 0.06), i*50)); },
+    crack()   { note(200+Math.random()*100, 0.05, 'square', 0.04); },
+    paint()   { note(600+Math.random()*600, 0.05, 'sine', 0.03); },
+    milestone(){ [523,659,784,1047,1319].forEach((n,i)=>setTimeout(()=>note(n, 0.4, 'sine', 0.08), i*100)); },
+    collect() { note(1000+Math.random()*500, 0.1, 'sine', 0.06); }
+  };
+})();
+
+// ── Glitter Particle System ──
+const Glitter = (() => {
+  const c = document.getElementById('glitterCanvas'), x = c.getContext('2d');
+  let P = [];
+  const C = ['#fff','#ffb6d9','#ff69b4','#ff1493','#ffc0cb','#ffd700','#fff5ee'];
+  const resize = () => { c.width = innerWidth; c.height = innerHeight; };
+  addEventListener('resize', resize); resize();
+
+  const burst = (bx, by, n=25) => {
+    for (let i=0; i<n; i++) {
+      const a=Math.random()*Math.PI*2, s=1+Math.random()*4;
+      P.push({x:bx, y:by, vx:Math.cos(a)*s, vy:Math.sin(a)*s-2,
+        sz:1+Math.random()*4, c:C[Math.floor(Math.random()*C.length)],
+        l:1, d:0.01+Math.random()*0.015, t:Math.random()*6.28, ts:0.1+Math.random()*0.2});
+    }
+  };
+  const ambient = () => {
+    if (P.length < 50) P.push({x:Math.random()*c.width, y:-5,
+      vx:(Math.random()-0.5)*0.4, vy:0.3+Math.random()*0.6,
+      sz:1+Math.random()*2.5, c:C[Math.floor(Math.random()*C.length)],
+      l:1, d:0.002+Math.random()*0.003, t:Math.random()*6.28, ts:0.05+Math.random()*0.1});
+  };
+  const loop = () => {
+    x.clearRect(0,0,c.width,c.height);
+    ambient();
+    for (let i=P.length-1; i>=0; i--) {
+      const p=P[i]; p.x+=p.vx; p.y+=p.vy; p.vy+=0.02; p.l-=p.d; p.t+=p.ts;
+      if (p.l<=0) { P.splice(i,1); continue; }
+      x.globalAlpha = p.l * (0.5 + 0.5*Math.sin(p.t));
+      x.fillStyle = p.c;
+      x.beginPath(); x.arc(p.x, p.y, p.sz, 0, 6.28); x.fill();
+    }
+    x.globalAlpha = 1;
+    requestAnimationFrame(loop);
+  };
+  loop();
+  return { burst };
+})();
+
+// ── Paint Tool State ──
+const PT = {
+  tool: 'brush',      // brush | spray | stamp | rainbow | eraser
+  color: '#ff1493',
+  stamp: '🌟',
+  rainbowHue: 0,
+  sprayTimer: null,
+  sprayX: 0, sprayY: 0,
+  drawing: false,
+  lastX: 0, lastY: 0
+};
+const PAINT_COLORS = [
+  '#ff1493','#ff6b6b','#ff8c00','#ffd700',
+  '#7fff00','#00d4aa','#4da6ff','#c44dff',
+  '#ffffff','#333333'
+];
+const STAMP_EMOJIS = [
+  '🌟','💖','🌸','🌈','🦄','🦋','⭐','🍭',
+  '🎀','👑','🌺','🐱','🐶','🐝','🏠','🍦',
+  '🎈','🌙','🚀','🦕'
+];
+
+// ── Paint Canvas ──
+const PaintCanvas = (() => {
+  const c = document.getElementById('paintCanvas');
+  const ctx = c.getContext('2d');
+  const resize = () => { c.width = innerWidth; c.height = innerHeight; };
+  addEventListener('resize', resize); resize();
+
+  // ── Brush / Rainbow ──
+  const startBrush = (px, py, rainbow) => {
+    PT.drawing = true;
+    PT.lastX = px; PT.lastY = py;
+    moveBrush(px, py, rainbow);
+  };
+  const moveBrush = (px, py, rainbow) => {
+    if (!PT.drawing) return;
+    ctx.beginPath();
+    ctx.moveTo(PT.lastX, PT.lastY);
+    ctx.lineTo(px, py);
+    if (rainbow) {
+      PT.rainbowHue = (PT.rainbowHue + 4) % 360;
+      ctx.strokeStyle = `hsl(${PT.rainbowHue},100%,58%)`;
+    } else {
+      ctx.strokeStyle = PT.color;
+    }
+    ctx.lineWidth = 22;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.globalAlpha = 0.88;
+    ctx.shadowColor = ctx.strokeStyle;
+    ctx.shadowBlur = 14;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+    ctx.shadowBlur = 0;
+    if (Math.random() < 0.18) Glitter.burst(px, py, 3);
+    PT.lastX = px; PT.lastY = py;
+  };
+
+  // ── Spray ──
+  const doSpray = () => {
+    const r = 40, n = 12;
+    for (let i = 0; i < n; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const d = Math.random() * r;
+      ctx.beginPath();
+      ctx.arc(PT.sprayX + Math.cos(a)*d, PT.sprayY + Math.sin(a)*d,
+        1.2 + Math.random()*2.8, 0, Math.PI*2);
+      ctx.fillStyle = PT.color;
+      ctx.globalAlpha = 0.2 + Math.random() * 0.6;
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  };
+  const startSpray = (px, py) => {
+    PT.sprayX = px; PT.sprayY = py;
+    PT.drawing = true;
+    doSpray();
+    PT.sprayTimer = setInterval(doSpray, 40);
+  };
+  const moveSpray = (px, py) => { PT.sprayX = px; PT.sprayY = py; };
+  const stopSpray = () => {
+    clearInterval(PT.sprayTimer); PT.sprayTimer = null; PT.drawing = false;
+  };
+
+  // ── Stamps ──
+  const placeStamp = (px, py) => {
+    const sz = 68;
+    ctx.save();
+    ctx.font = `${sz}px Arial, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = 'rgba(255,105,180,0.7)';
+    ctx.shadowBlur = 20;
+    ctx.globalAlpha = 1;
+    ctx.fillText(PT.stamp, px, py);
+    ctx.restore();
+    Glitter.burst(px, py, 14);
+    SFX.collect();
+  };
+
+  // ── Eraser ──
+  const startEraser = (px, py) => {
+    PT.drawing = true; PT.lastX = px; PT.lastY = py;
+    moveEraser(px, py);
+  };
+  const moveEraser = (px, py) => {
+    if (!PT.drawing) return;
+    ctx.save();
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath();
+    ctx.arc(px, py, 28, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(0,0,0,1)';
+    ctx.fill();
+    ctx.restore();
+    PT.lastX = px; PT.lastY = py;
+  };
+
+  // ── Public API ──
+  const start = (px, py) => {
+    switch (PT.tool) {
+      case 'brush':   startBrush(px, py, false); break;
+      case 'rainbow': startBrush(px, py, true);  break;
+      case 'spray':   startSpray(px, py);         break;
+      case 'stamp':   placeStamp(px, py);         break;
+      case 'eraser':  startEraser(px, py);        break;
+    }
+  };
+  const move = (px, py) => {
+    switch (PT.tool) {
+      case 'brush':   moveBrush(px, py, false); break;
+      case 'rainbow': moveBrush(px, py, true);  break;
+      case 'spray':   moveSpray(px, py);         break;
+      case 'eraser':  moveEraser(px, py);        break;
+      // stamp: no drag behaviour
+    }
+  };
+  const stop = () => {
+    if (PT.tool === 'spray') stopSpray();
+    else PT.drawing = false;
+  };
+  const clear = () => { ctx.clearRect(0, 0, c.width, c.height); };
+
+  return { start, move, stop, clear, isActive: () => PT.drawing };
+})();
+
+// ── DOM Element Manager (prevents clutter) ──
+const DOMManager = (() => {
+  const MAX_BUBBLES = 8;
+  const MAX_STARS = 6;
+  const MAX_EGGS = 3;
+  const MAX_UNICORNS = 4;
+  const MAX_BUTTERFLIES = 4;
+
+  const counts = { bubbles: 0, stars: 0, eggs: 0, unicorns: 0, butterflies: 0 };
+
+  const canSpawn = (type) => counts[type] < {bubbles:MAX_BUBBLES, stars:MAX_STARS, eggs:MAX_EGGS, unicorns:MAX_UNICORNS, butterflies:MAX_BUTTERFLIES}[type];
+  const add = (type) => counts[type]++;
+  const remove = (type) => counts[type] = Math.max(0, counts[type]-1);
+
+  return { canSpawn, add, remove, counts };
+})();
+
+// ── State ──
+const S = {
+  sparkles: 0,
+  unicorns: 0,
+  started: false,
+  mode: 'tap',
+  magicMeter: 0,
+  currentMilestone: 0,
+  unlockedAccessories: [],
+  celebrationActive: false
+};
+
+// Milestones with unlockables
+const MILESTONES = [
+  { at: 5,   emoji: '🧚', name: 'Fairy Friend', msg: 'A fairy came to play!' },
+  { at: 10,  emoji: '🎀', name: 'Bow',         msg: 'Your unicorn got a bow!' },
+  { at: 20,  emoji: '🦋', name: 'Butterfly',   msg: 'Magic butterflies appeared!' },
+  { at: 25,  emoji: '👑', name: 'Crown',       msg: 'A royal crown appeared!' },
+  { at: 50,  emoji: '🌈', name: 'Rainbow',     msg: 'Rainbow magic unlocked!' },
+  { at: 75,  emoji: '💎', name: 'Diamond',     msg: 'A sparkling diamond!' },
+  { at: 100, emoji: '🏰', name: 'Castle',      msg: 'Your fairytale castle appeared!' },
+  { at: 130, emoji: '🏆', name: 'Champion',    msg: 'You are a Unicorn Champion!' },
+  { at: 170, emoji: '⭐', name: 'Superstar',   msg: 'SUPERSTAR mode!' },
+  { at: 220, emoji: '🦄', name: 'Unicorn Herd', msg: 'You built a unicorn herd!' },
+];
+
+const scene = document.getElementById('gameScene');
+const sparkleEl = document.getElementById('sparkleCount');
+const unicornEl = document.getElementById('unicornCount');
+const magicBtn = document.getElementById('magicBtn');
+const titleScreen = document.getElementById('titleScreen');
+const milestoneFill = document.getElementById('milestoneFill');
+const milestoneLabel = document.getElementById('milestoneLabel');
+const celebration = document.getElementById('celebration');
+const celEmoji = document.getElementById('celEmoji');
+const celText = document.getElementById('celText');
+const celSub = document.getElementById('celSub');
+const celDismiss = document.getElementById('celDismiss');
+const paintIndicator = document.getElementById('paintIndicator');
+const paintToolbar  = document.getElementById('paintToolbar');
+const wandGlow = document.getElementById('wandGlow');
+const spellFlash = document.getElementById('spellFlash');
+
+// ── Magical Pointer FX (wand glow + sparkle trail) ──
+const TRAIL_EMOJIS = ['✨','⭐','💫','🌟','💖','🪄','💕','🌸'];
+let _lastTrail = 0, _wandHide;
+function moveWand(px, py) {
+  wandGlow.style.transform = `translate(${px}px,${py}px)`;
+  wandGlow.classList.add('show');
+  clearTimeout(_wandHide);
+  _wandHide = setTimeout(() => wandGlow.classList.remove('show'), 450);
+}
+function magicTrail(px, py) {
+  const now = performance.now();
+  if (now - _lastTrail < 45) return; // throttle so mashing stays smooth
+  _lastTrail = now;
+  const s = document.createElement('div');
+  s.className = 'trail-spark';
+  s.textContent = TRAIL_EMOJIS[Math.floor(Math.random()*TRAIL_EMOJIS.length)];
+  s.style.left = px + 'px';
+  s.style.top = py + 'px';
+  s.style.fontSize = (14 + Math.random()*16) + 'px';
+  document.body.appendChild(s);
+  setTimeout(() => s.remove(), 700);
+  if (Math.random() < 0.45) Glitter.burst(px, py, 3);
+}
+
+// ── Spell effects (used by the MAGIC button) ──
+const SHOOTING_EMOJIS = ['🌟','💫','⭐','✨','🦄','🌈'];
+function shootingStars(n = 7) {
+  for (let i = 0; i < n; i++) {
+    setTimeout(() => {
+      const s = document.createElement('div');
+      s.className = 'shooting-star';
+      s.textContent = SHOOTING_EMOJIS[Math.floor(Math.random()*SHOOTING_EMOJIS.length)];
+      const fromX = -80, fromY = Math.random() * innerHeight * 0.7;
+      const toX = innerWidth + 80, toY = fromY + (Math.random()*200 - 100);
+      s.style.transform = `translate(${fromX}px,${fromY}px)`;
+      document.body.appendChild(s);
+      s.animate([
+        { transform: `translate(${fromX}px,${fromY}px) scale(.6) rotate(0deg)`, opacity: 0 },
+        { transform: `translate(${(fromX+toX)/2}px,${(fromY+toY)/2}px) scale(1.2) rotate(180deg)`, opacity: 1, offset: .5 },
+        { transform: `translate(${toX}px,${toY}px) scale(.5) rotate(360deg)`, opacity: 0 }
+      ], { duration: 900 + Math.random()*300, easing: 'ease-in-out' });
+      setTimeout(() => s.remove(), 1300);
+    }, i * 90);
+  }
+}
+function castSpell() {
+  spellFlash.classList.remove('flash'); void spellFlash.offsetWidth;
+  spellFlash.classList.add('flash');
+  document.body.classList.remove('shake'); void document.body.offsetWidth;
+  document.body.classList.add('shake');
+  setTimeout(() => document.body.classList.remove('shake'), 500);
+  shootingStars(8);
+}
+
+// ── Rainbow arc that sweeps the sky on a milestone ──
+function showRainbowArc() {
+  const arc = document.createElement('div');
+  arc.className = 'rainbow-arc';
+  document.body.appendChild(arc);
+  // sprinkle glitter along the arc as it appears
+  for (let i = 0; i < 6; i++) {
+    setTimeout(() => Glitter.burst(innerWidth*(0.15+i*0.14), innerHeight*0.35 - Math.sin(i/5*Math.PI)*innerHeight*0.18, 12), 200 + i*120);
+  }
+  setTimeout(() => arc.remove(), 3700);
+}
+
+// ── Falling magic (snow, flowers, hearts, candy…) ──
+function fallingMagic(emojis, n = 26, dur = 4.2) {
+  for (let i = 0; i < n; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'falling';
+      el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+      el.style.left = (Math.random()*100) + 'vw';
+      el.style.fontSize = (16 + Math.random()*26) + 'px';
+      el.style.setProperty('--fall', (dur*(0.7+Math.random()*0.7)) + 's');
+      el.style.setProperty('--drift', (Math.random()*140-70) + 'px');
+      el.style.setProperty('--spin', (Math.random()*720-360) + 'deg');
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), dur*1500);
+    }, i*55);
+  }
+}
+
+// ── Flying magic (butterflies, unicorns drifting across) ──
+function flyingMagic(emojis, n = 10, dur = 5.5) {
+  for (let i = 0; i < n; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'flyacross';
+      el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+      el.style.top = (10 + Math.random()*72) + 'vh';
+      el.style.left = '0';
+      el.style.fontSize = (28 + Math.random()*24) + 'px';
+      el.style.setProperty('--fly', (dur*(0.7+Math.random()*0.6)) + 's');
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), dur*1400);
+    }, i*120);
+  }
+}
+
+// ── Giant emoji bloom that announces a spell ──
+function giantBloom(emoji) {
+  const el = document.createElement('div');
+  el.className = 'giant-bloom';
+  el.textContent = emoji;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1550);
+}
+
+// ── Day <-> Night theme (magic can flip the whole world) ──
+let nightStarTimer = null;
+function setNight(on) {
+  document.body.classList.toggle('night', on);
+  if (on) {
+    if (!nightStarTimer) {
+      nightStarTimer = setInterval(() => {
+        if (document.body.classList.contains('night') && S.started) shootingStars(1 + (Math.random()<0.4?1:0));
+      }, 2200);
+    }
+  } else if (nightStarTimer) {
+    clearInterval(nightStarTimer); nightStarTimer = null;
+  }
+}
+function toggleNight() {
+  const goingNight = !document.body.classList.contains('night');
+  setNight(goingNight);
+  if (goingNight) { shootingStars(10); giantBloom('🌙'); }
+  else { for (let i=0;i<6;i++) setTimeout(()=>Glitter.burst(Math.random()*innerWidth, innerHeight*0.4*Math.random(), 18), i*90); giantBloom('☀️'); }
+}
+
+// ── Surprise spell book — the MAGIC button casts a random one each press ──
+const SPELLS = [
+  { run: () => { flyingMagic(['🦋','🧚','🪽','🦋'], 14, 6); giantBloom('🦋'); } },                 // butterfly swarm
+  { run: () => { fallingMagic(['❄️','✨','🌨️','⛄','❅'], 34, 5); giantBloom('❄️'); } },            // snow
+  { run: () => { fallingMagic(['🌸','🌷','🌺','🌼','🪻','💮'], 30, 5); giantBloom('🌷'); } },       // flower rain
+  { run: () => { fallingMagic(['💖','💕','💗','💝','❤️'], 28, 4.6); giantBloom('💖'); } },          // heart rain
+  { run: () => { shootingStars(12); fallingMagic(['⭐','🌟','✨','💫'], 22, 4); giantBloom('🌟'); } },// star shower
+  { run: () => { showRainbowArc(); giantBloom('🌈'); } },                                            // rainbow
+  { run: () => { flyingMagic(['🦄'], 7, 6); for (let i=0;i<3;i++) setTimeout(spawnUnicorn, i*200); giantBloom('🦄'); } }, // unicorn parade
+  { run: () => { for (let i=0;i<6;i++) setTimeout(spawnBubble, i*120); fallingMagic(['🫧','💫','🔮'], 18, 4.2); giantBloom('🫧'); } }, // bubbles
+  { run: () => { fallingMagic(['🍭','🍬','🧁','🍩','🍰','🍓'], 26, 5); giantBloom('🍭'); } },        // candy rain
+  { run: () => { for (let i=0;i<12;i++) setTimeout(()=>Glitter.burst(Math.random()*innerWidth, Math.random()*innerHeight, 30), i*55); fallingMagic(['✨','💫','⭐'], 20, 4); giantBloom('🪄'); } }, // magic dust
+  { run: () => toggleNight() },                                                                       // NIGHT / DAY switch
+  { run: () => toggleNight() },                                                                       // (weighted: night appears more often)
+];
+let _lastSpell = -1;
+function pickSpells(n) {
+  const picks = [];
+  const pool = SPELLS.map((_, i) => i).filter(i => i !== _lastSpell);
+  while (picks.length < n && pool.length) {
+    const idx = pool.splice(Math.floor(Math.random()*pool.length), 1)[0];
+    picks.push(SPELLS[idx]); _lastSpell = idx;
+  }
+  return picks;
+}
+
+function bump(el) { el.classList.add('bump'); setTimeout(()=>el.classList.remove('bump'), 150); }
+function addSparkles(n) {
+  S.sparkles += n;
+  sparkleEl.textContent = S.sparkles;
+  bump(sparkleEl);
+  checkMilestone();
+  checkWorldUnlocks();
+  updateMagicMeter(n);
+}
+function addUnicorns(n) { S.unicorns += n; unicornEl.textContent = S.unicorns; bump(unicornEl); }
+
+// ── Milestone System ──
+function checkMilestone() {
+  if (S.celebrationActive) return;
+  const next = MILESTONES[S.currentMilestone];
+  if (!next) return;
+
+  // Update progress bar
+  const prevAt = S.currentMilestone > 0 ? MILESTONES[S.currentMilestone-1].at : 0;
+  const progress = ((S.sparkles - prevAt) / (next.at - prevAt)) * 100;
+  milestoneFill.style.width = Math.min(100, Math.max(0, progress)) + '%';
+  milestoneLabel.textContent = `Next: ${next.emoji} ${next.name} (${next.at}✨)`;
+
+  if (S.sparkles >= next.at) {
+    triggerMilestone(next);
+  }
+}
+
+function triggerMilestone(m) {
+  S.currentMilestone++;
+  S.celebrationActive = true;
+  S.unlockedAccessories.push(m.emoji);
+
+  // Show celebration
+  celEmoji.textContent = m.emoji;
+  celText.textContent = m.msg;
+  celSub.textContent = `${S.sparkles} sparkles collected!`;
+  celebration.classList.add('show');
+
+  SFX.milestone();
+  showRainbowArc();
+
+  // Big glitter burst
+  for (let i = 0; i < 8; i++) {
+    setTimeout(() => {
+      Glitter.burst(Math.random()*innerWidth, Math.random()*innerHeight, 30);
+    }, i * 100);
+  }
+
+  // Update next milestone label
+  const nextM = MILESTONES[S.currentMilestone];
+  if (nextM) {
+    milestoneLabel.textContent = `Next: ${nextM.emoji} ${nextM.name} (${nextM.at}✨)`;
+    milestoneFill.style.width = '0%';
+  } else {
+    milestoneLabel.textContent = '🌟 All unlocked! Keep collecting! 🌟';
+    milestoneFill.style.width = '100%';
+  }
+}
+
+celDismiss.addEventListener('click', (e) => {
+  e.stopPropagation();
+  celebration.classList.remove('show');
+  S.celebrationActive = false;
+  // Spawn celebratory unicorns
+  for (let i = 0; i < 3; i++) setTimeout(() => spawnUnicorn(), i * 300);
+});
+
+// ── Magic Meter ──
+function updateMagicMeter(n) {
+  S.magicMeter += n;
+  if (S.magicMeter >= 50) {
+    magicBtn.classList.add('ready');
+    magicBtn.textContent = '🦄 MEGA MAGIC! 🦄';
+  } else {
+    magicBtn.textContent = `🦄 MAGIC (${S.magicMeter}/50)`;
+  }
+}
+
+function doMagicBurst() {
+  const isMega = S.magicMeter >= 50;
+
+  if (isMega) {
+    // MEGA BURST — full-screen spell + TWO surprise spells at once
+    S.magicMeter = 0;
+    magicBtn.classList.remove('ready');
+    magicBtn.textContent = '🦄 MAGIC (0/50)';
+
+    const burst = document.createElement('div');
+    burst.className = 'mega-burst';
+    document.body.appendChild(burst);
+    setTimeout(() => burst.remove(), 1000);
+
+    castSpell(); // flash + shooting stars + shake
+
+    for (let i = 0; i < 8; i++) {
+      setTimeout(() => Glitter.burst(Math.random()*innerWidth, Math.random()*innerHeight, 30), i * 50);
+    }
+
+    // Two different surprise spells, staggered so each gets its moment
+    pickSpells(2).forEach((sp, i) => setTimeout(() => sp.run(), i * 450));
+
+    for (let i = 0; i < 3; i++) setTimeout(() => spawnBubble(), i * 200);
+    setTimeout(() => spawnUnicorn(), 250);
+    setTimeout(() => spawnEgg(), 600);
+
+    addSparkles(20);
+    SFX.magic();
+  } else {
+    // EVERY press still casts ONE random surprise spell — never the same twice in a row
+    spellFlash.classList.remove('flash'); void spellFlash.offsetWidth;
+    spellFlash.classList.add('flash');
+    pickSpells(1)[0].run();
+    for (let i = 0; i < 2; i++) setTimeout(() => spawnBubble(), i * 200);
+    SFX.magic();
+  }
+}
+
+magicBtn.addEventListener('click', (e) => { e.stopPropagation(); doMagicBurst(); });
+magicBtn.addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); doMagicBurst(); }, {passive: false});
+
+// ── MUSIC TOGGLE ──
+const musicBtn = document.getElementById('musicBtn');
+const updateMusicBtn = () => {
+  const on = SFX.isMusicOn();
+  musicBtn.textContent = on ? '🎵' : '🔇';
+  musicBtn.classList.toggle('off', !on);
+};
+musicBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  SFX.init();
+  SFX.toggleMusic();
+  updateMusicBtn();
+});
+
+// ── WORLDS (each world transforms the whole scene) ──
+const WORLDS = [
+  {
+    id:'garden', name:'Magic Garden', icon:'🌸', unlock:0, dark:false, pitch:1,
+    bg:'linear-gradient(135deg,#ffe0f0 0%,#ffb6d9 18%,#ff8ec4 36%,#d9a7ff 54%,#a7c8ff 72%,#fff0f5 100%)',
+    bubbles:['💖','⭐','🌟','💫','🦄','🌈','💝','🎀','👑','💎','🧁','🩰','🌸','💕','✨','🧚','🦋','🔮','🪄','🏰','🍄','🌷','🌺','🌻','🦢','🕊️','🦚','🐬','🌙','🫧','💐','🎠','🪽','🦩','🌼','🪻'],
+    stars:['✨','⭐','🌟','💫','🌠','🪩','🔆','💖'],
+    creature:'🦄', fliers:['🦋','🧚','🪽','🐝'],
+    drifters:['☁️','🌸','💗','🧚','🦋','🌈','⭐','🎈','🌷','🪽']
+  },
+  {
+    id:'candy', name:'Candy Land', icon:'🍭', unlock:20, dark:false, pitch:1.12,
+    bg:'linear-gradient(135deg,#fff0f5 0%,#ffd9ec 25%,#ffc8e0 45%,#ffe0b3 65%,#ffeaf4 85%,#fff0f5 100%)',
+    bubbles:['🍭','🍬','🧁','🍩','🍰','🍪','🍫','🍓','🍒','🍦','🍮','🍯','🧃','🍡','🍧','🍨','🌈','⭐','🫧','💖','🍌','🍉'],
+    stars:['🍬','⭐','✨','🍭','🌟','🧁','💖','🍩'],
+    creature:'🦄', fliers:['🧁','🍭','🍬','🦋'],
+    drifters:['🍭','🍬','☁️','🍩','🌈','🧁','🍓','🍫']
+  },
+  {
+    id:'sea', name:'Under the Sea', icon:'🌊', unlock:40, dark:false, pitch:0.9,
+    bg:'linear-gradient(160deg,#aef3ff 0%,#7fd8f5 25%,#4fb8e8 50%,#3a9fd6 72%,#bff3ff 100%)',
+    bubbles:['🐠','🐟','🐬','🐙','🦀','🐚','🧜‍♀️','🌊','🐳','🐢','🦑','🪸','🐡','🦭','🦈','⭐','🫧','💎','🏝️','🦞'],
+    stars:['⭐','🐚','✨','🫧','🌟','💎','🐠'],
+    creature:'🧜‍♀️', fliers:['🐠','🐬','🐟','🦋'],
+    drifters:['🫧','🐠','🐚','🌊','🐬','⭐','🐟','🪼']
+  },
+  {
+    id:'space', name:'Outer Space', icon:'🚀', unlock:60, dark:true, pitch:1.05,
+    bg:'linear-gradient(160deg,#140a33 0%,#241258 32%,#3d2270 58%,#5a2d7a 82%,#140a33 100%)',
+    bubbles:['🚀','🪐','⭐','🌙','👽','🛸','☄️','✨','🌟','🌠','💫','🌍','🔭','🌌','🌕','🌑','🪨','👾','🌞','💜'],
+    stars:['⭐','🌟','✨','💫','🌠','🪐','🌙'],
+    creature:'🚀', fliers:['🛸','👽','🚀','⭐'],
+    drifters:['⭐','🪐','🌙','🚀','🛸','☄️','🌟','👽']
+  },
+];
+let W = WORLDS[0]; // current world
+
+function clearScene() {
+  ['.bubble','.unicorn','.egg','.star','.butterfly'].forEach(sel =>
+    document.querySelectorAll(sel).forEach(el => {
+      el.style.transition = 'opacity .3s, transform .3s';
+      el.style.opacity = '0'; el.style.transform = 'scale(.4)';
+      setTimeout(() => el.remove(), 300);
+    }));
+  Object.keys(DOMManager.counts).forEach(k => DOMManager.counts[k] = 0);
+}
+
+function applyWorld(world, announce = true) {
+  W = world;
+  document.body.style.setProperty('--bg', world.bg);
+  document.body.classList.toggle('dark-world', !!world.dark);
+  SFX.setPitch(world.pitch);
+  if (announce) {
+    clearScene(); // sweep away the old world so the new one feels fresh
+    spellFlash.classList.remove('flash'); void spellFlash.offsetWidth;
+    spellFlash.classList.add('flash');
+    giantBloom(world.icon);
+    showWorldToast(`${world.icon} ${world.name}!`);
+    shootingStars(5);
+    for (let i = 0; i < 5; i++) setTimeout(() => Glitter.burst(Math.random()*innerWidth, Math.random()*innerHeight, 22), i*90);
+    // welcome the new world with its own creatures
+    for (let i = 0; i < 4; i++) setTimeout(spawnBubble, 350 + i*170);
+    setTimeout(spawnUnicorn, 550);
+    setTimeout(spawnStar, 750);
+    setTimeout(() => spawnButterfly(), 950);
+  }
+}
+
+// ── WORLD PICKER UI ──
+const worldBtn = document.getElementById('worldBtn');
+const worldToast = document.getElementById('worldToast');
+const worldPicker = document.getElementById('worldPicker');
+const worldGrid = document.getElementById('worldGrid');
+const worldClose = document.getElementById('worldClose');
+S.unlockedWorlds = ['garden'];
+let _toastT;
+function showWorldToast(text) {
+  worldToast.textContent = text;
+  worldToast.classList.add('show');
+  clearTimeout(_toastT);
+  _toastT = setTimeout(() => worldToast.classList.remove('show'), 2300);
+}
+function buildWorldGrid() {
+  worldGrid.innerHTML = '';
+  WORLDS.forEach(w => {
+    const unlocked = S.unlockedWorlds.includes(w.id);
+    const card = document.createElement('div');
+    card.className = 'world-card' + (w.id === W.id ? ' current' : '') + (unlocked ? '' : ' locked');
+    card.innerHTML = `<div class="wc-icon">${unlocked ? w.icon : '🔒'}</div>` +
+      `<div class="wc-name">${w.name}</div>` +
+      (unlocked ? '' : `<div class="wc-lock">${w.unlock}✨ to open</div>`);
+    card.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!S.unlockedWorlds.includes(w.id)) {
+        SFX.crack();
+        card.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}], {duration:300});
+        showWorldToast(`Collect ${w.unlock}✨ to open ${w.name}!`);
+        return;
+      }
+      travel(w);
+    });
+    worldGrid.appendChild(card);
+  });
+}
+function openPicker() { SFX.init(); buildWorldGrid(); worldPicker.classList.add('show'); }
+function closePicker() { worldPicker.classList.remove('show'); }
+function travel(w) {
+  closePicker();
+  worldBtn.classList.remove('glow');
+  applyWorld(w, true);
+}
+function checkWorldUnlocks() {
+  WORLDS.forEach(w => {
+    if (w.unlock > 0 && S.sparkles >= w.unlock && !S.unlockedWorlds.includes(w.id)) {
+      S.unlockedWorlds.push(w.id);
+      worldBtn.classList.add('glow');
+      showWorldToast(`${w.icon} ${w.name} unlocked! Tap 🌍`);
+      SFX.milestone();
+      shootingStars(6);
+    }
+  });
+}
+worldBtn.addEventListener('click', (e) => { e.stopPropagation(); openPicker(); });
+worldClose.addEventListener('click', (e) => { e.stopPropagation(); closePicker(); });
+worldPicker.addEventListener('click', (e) => { if (e.target === worldPicker) closePicker(); });
+
+// ── BUBBLES ──
+function spawnBubble() {
+  if (!S.started || !DOMManager.canSpawn('bubbles')) return;
+  DOMManager.add('bubbles');
+
+  const size = 60 + Math.random() * 45;
+  const el = document.createElement('div');
+  el.className = 'bubble';
+  const emoji = W.bubbles[Math.floor(Math.random() * W.bubbles.length)];
+  el.innerHTML = `<div class="bubble-inner">${emoji}</div>`;
+  el.style.width = el.style.height = size + 'px';
+  el.style.left = (20 + Math.random() * (innerWidth - size - 40)) + 'px';
+  el.style.bottom = '-' + (size + 20) + 'px';
+  el.style.setProperty('--rise-time', (5 + Math.random() * 4) + 's');
+  el.style.setProperty('--sway', (Math.random() * 60 - 30) + 'px');
+  el.style.setProperty('--emoji-size', (size * 0.45) + 'px');
+  scene.appendChild(el);
+
+  const popBubble = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const r = el.getBoundingClientRect();
+    const cx = r.left + r.width/2, cy = r.top + r.height/2;
+    Glitter.burst(cx, cy, 20);
+    SFX.pop();
+    addSparkles(1);
+
+    // Pop ring
+    const ring = document.createElement('div');
+    ring.className = 'pop-ring';
+    ring.style.left = cx + 'px'; ring.style.top = cy + 'px';
+    ring.style.borderColor = `hsl(${330+Math.random()*30},100%,75%)`;
+    scene.appendChild(ring);
+    setTimeout(() => ring.remove(), 600);
+
+    DOMManager.remove('bubbles');
+    el.remove();
+  };
+
+  el.addEventListener('pointerdown', popBubble);
+  el.addEventListener('touchstart', (e) => { e.preventDefault(); popBubble(e); }, {passive:false});
+
+  const dur = parseFloat(el.style.getPropertyValue('--rise-time')) * 1000;
+  setTimeout(() => {
+    if (el.parentNode) { el.remove(); DOMManager.remove('bubbles'); }
+  }, dur + 200);
+}
+
+// ── UNICORNS ──
+function spawnUnicorn() {
+  if (!S.started || !DOMManager.canSpawn('unicorns')) return;
+  DOMManager.add('unicorns');
+
+  const el = document.createElement('div');
+  el.className = 'unicorn';
+  el.textContent = W.creature;
+  const dir = Math.random() > 0.5 ? 1 : -1;
+  const y = 80 + Math.random() * (innerHeight - 250);
+  el.style.top = y + 'px';
+  el.style.setProperty('--dir', dir);
+  el.style.setProperty('--walk-speed', (6 + Math.random() * 5) + 's');
+
+  if (dir === 1) { el.style.left = '-100px'; }
+  else { el.style.right = '-100px'; }
+
+  el.classList.add('walking');
+  scene.appendChild(el);
+  SFX.unicorn();
+
+  const catchUnicorn = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const r = el.getBoundingClientRect();
+    Glitter.burst(r.left + r.width/2, r.top + r.height/2, 30);
+    SFX.sparkle();
+    addSparkles(5);
+    addUnicorns(1);
+    el.classList.remove('walking');
+    el.classList.add('caught');
+    setTimeout(() => { el.remove(); DOMManager.remove('unicorns'); }, 500);
+  };
+
+  el.addEventListener('pointerdown', catchUnicorn);
+  el.addEventListener('touchstart', (e) => { e.preventDefault(); catchUnicorn(e); }, {passive:false});
+
+  const dur = parseFloat(el.style.getPropertyValue('--walk-speed')) * 1000;
+  setTimeout(() => {
+    if (el.parentNode && !el.classList.contains('caught')) {
+      el.remove(); DOMManager.remove('unicorns');
+    }
+  }, dur + 200);
+}
+
+// ── EGGS ──
+function spawnEgg() {
+  if (!S.started || !DOMManager.canSpawn('eggs')) return;
+  DOMManager.add('eggs');
+
+  const el = document.createElement('div');
+  el.className = 'egg';
+  el.textContent = '🥚';
+  el.style.left = (40 + Math.random() * (innerWidth - 120)) + 'px';
+  el.style.top = (100 + Math.random() * (innerHeight - 250)) + 'px';
+  scene.appendChild(el);
+
+  let taps = 0;
+  const maxTaps = 3 + Math.floor(Math.random() * 2);
+
+  const tapEgg = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    taps++;
+    SFX.crack();
+    const r = el.getBoundingClientRect();
+    Glitter.burst(r.left + r.width/2, r.top + r.height/2, 8);
+
+    if (taps < maxTaps) {
+      el.classList.remove('shaking');
+      void el.offsetWidth;
+      el.classList.add('shaking');
+      // Visual progress
+      el.style.filter = `drop-shadow(0 0 ${taps*5}px #ff69b4) drop-shadow(0 6px 12px rgba(255,105,180,.4))`;
+    } else {
+      // HATCH!
+      const cx = r.left + r.width/2, cy = r.top + r.height/2;
+      Glitter.burst(cx, cy, 40);
+      SFX.hatch();
+      addSparkles(10);
+      addUnicorns(1);
+
+      // Show hatched unicorn
+      const hatched = document.createElement('div');
+      hatched.style.cssText = `position:absolute;left:${cx-40}px;top:${cy-40}px;font-size:80px;pointer-events:none;z-index:16;animation:hatchPop .8s ease-out forwards`;
+      hatched.textContent = '🦄';
+      scene.appendChild(hatched);
+      setTimeout(() => hatched.remove(), 800);
+
+      DOMManager.remove('eggs');
+      el.remove();
+    }
+  };
+
+  el.addEventListener('pointerdown', tapEgg);
+  el.addEventListener('touchstart', (e) => { e.preventDefault(); tapEgg(e); }, {passive:false});
+
+  setTimeout(() => {
+    if (el.parentNode) { el.remove(); DOMManager.remove('eggs'); }
+  }, 12000);
+}
+
+// ── STARS (tap to collect) ──
+function spawnStar() {
+  if (!S.started || !DOMManager.canSpawn('stars')) return;
+  DOMManager.add('stars');
+
+  const el = document.createElement('div');
+  el.className = 'star';
+  el.textContent = W.stars[Math.floor(Math.random()*W.stars.length)];
+  el.style.left = (30 + Math.random() * (innerWidth - 80)) + 'px';
+  el.style.top = (80 + Math.random() * (innerHeight - 200)) + 'px';
+  scene.appendChild(el);
+
+  const collect = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const r = el.getBoundingClientRect();
+    Glitter.burst(r.left + r.width/2, r.top + r.height/2, 15);
+    SFX.collect();
+    addSparkles(3);
+    el.classList.add('collected');
+    setTimeout(() => { el.remove(); DOMManager.remove('stars'); }, 400);
+  };
+
+  el.addEventListener('pointerdown', collect);
+  el.addEventListener('touchstart', (e) => { e.preventDefault(); collect(e); }, {passive:false});
+
+  // Auto-remove after 5 seconds
+  setTimeout(() => {
+    if (el.parentNode && !el.classList.contains('collected')) {
+      el.remove(); DOMManager.remove('stars');
+    }
+  }, 5000);
+}
+
+// ── BUTTERFLIES (flutter across, tap to catch) ──
+function spawnButterfly() {
+  if (!S.started || !DOMManager.canSpawn('butterflies')) return;
+  DOMManager.add('butterflies');
+
+  const el = document.createElement('div');
+  el.className = 'butterfly';
+  el.textContent = W.fliers[Math.floor(Math.random() * W.fliers.length)];
+  const dir = Math.random() > 0.5 ? 1 : -1;
+  const y = 90 + Math.random() * (innerHeight - 280);
+  el.style.top = y + 'px';
+  el.style.left = '0px';
+  el.style.setProperty('--dir', dir);
+  el.style.setProperty('--fly-speed', (7 + Math.random() * 5) + 's');
+  scene.appendChild(el);
+  SFX.sparkle();
+
+  const catchButterfly = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const r = el.getBoundingClientRect();
+    Glitter.burst(r.left + r.width/2, r.top + r.height/2, 22);
+    SFX.collect();
+    addSparkles(4);
+    el.classList.add('caught');
+    setTimeout(() => { el.remove(); DOMManager.remove('butterflies'); }, 500);
+  };
+
+  el.addEventListener('pointerdown', catchButterfly);
+  el.addEventListener('touchstart', (e) => { e.preventDefault(); catchButterfly(e); }, {passive:false});
+
+  const dur = parseFloat(el.style.getPropertyValue('--fly-speed')) * 1000;
+  setTimeout(() => {
+    if (el.parentNode && !el.classList.contains('caught')) {
+      el.remove(); DOMManager.remove('butterflies');
+    }
+  }, dur + 200);
+}
+
+// ── BACKGROUND TAP (in tap mode) ──
+function tapSparkle(px, py) {
+  Glitter.burst(px, py, 14);
+  SFX.sparkle();
+
+  // Colorful magic ring ripple on every tap
+  const ring = document.createElement('div');
+  ring.className = 'pop-ring';
+  ring.style.left = px + 'px'; ring.style.top = py + 'px';
+  ring.style.borderColor = `hsl(${Math.random()*360},100%,72%)`;
+  scene.appendChild(ring);
+  setTimeout(() => ring.remove(), 600);
+
+  // Temporary sparkle that fades quickly
+  const star = document.createElement('div');
+  star.style.cssText = `position:absolute;left:${px-18}px;top:${py-18}px;font-size:36px;pointer-events:none;z-index:10;animation:starPulse .5s ease-in-out forwards;opacity:0`;
+  star.textContent = W.stars[Math.floor(Math.random()*W.stars.length)];
+  scene.appendChild(star);
+  // Animate in then out
+  star.animate([
+    { transform: 'scale(0) rotate(0)', opacity: 0 },
+    { transform: 'scale(1.2) rotate(15deg)', opacity: 1, offset: 0.3 },
+    { transform: 'scale(0.8) rotate(-10deg)', opacity: 0.8, offset: 0.7 },
+    { transform: 'scale(0) rotate(30deg)', opacity: 0 }
+  ], { duration: 800, easing: 'ease-out' });
+  setTimeout(() => star.remove(), 800);
+}
+
+// ── PAINT TOOLBAR INIT ──
+(function initPaintToolbar() {
+  // Color palette
+  const palette = document.getElementById('colorPalette');
+  PAINT_COLORS.forEach((col, i) => {
+    const sw = document.createElement('div');
+    sw.className = 'c-swatch' + (i === 0 ? ' active' : '');
+    sw.style.background = col;
+    if (col === '#ffffff') sw.style.boxShadow = '0 2px 6px rgba(0,0,0,.2), inset 0 0 0 1px #ffb6d9';
+    sw.addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.querySelectorAll('.c-swatch').forEach(s => s.classList.remove('active'));
+      sw.classList.add('active');
+      PT.color = col;
+    });
+    palette.appendChild(sw);
+  });
+
+  // Stamp picker
+  const picker = document.getElementById('stampPicker');
+  STAMP_EMOJIS.forEach((em, i) => {
+    const btn = document.createElement('span');
+    btn.className = 'stamp-opt' + (i === 0 ? ' active' : '');
+    btn.textContent = em;
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.querySelectorAll('.stamp-opt').forEach(s => s.classList.remove('active'));
+      btn.classList.add('active');
+      PT.stamp = em;
+    });
+    picker.appendChild(btn);
+  });
+
+  // Tool buttons
+  document.querySelectorAll('.tool-btn[data-tool]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      PaintCanvas.stop();
+      document.querySelectorAll('.tool-btn[data-tool]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      PT.tool = btn.dataset.tool;
+      const isStamp   = PT.tool === 'stamp';
+      const isRainbow = PT.tool === 'rainbow';
+      const isEraser  = PT.tool === 'eraser';
+      palette.style.display  = (isStamp || isRainbow || isEraser) ? 'none' : 'flex';
+      picker.classList.toggle('show', isStamp);
+    });
+  });
+
+  // Clear button
+  document.getElementById('clearPaintBtn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    PaintCanvas.clear();
+    SFX.magic();
+    Glitter.burst(innerWidth/2, innerHeight/2, 30);
+  });
+})();
+
+// ── MODE SWITCHING ──
+document.querySelectorAll('.mode-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    S.mode = btn.dataset.mode;
+
+    if (S.mode === 'paint') {
+      paintToolbar.classList.add('show');
+      paintIndicator.classList.add('show');
+      setTimeout(() => paintIndicator.classList.remove('show'), 1500);
+    } else {
+      paintToolbar.classList.remove('show');
+      PaintCanvas.stop();
+    }
+  });
+});
+
+// ── POINTER EVENTS ──
+let isPointerDown = false;
+
+scene.addEventListener('pointerdown', (e) => {
+  if (!S.started || S.celebrationActive) return;
+  isPointerDown = true;
+  moveWand(e.clientX, e.clientY);
+
+  if (S.mode === 'paint') {
+    PaintCanvas.start(e.clientX, e.clientY);
+    SFX.paint();
+  } else {
+    tapSparkle(e.clientX, e.clientY);
+  }
+});
+
+scene.addEventListener('pointermove', (e) => {
+  if (!isPointerDown || !S.started || S.celebrationActive) return;
+  if (S.mode === 'paint') {
+    PaintCanvas.move(e.clientX, e.clientY);
+  }
+});
+
+// Magic wand glow + sparkle dust follow the finger everywhere
+scene.addEventListener('pointermove', (e) => {
+  if (!S.started || S.celebrationActive) return;
+  moveWand(e.clientX, e.clientY);
+  magicTrail(e.clientX, e.clientY);
+});
+
+scene.addEventListener('pointerup', () => {
+  isPointerDown = false;
+  PaintCanvas.stop();
+});
+
+scene.addEventListener('pointercancel', () => {
+  isPointerDown = false;
+  PaintCanvas.stop();
+});
+
+// Touch events
+scene.addEventListener('touchstart', (e) => {
+  if (!S.started || S.celebrationActive) return;
+  e.preventDefault();
+  isPointerDown = true;
+  for (const t of e.changedTouches) {
+    moveWand(t.clientX, t.clientY);
+    if (S.mode === 'paint') {
+      PaintCanvas.start(t.clientX, t.clientY);
+      SFX.paint();
+    } else {
+      tapSparkle(t.clientX, t.clientY);
+    }
+  }
+}, {passive: false});
+
+scene.addEventListener('touchmove', (e) => {
+  if (!isPointerDown || !S.started) return;
+  e.preventDefault();
+  for (const t of e.changedTouches) {
+    moveWand(t.clientX, t.clientY);
+    magicTrail(t.clientX, t.clientY);
+    if (S.mode === 'paint') {
+      PaintCanvas.move(t.clientX, t.clientY);
+    }
+  }
+}, {passive: false});
+
+scene.addEventListener('touchend', () => {
+  isPointerDown = false;
+  PaintCanvas.stop();
+});
+
+// ── TITLE SCREEN FLOATING EMOJIS ──
+(function fillTitleFloat() {
+  const box = document.getElementById('titleFloat');
+  if (!box) return;
+  const EM = ['✨','🦄','🌈','💖','⭐','🧚','🦋','👑','💎','🌸','🪄','🌟','🎀','🍭','🏰'];
+  for (let i = 0; i < 14; i++) {
+    const f = document.createElement('div');
+    f.className = 'float-emoji';
+    f.textContent = EM[i % EM.length];
+    f.style.left = (5 + Math.random() * 90) + '%';
+    f.style.top = (10 + Math.random() * 80) + '%';
+    f.style.setProperty('--ft', (5 + Math.random() * 5) + 's');
+    f.style.animationDelay = (-Math.random() * 5) + 's';
+    box.appendChild(f);
+  }
+})();
+
+// ── START GAME ──
+document.getElementById('playBtn').addEventListener('click', () => {
+  SFX.init();
+  SFX.startMusic();
+  S.started = true;
+  titleScreen.classList.add('hidden');
+  setTimeout(() => titleScreen.style.display = 'none', 800);
+
+  // Magical "entering the world" moment
+  spellFlash.classList.remove('flash'); void spellFlash.offsetWidth;
+  spellFlash.classList.add('flash');
+  shootingStars(6);
+
+  // Welcome sequence
+  setTimeout(() => {
+    for (let i = 0; i < 4; i++) {
+      setTimeout(() => {
+        Glitter.burst(Math.random()*innerWidth, Math.random()*innerHeight, 20);
+        SFX.sparkle();
+      }, i * 150);
+    }
+  }, 300);
+  setTimeout(() => spawnUnicorn(), 600);
+  setTimeout(() => spawnBubble(), 800);
+  setTimeout(() => spawnBubble(), 1200);
+  setTimeout(() => spawnEgg(), 1500);
+  setTimeout(() => spawnStar(), 1000);
+  setTimeout(() => spawnStar(), 1800);
+  setTimeout(() => spawnButterfly(), 1300);
+  setTimeout(() => spawnButterfly(), 2100);
+});
+
+// ── SPAWNERS (varied timing for variety) ──
+setInterval(() => { if (S.started) spawnBubble(); }, 2000);
+setInterval(() => { if (S.started && Math.random() < 0.5) spawnUnicorn(); }, 8000);
+setInterval(() => { if (S.started && Math.random() < 0.4) spawnEgg(); }, 10000);
+setInterval(() => { if (S.started && Math.random() < 0.6) spawnStar(); }, 4000);
+setInterval(() => { if (S.started && Math.random() < 0.55) spawnButterfly(); }, 6000);
+
+// ── CLOUDS ──
+function spawnCloud() {
+  const c = document.createElement('div');
+  c.className = 'cloud';
+  c.textContent = W.drifters[Math.floor(Math.random()*W.drifters.length)];
+  c.style.top = (5 + Math.random() * 25) + '%';
+  const sp = 25 + Math.random() * 20;
+  c.style.setProperty('--speed', sp + 's');
+  c.style.left = '-100px';
+  document.body.appendChild(c);
+  setTimeout(() => c.remove(), sp * 1000);
+}
+setInterval(spawnCloud, 12000);
+setTimeout(spawnCloud, 500);
+
+// ── Hatch pop animation (injected) ──
+const hatchStyle = document.createElement('style');
+hatchStyle.textContent = `@keyframes hatchPop{0%{transform:scale(0) rotate(-20deg);opacity:0}30%{transform:scale(1.5) rotate(10deg);opacity:1}60%{transform:scale(1.2) rotate(-5deg);opacity:1}100%{transform:scale(1) translateY(-30px) rotate(0);opacity:0}}`;
+document.head.appendChild(hatchStyle);
+</script>
+</body>
+</html>

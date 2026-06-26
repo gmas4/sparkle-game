@@ -402,7 +402,7 @@ body {
 </head>
 <body>
 
-<a href="index.html" class="back-btn">✨ Play Games</a>
+<a href="index.html" class="back-btn">🏠 Home</a>
 
 <!-- HEADER -->
 <div class="header">
@@ -786,6 +786,12 @@ const tools = {
       { id: 'coffee', icon: '☕', label: 'Coffee!', cls: 'coffee-btn', action: doCoffee },
     ]
   },
+  save: {
+    type: 'actions',
+    items: [
+      { id: 'save', icon: '💾', label: 'Save my Unicorn!', cls: 'save-btn', action: saveUnicorn },
+    ]
+  },
 };
 
 function buildToolbar() {
@@ -1096,9 +1102,13 @@ function spawnParticles(anchor, emojis, count) {
 function saveUnicorn() {
   const svgEl = document.querySelector('.unicorn-svg');
   if (!svgEl) return;
-  const svgData = new XMLSerializer().serializeToString(svgEl);
-  const canvas = document.getElementById('unicornCanvas');
-  const ctx = canvas.getContext('2d');
+  // Clone + give it an explicit size (the live SVG only has a viewBox, which
+  // makes naturalWidth 0 in some browsers and breaks the export).
+  const clone = svgEl.cloneNode(true);
+  clone.setAttribute('width', '300');
+  clone.setAttribute('height', '320');
+  clone.removeAttribute('class');
+  const svgData = new XMLSerializer().serializeToString(clone);
   const img = new Image();
 
   // Create a nice background
@@ -1127,26 +1137,34 @@ function saveUnicorn() {
   const url = URL.createObjectURL(svgBlob);
 
   img.onload = () => {
-    const scale = 420 / img.naturalWidth;
-    const w = img.naturalWidth * scale;
-    const h = img.naturalHeight * scale;
-    ectx.drawImage(img, (600 - w) / 2, (650 - h) / 2, w, h);
+    try {
+      const natW = img.naturalWidth || 300;
+      const natH = img.naturalHeight || 320;
+      const scale = 420 / natW;
+      const w = natW * scale;
+      const h = natH * scale;
+      ectx.drawImage(img, (600 - w) / 2, (650 - h) / 2, w, h);
 
-    // Name
-    const name = document.getElementById('unicornName').value || 'My Unicorn';
-    ectx.font = 'bold 28px Fredoka, sans-serif';
-    ectx.fillStyle = '#b06aff';
-    ectx.textAlign = 'center';
-    ectx.fillText(name, 300, 660);
+      // Name
+      const name = document.getElementById('unicornName').value || 'My Unicorn';
+      ectx.font = 'bold 28px Fredoka, sans-serif';
+      ectx.fillStyle = '#b06aff';
+      ectx.textAlign = 'center';
+      ectx.fillText(name, 300, 660);
 
-    // Show modal
-    const dataUrl = exportCanvas.toDataURL('image/png');
-    document.getElementById('savePreview').src = dataUrl;
-    document.getElementById('saveName').textContent = `"${name}" — made with love! 💜`;
-    document.getElementById('saveModal').classList.add('show');
-    window._saveDataUrl = dataUrl;
-    URL.revokeObjectURL(url);
+      // Show modal
+      const dataUrl = exportCanvas.toDataURL('image/png');
+      document.getElementById('savePreview').src = dataUrl;
+      document.getElementById('saveName').textContent = `"${name}" — made with love! 💜`;
+      document.getElementById('saveModal').classList.add('show');
+      window._saveDataUrl = dataUrl;
+    } catch (err) {
+      showMood('😢');
+    } finally {
+      URL.revokeObjectURL(url);
+    }
   };
+  img.onerror = () => { URL.revokeObjectURL(url); showMood('😢'); };
   img.src = url;
 }
 
