@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>✨ Sparkle Unicorn Magic Garden ✨</title>
 <meta name="description" content="A magical tap, paint & sparkle game for little ones — pop bubbles, catch unicorns, hatch eggs, and cast surprise spells in a fantasy garden!">
 <meta name="theme-color" content="#ff69b4">
@@ -31,7 +31,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;height:100%;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow:hidden;touch-action:none;overscroll-behavior:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
 body{--bg:linear-gradient(135deg,#ffe0f0 0%,#ffb6d9 18%,#ff8ec4 36%,#d9a7ff 54%,#a7c8ff 72%,#fff0f5 100%);background-image:var(--bg);background-size:400% 400%;animation:auroraShift 20s ease infinite;font-family:'Fredoka','Baloo 2',sans-serif;transition:none}
 body.dark-world .twinkle-stars{opacity:1;filter:brightness(1.7) drop-shadow(0 0 3px #fff)}
 @keyframes auroraShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
@@ -153,12 +153,6 @@ iframe:not(#gameFrame),.watermark,[id*="badge"],[class*="watermark"]{display:non
 body.castle-mode #castleBg{opacity:.85}
 #castlePortal{position:fixed;z-index:59;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(255,235,150,.85),rgba(160,68,255,.7) 60%,transparent 75%)}
 
-/* === FEED THE UNICORN (Feature 4) === */
-.food-item{position:fixed;z-index:41;font-size:44px;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;display:none;filter:drop-shadow(0 4px 8px rgba(255,105,180,.45))}
-.food-item.visible{display:block}
-.food-item.dragging{z-index:60;cursor:grabbing}
-.food-item.spring{transition:left .4s cubic-bezier(.34,1.56,.64,1),top .4s cubic-bezier(.34,1.56,.64,1)}
-
 /* === POP RING === */
 .pop-ring{position:absolute;border-radius:50%;border:3px solid;pointer-events:none;z-index:15;animation:popRing .6s ease-out forwards}
 @keyframes popRing{0%{width:10px;height:10px;opacity:1;margin-left:-5px;margin-top:-5px}100%{width:120px;height:120px;opacity:0;margin-left:-60px;margin-top:-60px}}
@@ -229,7 +223,8 @@ body.castle-mode #castleBg{opacity:.85}
 @keyframes rainbowArc{0%{opacity:0;transform:translateX(-50%) scale(.4)}25%{opacity:.95;transform:translateX(-50%) scale(1)}80%{opacity:.9;transform:translateX(-50%) scale(1)}100%{opacity:0;transform:translateX(-50%) scale(1.05)}}
 
 /* === MAGIC BUTTON === */
-#magicBtn{position:fixed;bottom:65px;right:15px;z-index:50;font-family:'Baloo 2',sans-serif;font-size:16px;font-weight:800;color:#fff;background:linear-gradient(135deg,#ff69b4,#ff1493,#c44dff);background-size:200% 200%;animation:magicShimmer 4s ease infinite;padding:10px 20px;border-radius:50px;border:3px solid rgba(255,255,255,.6);box-shadow:0 6px 20px rgba(255,20,147,.5);cursor:pointer;transition:transform .2s}
+#magicBtn{position:fixed;top:46%;right:12px;z-index:50;font-family:'Baloo 2',sans-serif;font-size:16px;font-weight:800;color:#fff;background:linear-gradient(135deg,#ff69b4,#ff1493,#c44dff);background-size:200% 200%;animation:magicShimmer 4s ease infinite;padding:10px 20px;border-radius:50px;border:3px solid rgba(255,255,255,.6);box-shadow:0 6px 20px rgba(255,20,147,.5);cursor:pointer;transition:transform .2s}
+body.painting #magicBtn{display:none}
 @keyframes magicShimmer{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
 #magicBtn.ready{animation:magicPulse 1s ease-in-out infinite;transform:scale(1.1)}
 @keyframes magicPulse{0%,100%{box-shadow:0 6px 20px rgba(255,20,147,.5)}50%{box-shadow:0 6px 40px rgba(255,20,147,.8),0 0 50px rgba(255,105,180,.5)}}
@@ -345,7 +340,7 @@ body.night #moon{opacity:1;transform:scale(1) rotate(0);pointer-events:auto;curs
 @media(max-width:600px){
   .score-item{font-size:14px;padding:4px 10px}
   .mode-btn{font-size:12px;padding:6px 12px}
-  #magicBtn{font-size:14px;padding:8px 16px;bottom:55px;right:10px}
+  #magicBtn{font-size:14px;padding:8px 16px;top:46%;right:8px}
   .unicorn{font-size:55px}
   .egg{font-size:50px}
   #milestoneBar{height:12px}
@@ -630,7 +625,7 @@ const PaintCanvas = (() => {
     ctx.beginPath();
     ctx.moveTo(PT.lastX, PT.lastY);
     ctx.lineTo(px, py);
-    if (rainbow) {
+    if (rainbow || PT.color === 'rainbow') {
       PT.rainbowHue = (PT.rainbowHue + 4) % 360;
       ctx.strokeStyle = `hsl(${PT.rainbowHue},100%,58%)`;
     } else {
@@ -666,7 +661,9 @@ const PaintCanvas = (() => {
       ctx.beginPath();
       ctx.arc(PT.sprayX + Math.cos(a)*d, PT.sprayY + Math.sin(a)*d,
         1.2 + Math.random()*2.8, 0, Math.PI*2);
-      ctx.fillStyle = PT.color;
+      ctx.fillStyle = PT.color === 'rainbow'
+        ? `hsl(${(PT.rainbowHue = (PT.rainbowHue + 12) % 360)},100%,60%)`
+        : PT.color;
       ctx.globalAlpha = 0.2 + Math.random() * 0.6;
       ctx.fill();
     }
@@ -994,64 +991,6 @@ function enterCastle() {
   castle.addEventListener('touchstart', (e) => { e.preventDefault(); tap(e); }, {passive:false});
 })();
 
-// ── Feed the Unicorn (Feature 4) ──
-(function () {
-  const foods = [];
-  function feedUnicorn(u) {
-    const r = u.getBoundingClientRect(), cx = r.left + r.width/2, cy = r.top + r.height/2;
-    [220,200,180].forEach((f,i) => setTimeout(() => SFX.note(f, 0.08, 'sine', 0.07), i*100)); // bwom bwom bwom
-    addSparkles(3);
-    floatText('NOM NOM', cx, r.top, { color:'#fff' });
-    floatText('💖', cx - 8, cy, { duration:1200 });
-    Glitter.burst(cx, cy, 14);
-    try { u.animate([{ transform:'scale(1)' },{ transform:'scale(1.3)' },{ transform:'scale(1)' }], { duration:500, composite:'add' }); } catch(e) {}
-  }
-  function tryFeed(x, y) {
-    const unis = [...document.querySelectorAll('.unicorn')].filter(u => !u.classList.contains('caught'));
-    for (const u of unis) {
-      const r = u.getBoundingClientRect();
-      if (x >= r.left-24 && x <= r.right+24 && y >= r.top-24 && y <= r.bottom+24) { feedUnicorn(u); return true; }
-    }
-    return false;
-  }
-  ['🧁','🍎'].forEach((emoji, idx) => {
-    const el = document.createElement('div');
-    el.className = 'food-item';
-    el.textContent = emoji;
-    document.body.appendChild(el);
-    const home = () => ({ x: 16, y: innerHeight - 165 - idx*60 });
-    const place = () => { const h = home(); el.style.left = h.x + 'px'; el.style.top = h.y + 'px'; };
-    place();
-    let dragging = false, eaten = false, ox = 0, oy = 0;
-    el.addEventListener('pointerdown', (e) => {
-      if (eaten) return;
-      e.preventDefault(); e.stopPropagation();
-      dragging = true; el.classList.add('dragging'); el.classList.remove('spring');
-      const r = el.getBoundingClientRect(); ox = e.clientX - r.left; oy = e.clientY - r.top;
-      try { el.setPointerCapture(e.pointerId); } catch(_) {}
-    });
-    el.addEventListener('pointermove', (e) => { if (!dragging) return; el.style.left = (e.clientX - ox) + 'px'; el.style.top = (e.clientY - oy) + 'px'; });
-    const end = (e) => {
-      if (!dragging) return; dragging = false; el.classList.remove('dragging');
-      if (tryFeed(e.clientX, e.clientY)) {
-        eaten = true; el.style.opacity = '0';
-        setTimeout(() => { eaten = false; el.style.opacity = '1'; place(); }, 3000); // replenish
-      } else {
-        el.classList.add('spring'); place(); setTimeout(() => el.classList.remove('spring'), 430);
-      }
-    };
-    el.addEventListener('pointerup', end);
-    el.addEventListener('pointercancel', end);
-    foods.push({ el, place, isBusy: () => dragging || eaten });
-  });
-  // show food only when an (uncaught) unicorn is on screen
-  setInterval(() => {
-    if (!S.started) return;
-    const present = [...document.querySelectorAll('.unicorn')].some(u => !u.classList.contains('caught'));
-    foods.forEach(f => { if (!f.isBusy()) f.el.classList.toggle('visible', present); });
-  }, 300);
-})();
-
 // ── Surprise spell book — the MAGIC button casts a random one each press ──
 const SPELLS = [
   { run: () => { flyingMagic(['🦋','🧚','🪽','🦋'], 14, 6); giantBloom('🦋'); } },                 // butterfly swarm
@@ -1185,16 +1124,12 @@ function checkMilestone() {
 
 function triggerMilestone(m) {
   S.currentMilestone++;
-  S.celebrationActive = true;
   S.unlockedAccessories.push(m.emoji);
 
-  // Show celebration (personalized with the unicorn's name if set)
-  celEmoji.textContent = m.emoji;
-  celText.textContent = unicornName ? m.msg.replace(/Your unicorn/i, unicornName) : m.msg;
-  celSub.textContent = unicornName
-    ? `${unicornName} now has ${S.sparkles} sparkles! ✨`
-    : `${S.sparkles} sparkles collected!`;
-  celebration.classList.add('show');
+  // NON-BLOCKING celebration — no screen to dismiss, the kid keeps playing.
+  const msg = unicornName ? m.msg.replace(/Your unicorn/i, unicornName) : m.msg;
+  showWorldToast(`${m.emoji} ${m.name} unlocked!`);
+  floatText(msg, innerWidth/2, innerHeight*0.34, { size:'24px', color:'#fff', duration:2200 });
 
   SFX.milestone();
   showRainbowArc();
@@ -1203,10 +1138,10 @@ function triggerMilestone(m) {
 
   // Big glitter burst
   for (let i = 0; i < 8; i++) {
-    setTimeout(() => {
-      Glitter.burst(Math.random()*innerWidth, Math.random()*innerHeight, 30);
-    }, i * 100);
+    setTimeout(() => Glitter.burst(Math.random()*innerWidth, Math.random()*innerHeight, 30), i * 100);
   }
+  // A couple of celebratory unicorns, automatically (no tap needed)
+  for (let i = 0; i < 2; i++) setTimeout(() => spawnUnicorn(), 250 + i * 250);
 
   // Update next milestone label
   const nextM = MILESTONES[S.currentMilestone];
@@ -1218,14 +1153,6 @@ function triggerMilestone(m) {
     milestoneFill.style.width = '100%';
   }
 }
-
-celDismiss.addEventListener('click', (e) => {
-  e.stopPropagation();
-  celebration.classList.remove('show');
-  S.celebrationActive = false;
-  // Spawn celebratory unicorns
-  for (let i = 0; i < 3; i++) setTimeout(() => spawnUnicorn(), i * 300);
-});
 
 // ── Magic Meter ──
 function updateMagicMeter(n) {
@@ -1333,7 +1260,7 @@ const WORLDS = [
 let W = WORLDS[0]; // current world
 
 function clearScene() {
-  ['.bubble','.unicorn','.egg','.star','.butterfly'].forEach(sel =>
+  ['.bubble','.unicorn','.egg','.star','.butterfly','.dino','.puppy'].forEach(sel =>
     document.querySelectorAll(sel).forEach(el => {
       el.style.transition = 'opacity .3s, transform .3s';
       el.style.opacity = '0'; el.style.transform = 'scale(.4)';
@@ -1423,7 +1350,7 @@ worldPicker.addEventListener('click', (e) => { if (e.target === worldPicker) clo
 
 // ── BUBBLES ──
 function spawnBubble() {
-  if (!S.started || !DOMManager.canSpawn('bubbles')) return;
+  if (!S.started || S.mode === 'paint' || !DOMManager.canSpawn('bubbles')) return;
   DOMManager.add('bubbles');
 
   const size = 55 + Math.random() * 40;        // visual 55–95px
@@ -1478,7 +1405,7 @@ function spawnBubble() {
 
 // ── UNICORNS ──
 function spawnUnicorn() {
-  if (!S.started || !DOMManager.canSpawn('unicorns')) return;
+  if (!S.started || S.mode === 'paint' || !DOMManager.canSpawn('unicorns')) return;
   DOMManager.add('unicorns');
 
   const el = document.createElement('div');
@@ -1599,7 +1526,7 @@ function hatchCreature(cx, cy) {
 }
 
 function spawnEgg() {
-  if (!S.started || !DOMManager.canSpawn('eggs')) return;
+  if (!S.started || S.mode === 'paint' || !DOMManager.canSpawn('eggs')) return;
   DOMManager.add('eggs');
 
   const el = document.createElement('div');
@@ -1648,7 +1575,7 @@ function spawnEgg() {
 
 // ── STARS (tap to collect) ──
 function spawnStar() {
-  if (!S.started || !DOMManager.canSpawn('stars')) return;
+  if (!S.started || S.mode === 'paint' || !DOMManager.canSpawn('stars')) return;
   DOMManager.add('stars');
 
   const el = document.createElement('div');
@@ -1682,7 +1609,7 @@ function spawnStar() {
 
 // ── BUTTERFLIES (flutter across, tap to catch) ──
 function spawnButterfly() {
-  if (!S.started || !DOMManager.canSpawn('butterflies')) return;
+  if (!S.started || S.mode === 'paint' || !DOMManager.canSpawn('butterflies')) return;
   DOMManager.add('butterflies');
 
   const el = document.createElement('div');
@@ -1725,7 +1652,7 @@ function dinoRoar() {
   setTimeout(() => SFX.slide(600, 200, 0.12, 'sine', 0.05), 320);
 }
 function spawnDino() {
-  if (!S.started || !DOMManager.canSpawn('dinos')) return;
+  if (!S.started || S.mode === 'paint' || !DOMManager.canSpawn('dinos')) return;
   DOMManager.add('dinos');
   const el = document.createElement('div');
   el.className = 'dino';
@@ -1771,7 +1698,7 @@ function pawPrints(x, y) {
   }
 }
 function spawnPuppy() {
-  if (!S.started || !DOMManager.canSpawn('puppies')) return;
+  if (!S.started || S.mode === 'paint' || !DOMManager.canSpawn('puppies')) return;
   DOMManager.add('puppies');
   const el = document.createElement('div');
   el.className = 'puppy';
@@ -1870,6 +1797,18 @@ function tapSparkle(px, py) {
     });
     palette.appendChild(sw);
   });
+  // Rainbow color option — works with Spray and Brush
+  const rsw = document.createElement('div');
+  rsw.className = 'c-swatch c-rainbow';
+  rsw.title = 'Rainbow';
+  rsw.style.background = 'conic-gradient(red,orange,yellow,#00e000,cyan,blue,magenta,red)';
+  rsw.addEventListener('click', (e) => {
+    e.stopPropagation();
+    document.querySelectorAll('.c-swatch').forEach(s => s.classList.remove('active'));
+    rsw.classList.add('active');
+    PT.color = 'rainbow';
+  });
+  palette.appendChild(rsw);
 
   // Stamp picker
   const picker = document.getElementById('stampPicker');
@@ -1962,10 +1901,14 @@ document.querySelectorAll('.mode-btn').forEach(btn => {
     S.mode = btn.dataset.mode;
 
     if (S.mode === 'paint') {
+      // Calm the canvas: stop the game and sweep away anything floating
+      document.body.classList.add('painting');
+      clearScene();
       paintToolbar.classList.add('show');
       paintIndicator.classList.add('show');
       setTimeout(() => paintIndicator.classList.remove('show'), 1500);
     } else {
+      document.body.classList.remove('painting');
       paintToolbar.classList.remove('show');
       PaintCanvas.stop();
     }
@@ -2102,14 +2045,15 @@ function beginGame() {
 // Use the name set in the Pet module (if any) for personalized messages
 unicornName = loadUnicornName();
 
-// ── SPAWNERS (varied timing for variety) ──
-setInterval(() => { if (S.started) spawnBubble(); }, 2000);
-setInterval(() => { if (S.started && Math.random() < 0.5) spawnUnicorn(); }, 8000);
-setInterval(() => { if (S.started && Math.random() < 0.4) spawnEgg(); }, 10000);
-setInterval(() => { if (S.started && Math.random() < 0.6) spawnStar(); }, 4000);
-setInterval(() => { if (S.started && Math.random() < 0.55) spawnButterfly(); }, 6000);
-setInterval(() => { if (S.started && Math.random() < 0.40) spawnDino(); }, 8000);
-setInterval(() => { if (S.started && Math.random() < 0.35) spawnPuppy(); }, 9000);
+// ── SPAWNERS (varied timing for variety; paused while painting) ──
+const playing = () => S.started && S.mode !== 'paint';
+setInterval(() => { if (playing()) spawnBubble(); }, 2000);
+setInterval(() => { if (playing() && Math.random() < 0.5) spawnUnicorn(); }, 8000);
+setInterval(() => { if (playing() && Math.random() < 0.4) spawnEgg(); }, 10000);
+setInterval(() => { if (playing() && Math.random() < 0.6) spawnStar(); }, 4000);
+setInterval(() => { if (playing() && Math.random() < 0.55) spawnButterfly(); }, 6000);
+setInterval(() => { if (playing() && Math.random() < 0.40) spawnDino(); }, 8000);
+setInterval(() => { if (playing() && Math.random() < 0.35) spawnPuppy(); }, 9000);
 
 // ── CLOUDS ──
 function spawnCloud() {
