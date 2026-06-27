@@ -127,16 +127,6 @@ iframe:not(#gameFrame),.watermark,[id*="badge"],[class*="watermark"]{display:non
 @keyframes pawFade{0%{opacity:.9;transform:scale(.6)}100%{opacity:0;transform:scale(1.1)}}
 
 /* === NAME PROMPT === */
-#namePrompt{position:fixed;inset:0;z-index:95;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(255,105,180,.35);backdrop-filter:blur(8px);padding:20px}
-#namePrompt.show{display:flex}
-#namePrompt .np-uni{font-size:clamp(60px,16vw,100px);animation:titleBob 2s ease-in-out infinite}
-#namePrompt h2{font-family:'Baloo 2',sans-serif;font-weight:800;color:#fff;font-size:clamp(22px,5vw,34px);text-shadow:0 3px 10px rgba(255,20,147,.5);text-align:center}
-#nameInput{font-family:'Baloo 2',sans-serif;font-size:clamp(20px,5vw,28px);font-weight:700;color:#ff1493;text-align:center;width:min(320px,86vw);padding:12px 18px;border:4px solid #fff;border-radius:40px;background:rgba(255,255,255,.92);outline:none}
-#nameInput::placeholder{color:#ffa6d4}
-#namePrompt .np-go{font-family:'Baloo 2',sans-serif;font-size:clamp(18px,4.5vw,24px);font-weight:800;color:#ff1493;background:#fff;border:4px solid #ff69b4;border-radius:50px;padding:12px 36px;cursor:pointer;box-shadow:0 6px 20px rgba(255,20,147,.4)}
-#namePrompt .np-go:active{transform:scale(.93)}
-#namePrompt .np-skip{font-family:'Fredoka',sans-serif;font-size:14px;color:rgba(255,255,255,.85);background:none;border:none;cursor:pointer;text-decoration:underline}
-#scoreBar .uni-name{font-family:'Baloo 2',sans-serif;font-weight:800;color:#fff;font-size:15px;text-shadow:0 2px 6px rgba(255,20,147,.5);max-width:34vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;align-self:center;cursor:pointer}
 
 /* === BABY UNICORN COMPANION === */
 #babyUnicorn{position:fixed;bottom:80px;right:15px;z-index:14;font-size:48px;cursor:pointer;display:none;animation:babyBob 2s ease-in-out infinite;filter:drop-shadow(0 4px 10px rgba(255,20,147,.4))}
@@ -384,7 +374,6 @@ body.night #moon{opacity:1;transform:scale(1) rotate(0);pointer-events:auto;curs
 
 <!-- Score -->
 <div id="scoreBar">
-  <span class="uni-name" id="uniNameLabel"></span>
   <div class="score-item"><span>✨</span><span class="score-val" id="sparkleCount">0</span></div>
   <div class="score-item"><span>🦄</span><span class="score-val" id="unicornCount">0</span></div>
 </div>
@@ -442,15 +431,6 @@ body.night #moon{opacity:1;transform:scale(1) rotate(0);pointer-events:auto;curs
   <div class="cel-text" id="celText">Amazing!</div>
   <div class="cel-sub" id="celSub">You unlocked something special!</div>
   <button class="cel-dismiss" id="celDismiss">✨ Keep Playing! ✨</button>
-</div>
-
-<!-- Name prompt -->
-<div id="namePrompt">
-  <div class="np-uni">🦄</div>
-  <h2>What's your unicorn's name?</h2>
-  <input type="text" id="nameInput" maxlength="20" placeholder="Type a name…" autocomplete="off">
-  <button class="np-go" id="nameGo">Let's go! ✨</button>
-  <button class="np-skip" id="nameSkip">No name yet</button>
 </div>
 
 <!-- Title -->
@@ -1130,15 +1110,14 @@ function floatText(text, x, y, opts = {}) {
 }
 
 // ── Unicorn name (Feature 1) ──
+// Unicorn name is set in the Pet module; the arcade just reads it for messages
 let unicornName = '';
-function setUnicornName(name) {
-  unicornName = (name || '').trim().slice(0, 20);
-  try { localStorage.setItem('sparkleUnicornGardenName', unicornName); } catch (e) {}
-  const lbl = document.getElementById('uniNameLabel');
-  if (lbl) lbl.textContent = unicornName ? `${unicornName} 🦄` : '✏️';
-}
 function loadUnicornName() {
-  try { return localStorage.getItem('sparkleUnicornGardenName') || ''; } catch (e) { return ''; }
+  try {
+    const raw = localStorage.getItem('sparkleUnicornPet');
+    if (raw) { const o = JSON.parse(raw); return (o.name || '').trim().slice(0, 20); }
+  } catch (e) {}
+  return '';
 }
 
 // ── Baby Unicorn Companion (Feature 6) ──
@@ -2093,24 +2072,7 @@ document.getElementById('playBtn').addEventListener('click', () => {
   beginGame();
 });
 
-// Optional naming: tap the name chip on the score bar to name/rename the unicorn
-(function () {
-  const lbl = document.getElementById('uniNameLabel');
-  if (!lbl) return;
-  lbl.addEventListener('click', (e) => {
-    e.stopPropagation();
-    SFX.init();
-    const np = document.getElementById('namePrompt');
-    const inp = document.getElementById('nameInput');
-    inp.value = loadUnicornName();
-    np.classList.add('show');
-    setTimeout(() => inp.focus(), 50);
-  });
-})();
-
 function beginGame() {
-  const np = document.getElementById('namePrompt');
-  np.classList.remove('show');
   if (S.started) return;
   S.started = true;
 
@@ -2137,11 +2099,8 @@ function beginGame() {
   setTimeout(() => spawnButterfly(), 2100);
 }
 
-// Name prompt actions
-document.getElementById('nameGo').addEventListener('click', () => { setUnicornName(document.getElementById('nameInput').value); beginGame(); });
-document.getElementById('nameSkip').addEventListener('click', () => { setUnicornName(''); beginGame(); });
-document.getElementById('nameInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') { setUnicornName(e.target.value); beginGame(); } });
-setUnicornName(loadUnicornName()); // restore saved name on load
+// Use the name set in the Pet module (if any) for personalized messages
+unicornName = loadUnicornName();
 
 // ── SPAWNERS (varied timing for variety) ──
 setInterval(() => { if (S.started) spawnBubble(); }, 2000);
