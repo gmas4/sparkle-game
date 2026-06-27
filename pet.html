@@ -212,10 +212,13 @@ body::before {
 }
 .tab-row {
   display: flex; gap: 4px;
-  overflow-x: auto; justify-content: center;
-  scrollbar-width: none;
+  overflow-x: auto; justify-content: safe center;
+  scroll-snap-type: x proximity;
+  padding: 0 6px;
+  scrollbar-width: none; -webkit-overflow-scrolling: touch;
 }
 .tab-row::-webkit-scrollbar { display: none; }
+.tab-btn { scroll-snap-align: center; }
 .tab-btn {
   font-family: 'Fredoka', sans-serif;
   font-size: 0.8rem; font-weight: 600;
@@ -474,22 +477,6 @@ body::before {
 
 <!-- MAIN AREA -->
 <div class="main-area">
-  <!-- STATUS BARS -->
-  <div class="status-bars">
-    <div class="status-bar">
-      <span class="icon">💖</span>
-      <div class="bar-track"><div class="bar-fill happiness" id="happyBar" style="width:70%"></div></div>
-    </div>
-    <div class="status-bar">
-      <span class="icon">⚡</span>
-      <div class="bar-track"><div class="bar-fill energy" id="energyBar" style="width:50%"></div></div>
-    </div>
-    <div class="status-bar">
-      <span class="icon">✨</span>
-      <div class="bar-track"><div class="bar-fill sparkle" id="sparkleBar" style="width:30%"></div></div>
-    </div>
-  </div>
-
   <!-- STAGE -->
   <div class="stage" id="stage">
     <div id="petFloaters"></div>
@@ -540,9 +527,23 @@ const state = {
   sparkle: 30,
   hasSlime: false,
   hasGlitter: false,
-  coffeeCount: 0,
   petCount: 0,
+  background: 'dreamy',
 };
+
+// Scene backgrounds for the pet stage
+const BACKGROUNDS = {
+  dreamy:   'linear-gradient(160deg,#ffd6f5,#e0a9ff,#b89bff)',
+  rainbow:  'linear-gradient(160deg,#ff9a9e,#fecfef,#a6c8ff,#b8f5c8)',
+  candy:    'linear-gradient(160deg,#fff0f5,#ffd9ec,#ffc8e0,#ffe7b3)',
+  ocean:    'linear-gradient(160deg,#aef3ff,#7fd8f5,#4fb8e8,#3a9fd6)',
+  space:    'radial-gradient(circle at 30% 20%,#fff8 0,transparent 1.5px),radial-gradient(circle at 70% 60%,#fff6 0,transparent 1.5px),linear-gradient(160deg,#1a0f3d,#2d1b5e,#3d2270)',
+  sunshine: 'linear-gradient(160deg,#fff7c2,#ffe066,#ffd194,#ffc8b3)',
+};
+function applyBackground() {
+  const stage = document.getElementById('stage');
+  if (stage) stage.style.background = BACKGROUNDS[state.background] || BACKGROUNDS.dreamy;
+}
 
 // === SAVE / LOAD THE PET (so she's still here tomorrow) ===
 const SAVE_KEY = 'sparkleUnicornPet';
@@ -568,31 +569,31 @@ function buildUnicornSVG() {
   const uc = state.unicornColor;
   const mc = state.maneColor;
   const eyeStyles = [
-    // Normal cute eyes
-    `<ellipse cx="128" cy="148" rx="10" ry="12" fill="#333"/><ellipse cx="172" cy="148" rx="10" ry="12" fill="#333"/>
-     <ellipse cx="131" cy="144" rx="4" ry="5" fill="white"/><ellipse cx="175" cy="144" rx="4" ry="5" fill="white"/>`,
-    // Happy closed eyes
-    `<path d="M118 148 Q128 138 138 148" stroke="#333" stroke-width="3" fill="none" stroke-linecap="round"/>
-     <path d="M162 148 Q172 138 182 148" stroke="#333" stroke-width="3" fill="none" stroke-linecap="round"/>`,
+    // Big cute sparkly eyes (default)
+    `<ellipse cx="131" cy="141" rx="11" ry="13" fill="#3a2540"/><ellipse cx="169" cy="141" rx="11" ry="13" fill="#3a2540"/>
+     <circle cx="134" cy="136" r="4" fill="#fff"/><circle cx="172" cy="136" r="4" fill="#fff"/>
+     <circle cx="128" cy="146" r="2" fill="#fff" opacity="0.85"/><circle cx="166" cy="146" r="2" fill="#fff" opacity="0.85"/>`,
+    // Happy smiling eyes
+    `<path d="M121 143 Q131 131 141 143" stroke="#3a2540" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+     <path d="M159 143 Q169 131 179 143" stroke="#3a2540" stroke-width="3.5" fill="none" stroke-linecap="round"/>`,
     // Star eyes
-    `<text x="120" y="155" font-size="22" text-anchor="middle">⭐</text><text x="180" y="155" font-size="22" text-anchor="middle">⭐</text>`,
+    `<text x="131" y="150" font-size="24" text-anchor="middle">⭐</text><text x="169" y="150" font-size="24" text-anchor="middle">⭐</text>`,
     // Heart eyes
-    `<text x="120" y="155" font-size="22" text-anchor="middle">💖</text><text x="180" y="155" font-size="22" text-anchor="middle">💖</text>`,
+    `<text x="131" y="150" font-size="24" text-anchor="middle">💖</text><text x="169" y="150" font-size="24" text-anchor="middle">💖</text>`,
     // Wink
-    `<ellipse cx="128" cy="148" rx="10" ry="12" fill="#333"/><ellipse cx="131" cy="144" rx="4" ry="5" fill="white"/>
-     <path d="M162 148 Q172 138 182 148" stroke="#333" stroke-width="3" fill="none" stroke-linecap="round"/>`,
+    `<ellipse cx="131" cy="141" rx="11" ry="13" fill="#3a2540"/><circle cx="134" cy="136" r="4" fill="#fff"/>
+     <path d="M159 143 Q169 131 179 143" stroke="#3a2540" stroke-width="3.5" fill="none" stroke-linecap="round"/>`,
   ];
   const eyes = eyeStyles[state.eyeStyle % eyeStyles.length];
 
-  // Mouth - changes if drinking coffee
-  const mouth = state.coffeeCount > 0
-    ? `<ellipse cx="150" cy="182" rx="8" ry="5" fill="#d4776b"/>`
-    : `<path d="M135 178 Q150 192 165 178" stroke="#e88" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
+  // Cute nose + smile + little tongue (kept on the face, above the chin)
+  const nose = `<ellipse cx="145" cy="152" rx="2.2" ry="1.6" fill="#c79ac0"/><ellipse cx="155" cy="152" rx="2.2" ry="1.6" fill="#c79ac0"/>`;
+  const mouth = `<path d="M141 158 Q150 169 159 158" stroke="#c45b7a" stroke-width="3" fill="none" stroke-linecap="round"/>
+     <ellipse cx="150" cy="164" rx="4" ry="2.6" fill="#ff9eb5"/>`;
 
-  // Blush
-  const blush = state.happiness > 60
-    ? `<ellipse cx="112" cy="168" rx="12" ry="7" fill="rgba(255,150,150,0.4)"/>
-       <ellipse cx="188" cy="168" rx="12" ry="7" fill="rgba(255,150,150,0.4)"/>` : '';
+  // Always-on rosy cheeks
+  const blush = `<ellipse cx="120" cy="150" rx="11" ry="7" fill="rgba(255,150,170,0.45)"/>
+     <ellipse cx="180" cy="150" rx="11" ry="7" fill="rgba(255,150,170,0.45)"/>`;
 
   // Accessories layers
   let accLayers = '';
@@ -697,14 +698,17 @@ function buildUnicornSVG() {
     <ellipse cx="185" cy="100" rx="12" ry="18" fill="${uc}" stroke="#e0d0f0" stroke-width="1" transform="rotate(15 185 100)"/>
     <ellipse cx="185" cy="100" rx="6" ry="12" fill="#ffcce0" transform="rotate(15 185 100)"/>
 
+    <!-- BLUSH -->
+    ${blush}
+
     <!-- EYES -->
     ${eyes}
 
+    <!-- NOSE -->
+    ${nose}
+
     <!-- MOUTH -->
     ${mouth}
-
-    <!-- BLUSH -->
-    ${blush}
 
     <!-- SLIME OVERLAY -->
     ${slimeLayer}
@@ -714,33 +718,29 @@ function buildUnicornSVG() {
 
     <!-- ACCESSORIES -->
     ${accLayers}
-
-    <!-- COFFEE CUP if drunk -->
-    ${state.coffeeCount > 0 ? `
-      <g transform="translate(200,160)">
-        <rect x="0" y="5" width="22" height="26" rx="3" fill="#8B4513"/>
-        <rect x="2" y="2" width="18" height="6" rx="2" fill="#A0522D"/>
-        <path d="M22 12 Q32 12 32 20 Q32 28 22 28" stroke="#8B4513" stroke-width="2.5" fill="none"/>
-        <text x="11" y="24" font-size="8" fill="white" text-anchor="middle">☕</text>
-        <!-- Steam -->
-        <path d="M6 0 Q8 -8 6 -14" stroke="rgba(200,200,200,0.6)" stroke-width="1.5" fill="none">
-          <animate attributeName="d" values="M6 0 Q8 -8 6 -14;M6 0 Q4 -8 6 -14;M6 0 Q8 -8 6 -14" dur="1.5s" repeatCount="indefinite"/>
-        </path>
-        <path d="M14 0 Q16 -10 14 -16" stroke="rgba(200,200,200,0.5)" stroke-width="1.5" fill="none">
-          <animate attributeName="d" values="M14 0 Q16 -10 14 -16;M14 0 Q12 -10 14 -16;M14 0 Q16 -10 14 -16" dur="1.8s" repeatCount="indefinite"/>
-        </path>
-      </g>
-    ` : ''}
   </svg>`;
 }
 
 function getAccessorySVG(type, id) {
   switch(type) {
-    case 'hat':
+    case 'hats':
       if (id === 'crown') return `<g transform="translate(125,15)"><polygon points="25,30 0,30 5,10 12,22 25,0 38,22 45,10 50,30" fill="#FFD700" stroke="#DAA520" stroke-width="1"/><circle cx="12" cy="20" r="3" fill="#FF6B6B"/><circle cx="25" cy="8" r="3" fill="#6BCBFF"/><circle cx="38" cy="20" r="3" fill="#B06AFF"/></g>`;
       if (id === 'tophat') return `<g transform="translate(122,10)"><rect x="5" y="25" width="50" height="8" rx="3" fill="#333"/><rect x="15" y="-5" width="30" height="32" rx="4" fill="#333"/><rect x="20" y="10" width="20" height="4" rx="2" fill="${state.maneColor}"/></g>`;
       if (id === 'flower') return `<g transform="translate(108,68)"><circle cx="0" cy="0" r="7" fill="#FF69B4"/><circle cx="10" cy="-5" r="7" fill="#FFB6C1"/><circle cx="20" cy="0" r="7" fill="#FF69B4"/><circle cx="10" cy="5" r="7" fill="#FFB6C1"/><circle cx="10" cy="0" r="5" fill="#FFD700"/></g>`;
       if (id === 'bow') return `<g transform="translate(165,75)"><ellipse cx="-10" cy="0" rx="12" ry="8" fill="#FF69B4"/><ellipse cx="10" cy="0" rx="12" ry="8" fill="#FF69B4"/><circle cx="0" cy="0" r="4" fill="#FF1493"/></g>`;
+      if (id === 'party') return `<g transform="translate(150,86)"><polygon points="0,-46 -17,-2 17,-2" fill="#ff6fb7" stroke="#fff" stroke-width="1.5"/><circle cx="0" cy="-46" r="5" fill="#ffe066"/><circle cx="-7" cy="-12" r="2.6" fill="#fff"/><circle cx="6" cy="-22" r="2.6" fill="#6ac3ff"/><circle cx="0" cy="-32" r="2.6" fill="#7ddf64"/></g>`;
+      return '';
+    case 'glasses':
+      if (id === 'sun') return `<g><rect x="116" y="132" width="28" height="17" rx="8" fill="#222" opacity="0.85"/><rect x="156" y="132" width="28" height="17" rx="8" fill="#222" opacity="0.85"/><line x1="144" y1="138" x2="156" y2="138" stroke="#222" stroke-width="3"/></g>`;
+      if (id === 'round') return `<g fill="rgba(180,220,255,0.25)" stroke="#7a5aa0" stroke-width="2.5"><circle cx="131" cy="141" r="13"/><circle cx="169" cy="141" r="13"/><line x1="144" y1="141" x2="156" y2="141"/></g>`;
+      if (id === 'heart') return `<g fill="none" stroke="#ff4d8a" stroke-width="2.6"><path d="M131 149 L121 139 Q118 133 125 133 Q131 133 131 139 Q131 133 137 133 Q144 133 141 139 Z"/><path d="M169 149 L159 139 Q156 133 163 133 Q169 133 169 139 Q169 133 175 133 Q182 133 179 139 Z"/></g>`;
+      if (id === 'goggles') return `<g fill="rgba(120,230,210,0.4)" stroke="#1faa97" stroke-width="2.6"><rect x="116" y="131" width="28" height="20" rx="9"/><rect x="156" y="131" width="28" height="20" rx="9"/><line x1="144" y1="141" x2="156" y2="141"/><path d="M116 137 Q106 138 103 146" fill="none"/><path d="M184 137 Q194 138 197 146" fill="none"/></g>`;
+      return '';
+    case 'jewels':
+      if (id === 'hoops') return `<g fill="none" stroke="#FFD700" stroke-width="2.5"><circle cx="112" cy="120" r="5.5"/><circle cx="188" cy="120" r="5.5"/></g>`;
+      if (id === 'studs') return `<circle cx="112" cy="116" r="4" fill="#FF69B4" stroke="#FFD700" stroke-width="1"/><circle cx="188" cy="116" r="4" fill="#FF69B4" stroke="#FFD700" stroke-width="1"/>`;
+      if (id === 'stars') return `<text x="112" y="123" font-size="13" text-anchor="middle">⭐</text><text x="188" y="123" font-size="13" text-anchor="middle">⭐</text>`;
+      if (id === 'gems') return `<g stroke="#fff" stroke-width="0.6"><polygon points="112,113 117,119 112,126 107,119" fill="#6BCBFF"/><polygon points="188,113 193,119 188,126 183,119" fill="#6BCBFF"/></g>`;
       return '';
     case 'eyes':
       // handled by eyeStyle
@@ -771,19 +771,25 @@ function render() {
 }
 
 function updateBars() {
-  document.getElementById('happyBar').style.width = state.happiness + '%';
-  document.getElementById('energyBar').style.width = state.energy + '%';
-  document.getElementById('sparkleBar').style.width = state.sparkle + '%';
+  const h = document.getElementById('happyBar');
+  const e = document.getElementById('energyBar');
+  const s = document.getElementById('sparkleBar');
+  if (h) h.style.width = state.happiness + '%';
+  if (e) e.style.width = state.energy + '%';
+  if (s) s.style.width = state.sparkle + '%';
 }
 
 // === TABS & TOOLS CONFIG ===
 const tabs = [
   { id: 'colors', icon: '🎨', label: 'Colors' },
   { id: 'hats', icon: '👑', label: 'Hats' },
+  { id: 'glasses', icon: '👓', label: 'Glasses' },
+  { id: 'jewels', icon: '💎', label: 'Jewels' },
   { id: 'wings', icon: '🪽', label: 'Wings' },
   { id: 'neck', icon: '📿', label: 'Neck' },
   { id: 'back', icon: '🌈', label: 'Back' },
   { id: 'eyes', icon: '👀', label: 'Eyes' },
+  { id: 'background', icon: '🖼️', label: 'Scene' },
   { id: 'effects', icon: '✨', label: 'Effects' },
   { id: 'pet', icon: '🐾', label: 'Pet' },
   { id: 'save', icon: '💾', label: 'Save' },
@@ -802,6 +808,25 @@ const tools = {
       { id: 'tophat', icon: '🎩', label: 'Top Hat' },
       { id: 'flower', icon: '🌸', label: 'Flowers' },
       { id: 'bow', icon: '🎀', label: 'Bow' },
+      { id: 'party', icon: '🥳', label: 'Party' },
+    ]
+  },
+  glasses: {
+    type: 'items',
+    items: [
+      { id: 'sun', icon: '🕶️', label: 'Sunnies' },
+      { id: 'round', icon: '👓', label: 'Round' },
+      { id: 'heart', icon: '😍', label: 'Hearts' },
+      { id: 'goggles', icon: '🥽', label: 'Goggles' },
+    ]
+  },
+  jewels: {
+    type: 'items',
+    items: [
+      { id: 'hoops', icon: '⭕', label: 'Hoops' },
+      { id: 'studs', icon: '🌸', label: 'Studs' },
+      { id: 'stars', icon: '⭐', label: 'Stars' },
+      { id: 'gems', icon: '💎', label: 'Gems' },
     ]
   },
   wings: {
@@ -835,6 +860,17 @@ const tools = {
       { id: 'star', icon: '⭐', label: 'Star' },
       { id: 'heart', icon: '💖', label: 'Heart' },
       { id: 'wink', icon: '😉', label: 'Wink' },
+    ]
+  },
+  background: {
+    type: 'items',
+    items: [
+      { id: 'dreamy', icon: '💜', label: 'Dreamy' },
+      { id: 'rainbow', icon: '🌈', label: 'Rainbow' },
+      { id: 'candy', icon: '🍭', label: 'Candy' },
+      { id: 'ocean', icon: '🌊', label: 'Ocean' },
+      { id: 'space', icon: '🚀', label: 'Space' },
+      { id: 'sunshine', icon: '☀️', label: 'Sunny' },
     ]
   },
   effects: {
@@ -970,6 +1006,16 @@ function toggleAccessory(type, id, el) {
     showMood(id === 'star' ? '⭐' : id === 'heart' ? '😍' : '😊');
     spawnParticles(el, ['👀','✨'], 4);
     render();
+    return;
+  }
+  if (type === 'background') {
+    state.background = id;
+    applyBackground();
+    document.querySelectorAll('#panel-background .tool-item').forEach(e => e.classList.remove('equipped'));
+    el.classList.add('equipped');
+    showMood('🖼️');
+    spawnParticles(el, ['✨','🌈'], 4);
+    persistPet();
     return;
   }
 
@@ -1355,6 +1401,7 @@ setInterval(() => {
 loadPet();              // bring back the saved unicorn if there is one
 buildToolbar();
 createBgStars();
+applyBackground();      // restore saved scene background
 render();
 showMood('🦄');
 // remember the name as she types it
