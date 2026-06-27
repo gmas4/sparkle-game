@@ -332,6 +332,14 @@ body.night #moon{opacity:1;transform:scale(1) rotate(0);pointer-events:auto;curs
 .c-swatch.active{border-color:#ff1493;transform:scale(1.28);box-shadow:0 0 10px rgba(255,20,147,.5)}
 #stampPicker{display:none;gap:4px;flex-wrap:wrap;justify-content:center;max-width:310px;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);padding:8px 12px;border-radius:20px;border:2px solid rgba(255,105,180,.4);box-shadow:0 4px 20px rgba(255,20,147,.2)}
 #stampPicker.show{display:flex}
+#textPicker{display:none;flex-direction:column;gap:6px;align-items:center;max-width:330px;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);padding:9px 12px;border-radius:20px;border:2px solid rgba(255,105,180,.4);box-shadow:0 4px 20px rgba(255,20,147,.2)}
+#textPicker.show{display:flex}
+#textInput{font-family:'Fredoka',sans-serif;font-size:16px;border:2px solid #ff69b4;border-radius:14px;padding:7px 12px;width:250px;max-width:72vw;text-align:center;color:#ff1493;outline:none}
+#textInput::placeholder{color:#ffa6d4}
+.text-opts{display:flex;gap:5px;flex-wrap:wrap;justify-content:center}
+.font-btn,.size-btn{font-size:13px;border:2px solid #ffb6d9;border-radius:12px;padding:4px 11px;background:#fff;cursor:pointer;color:#ff1493;font-weight:700;white-space:nowrap}
+.font-btn.active,.size-btn.active{background:linear-gradient(135deg,#ff69b4,#ff1493);color:#fff;border-color:#fff}
+.text-hint{font-size:11px;color:#b06aff;font-weight:600}
 .stamp-opt{font-size:26px;cursor:pointer;padding:3px;border-radius:8px;transition:transform .15s;line-height:1.1}
 .stamp-opt.active{background:rgba(255,105,180,.25);transform:scale(1.2)}
 .stamp-opt:active{transform:scale(.85)}
@@ -390,11 +398,18 @@ body.night #moon{opacity:1;transform:scale(1) rotate(0);pointer-events:auto;curs
 <!-- Paint Toolbar (visible only in paint mode) -->
 <div id="paintToolbar">
   <div id="stampPicker"></div>
+  <div id="textPicker">
+    <input id="textInput" type="text" maxlength="40" placeholder="Type your words…" autocomplete="off">
+    <div class="text-opts" id="fontOpts"></div>
+    <div class="text-opts" id="sizeOpts"></div>
+    <div class="text-hint">Now tap the picture to place it ✨</div>
+  </div>
   <div id="colorPalette"></div>
   <div id="paintTools">
     <button class="tool-btn active" data-tool="brush"><span class="t-ico">🖌️</span>Brush</button>
     <button class="tool-btn" data-tool="spray"><span class="t-ico">💨</span>Spray</button>
     <button class="tool-btn" data-tool="stamp"><span class="t-ico">🌟</span>Stamp</button>
+    <button class="tool-btn" data-tool="text"><span class="t-ico">🔤</span>Text</button>
     <button class="tool-btn" data-tool="rainbow"><span class="t-ico">🌈</span>Rainbow</button>
     <button class="tool-btn" data-tool="eraser"><span class="t-ico">⬜</span>Erase</button>
     <button class="tool-btn" id="clearPaintBtn"><span class="t-ico">🗑️</span>Clear</button>
@@ -587,15 +602,23 @@ const Glitter = (() => {
 
 // ── Paint Tool State ──
 const PT = {
-  tool: 'brush',      // brush | spray | stamp | rainbow | eraser
+  tool: 'brush',      // brush | spray | stamp | text | rainbow | eraser
   color: '#ff1493',
   stamp: '🌟',
   rainbowHue: 0,
   sprayTimer: null,
   sprayX: 0, sprayY: 0,
   drawing: false,
-  lastX: 0, lastY: 0
+  lastX: 0, lastY: 0,
+  text: '', font: "'Fredoka', sans-serif", fontSize: 54
 };
+const PAINT_FONTS = [
+  { label: 'Round',  css: "'Fredoka', sans-serif" },
+  { label: 'Chunky', css: "'Baloo 2', cursive" },
+  { label: 'Comic',  css: "'Comic Sans MS', 'Baloo 2', cursive" },
+  { label: 'Fancy',  css: "'Brush Script MT', cursive" },
+];
+const PAINT_TEXT_SIZES = [ { label: 'Small', px: 34 }, { label: 'Medium', px: 56 }, { label: 'Big', px: 84 } ];
 const PAINT_COLORS = [
   '#ff1493','#ff6b6b','#ff8c00','#ffd700',
   '#7fff00','#00d4aa','#4da6ff','#c44dff',
@@ -700,6 +723,27 @@ const PaintCanvas = (() => {
     SFX.slide(600, 300, 0.15, 'sine', 0.05); // musical boing
   };
 
+  // ── Text (for cards) ──
+  const placeText = (px, py) => {
+    const t = (PT.text || '').trim();
+    if (!t) return;
+    ctx.save();
+    ctx.font = `bold ${PT.fontSize}px ${PT.font}`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = PT.color === 'rainbow'
+      ? `hsl(${(PT.rainbowHue = (PT.rainbowHue + 40) % 360)},100%,55%)`
+      : PT.color;
+    ctx.shadowColor = 'rgba(255,255,255,0.95)';
+    ctx.shadowBlur = 6;
+    ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+    ctx.strokeText(t, px, py);
+    ctx.fillText(t, px, py);
+    ctx.restore();
+    Glitter.burst(px, py, 14);
+    SFX.collect();
+  };
+
   // ── Eraser ──
   const startEraser = (px, py) => {
     PT.drawing = true; PT.lastX = px; PT.lastY = py;
@@ -726,6 +770,7 @@ const PaintCanvas = (() => {
       case 'rainbow': startBrush(px, py, true);  break;
       case 'spray':   startSpray(px, py);         break;
       case 'stamp':   placeStamp(px, py);         break;
+      case 'text':    placeText(px, py);          break;
       case 'eraser':  startEraser(px, py);        break;
     }
   };
@@ -1826,6 +1871,37 @@ function tapSparkle(px, py) {
     picker.appendChild(btn);
   });
 
+  // Text picker — fonts + sizes for making cards
+  const textPicker = document.getElementById('textPicker');
+  const textInput = document.getElementById('textInput');
+  textInput.addEventListener('input', (e) => { PT.text = e.target.value; });
+  textInput.addEventListener('pointerdown', (e) => e.stopPropagation());
+  const fontOpts = document.getElementById('fontOpts');
+  PAINT_FONTS.forEach((f, i) => {
+    const fb = document.createElement('button');
+    fb.className = 'font-btn' + (i === 0 ? ' active' : '');
+    fb.textContent = f.label;
+    fb.style.fontFamily = f.css;
+    fb.addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.querySelectorAll('.font-btn').forEach(x => x.classList.remove('active'));
+      fb.classList.add('active'); PT.font = f.css;
+    });
+    fontOpts.appendChild(fb);
+  });
+  const sizeOpts = document.getElementById('sizeOpts');
+  PAINT_TEXT_SIZES.forEach((s, i) => {
+    const sb = document.createElement('button');
+    sb.className = 'size-btn' + (i === 1 ? ' active' : '');
+    sb.textContent = s.label;
+    sb.addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.querySelectorAll('.size-btn').forEach(x => x.classList.remove('active'));
+      sb.classList.add('active'); PT.fontSize = s.px;
+    });
+    sizeOpts.appendChild(sb);
+  });
+
   // Tool buttons
   document.querySelectorAll('.tool-btn[data-tool]').forEach(btn => {
     btn.addEventListener('click', (e) => {
@@ -1837,8 +1913,11 @@ function tapSparkle(px, py) {
       const isStamp   = PT.tool === 'stamp';
       const isRainbow = PT.tool === 'rainbow';
       const isEraser  = PT.tool === 'eraser';
+      const isText    = PT.tool === 'text';
       palette.style.display  = (isStamp || isRainbow || isEraser) ? 'none' : 'flex';
       picker.classList.toggle('show', isStamp);
+      textPicker.classList.toggle('show', isText);
+      if (isText) setTimeout(() => textInput.focus(), 50);
     });
   });
 
