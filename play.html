@@ -136,7 +136,7 @@ iframe:not(#gameFrame),.watermark,[id*="badge"],[class*="watermark"]{display:non
 #namePrompt .np-go{font-family:'Baloo 2',sans-serif;font-size:clamp(18px,4.5vw,24px);font-weight:800;color:#ff1493;background:#fff;border:4px solid #ff69b4;border-radius:50px;padding:12px 36px;cursor:pointer;box-shadow:0 6px 20px rgba(255,20,147,.4)}
 #namePrompt .np-go:active{transform:scale(.93)}
 #namePrompt .np-skip{font-family:'Fredoka',sans-serif;font-size:14px;color:rgba(255,255,255,.85);background:none;border:none;cursor:pointer;text-decoration:underline}
-#scoreBar .uni-name{font-family:'Baloo 2',sans-serif;font-weight:800;color:#fff;font-size:15px;text-shadow:0 2px 6px rgba(255,20,147,.5);max-width:34vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;align-self:center}
+#scoreBar .uni-name{font-family:'Baloo 2',sans-serif;font-weight:800;color:#fff;font-size:15px;text-shadow:0 2px 6px rgba(255,20,147,.5);max-width:34vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;align-self:center;cursor:pointer}
 
 /* === BABY UNICORN COMPANION === */
 #babyUnicorn{position:fixed;bottom:80px;right:15px;z-index:14;font-size:48px;cursor:pointer;display:none;animation:babyBob 2s ease-in-out infinite;filter:drop-shadow(0 4px 10px rgba(255,20,147,.4))}
@@ -1135,7 +1135,7 @@ function setUnicornName(name) {
   unicornName = (name || '').trim().slice(0, 20);
   try { localStorage.setItem('sparkleUnicornGardenName', unicornName); } catch (e) {}
   const lbl = document.getElementById('uniNameLabel');
-  if (lbl) lbl.textContent = unicornName ? `${unicornName} 🦄` : '';
+  if (lbl) lbl.textContent = unicornName ? `${unicornName} 🦄` : '✏️';
 }
 function loadUnicornName() {
   try { return localStorage.getItem('sparkleUnicornGardenName') || ''; } catch (e) { return ''; }
@@ -2089,12 +2089,24 @@ document.getElementById('playBtn').addEventListener('click', () => {
   SFX.startMusic();
   titleScreen.classList.add('hidden');
   setTimeout(() => titleScreen.style.display = 'none', 800);
-  // Show the name prompt (Feature 1) before the game begins
-  const np = document.getElementById('namePrompt');
-  const inp = document.getElementById('nameInput');
-  inp.value = loadUnicornName();
-  setTimeout(() => { np.classList.add('show'); inp.focus(); }, 350);
+  // Go straight into the game (naming is optional — tap the ✏️ on the score bar)
+  beginGame();
 });
+
+// Optional naming: tap the name chip on the score bar to name/rename the unicorn
+(function () {
+  const lbl = document.getElementById('uniNameLabel');
+  if (!lbl) return;
+  lbl.addEventListener('click', (e) => {
+    e.stopPropagation();
+    SFX.init();
+    const np = document.getElementById('namePrompt');
+    const inp = document.getElementById('nameInput');
+    inp.value = loadUnicornName();
+    np.classList.add('show');
+    setTimeout(() => inp.focus(), 50);
+  });
+})();
 
 function beginGame() {
   const np = document.getElementById('namePrompt');
