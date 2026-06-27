@@ -669,9 +669,10 @@ const PaintCanvas = (() => {
     }
     ctx.globalAlpha = 1;
     const now = performance.now();
-    if (now - (PT._spraySnd || 0) > 60) { PT._spraySnd = now; SFX.note(400, 0.08, 'sawtooth', 0.03); }
+    if (now - (PT._spraySnd || 0) > 150) { PT._spraySnd = now; SFX.note(380, 0.05, 'sawtooth', 0.018); }
   };
   const startSpray = (px, py) => {
+    if (PT.sprayTimer) clearInterval(PT.sprayTimer); // never stack timers
     PT.sprayX = px; PT.sprayY = py;
     PT.drawing = true;
     doSpray();
@@ -1954,6 +1955,12 @@ scene.addEventListener('pointercancel', () => {
   isPointerDown = false;
   PaintCanvas.stop();
 });
+
+// Safety net: a release/cancel ANYWHERE (e.g. on the toolbar) stops painting,
+// so the spray loop & its sound can never keep running after lifting the finger.
+['pointerup','pointercancel','touchend','touchcancel'].forEach(ev =>
+  window.addEventListener(ev, () => { isPointerDown = false; PaintCanvas.stop(); }));
+window.addEventListener('blur', () => { isPointerDown = false; PaintCanvas.stop(); });
 
 // Touch events
 scene.addEventListener('touchstart', (e) => {
