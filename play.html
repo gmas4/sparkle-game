@@ -413,7 +413,7 @@ body.night #moon{opacity:1;transform:scale(1) rotate(0);pointer-events:auto;curs
     <button class="tool-btn" data-tool="rainbow"><span class="t-ico">🌈</span>Rainbow</button>
     <button class="tool-btn" data-tool="eraser"><span class="t-ico">⬜</span>Erase</button>
     <button class="tool-btn" id="clearPaintBtn"><span class="t-ico">🗑️</span>Clear</button>
-    <button class="tool-btn" id="shareDrawingBtn"><span class="t-ico">📤</span><span id="shareLabel">Show Mummy!</span></button>
+    <button class="tool-btn" id="shareDrawingBtn"><span class="t-ico">📤</span><span id="shareLabel">Send</span></button>
   </div>
 </div>
 
@@ -578,7 +578,9 @@ const Glitter = (() => {
     }
   };
   const ambient = () => {
-    if (P.length < 50) P.push({x:Math.random()*c.width, y:-5,
+    // Calmer canvas while painting: far fewer drifting sparkles
+    const cap = window.__painting ? 8 : 50;
+    if (P.length < cap) P.push({x:Math.random()*c.width, y:-5,
       vx:(Math.random()-0.5)*0.4, vy:0.3+Math.random()*0.6,
       sz:1+Math.random()*2.5, c:C[Math.floor(Math.random()*C.length)],
       l:1, d:0.002+Math.random()*0.003, t:Math.random()*6.28, ts:0.05+Math.random()*0.1});
@@ -764,13 +766,20 @@ const PaintCanvas = (() => {
   };
 
   // ── Public API ──
+  let _lastPlace = 0;
   const start = (px, py) => {
+    // Stamp & text place once per tap — dedupe the touch+pointer double-fire
+    if (PT.tool === 'stamp' || PT.tool === 'text') {
+      const now = performance.now();
+      if (now - _lastPlace < 300) return;
+      _lastPlace = now;
+    }
     switch (PT.tool) {
       case 'brush':   startBrush(px, py, false); break;
       case 'rainbow': startBrush(px, py, true);  break;
       case 'spray':   startSpray(px, py);         break;
       case 'stamp':   placeStamp(px, py);         break;
-      case 'text':    placeText(px, py);          break;
+      case 'text':    placeText(px, py); { const ti = document.getElementById('textInput'); if (ti) ti.blur(); } break;
       case 'eraser':  startEraser(px, py);        break;
     }
   };
@@ -1929,10 +1938,8 @@ function tapSparkle(px, py) {
     Glitter.burst(innerWidth/2, innerHeight/2, 30);
   });
 
-  // Show Mummy / Save Drawing button (Feature 11)
+  // Send button (share the drawing) — consistent with the Pet's Send
   const isTouch = navigator.maxTouchPoints > 0;
-  const shareLbl = document.getElementById('shareLabel');
-  if (shareLbl) shareLbl.textContent = isTouch ? 'Show Mummy!' : 'Save Drawing';
   document.getElementById('shareDrawingBtn').addEventListener('click', async (e) => {
     e.stopPropagation();
     const src = document.getElementById('paintCanvas');
@@ -1954,7 +1961,7 @@ function tapSparkle(px, py) {
     o.fillText('Made with ✨ Sparkle Unicorn Magic Garden · sparklespop.com', W/2, H - 20);
     if (unicornName) { o.fillStyle = '#9a4dff'; o.font = "bold 26px 'Baloo 2', sans-serif"; o.fillText(`Painted by ${unicornName} 🎨`, W/2, 60); }
 
-    const finish = () => { SFX.milestone(); floatText('Sent to Mummy! 💖', innerWidth/2, innerHeight*0.4, { color:'#fff', duration:1500 }); };
+    const finish = () => { SFX.milestone(); floatText('Sent! 💖', innerWidth/2, innerHeight*0.4, { color:'#fff', duration:1500 }); };
     out.toBlob(async (blob) => {
       if (!blob) return;
       const file = new File([blob], 'sparkle-drawing.png', { type:'image/png' });
@@ -1980,6 +1987,7 @@ document.querySelectorAll('.mode-btn').forEach(btn => {
     btn.classList.add('active');
     S.mode = btn.dataset.mode;
 
+    window.__painting = (S.mode === 'paint');
     if (S.mode === 'paint') {
       // Calm the canvas: stop the game and sweep away anything floating
       document.body.classList.add('painting');
@@ -2018,11 +2026,11 @@ scene.addEventListener('pointermove', (e) => {
   }
 });
 
-// Magic wand glow + sparkle dust follow the finger everywhere
+// Magic wand glow + sparkle dust follow the finger (not while painting — keeps the canvas calm)
 scene.addEventListener('pointermove', (e) => {
   if (!S.started || S.celebrationActive) return;
   moveWand(e.clientX, e.clientY);
-  magicTrail(e.clientX, e.clientY);
+  if (S.mode !== 'paint') magicTrail(e.clientX, e.clientY);
 });
 
 scene.addEventListener('pointerup', () => {
@@ -2062,7 +2070,7 @@ scene.addEventListener('touchmove', (e) => {
   e.preventDefault();
   for (const t of e.changedTouches) {
     moveWand(t.clientX, t.clientY);
-    magicTrail(t.clientX, t.clientY);
+    if (S.mode !== 'paint') magicTrail(t.clientX, t.clientY);
     if (S.mode === 'paint') {
       PaintCanvas.move(t.clientX, t.clientY);
     }
@@ -2140,6 +2148,8 @@ setInterval(() => { if (playing() && Math.random() < 0.6) spawnStar(); }, 4000);
 setInterval(() => { if (playing() && Math.random() < 0.55) spawnButterfly(); }, 6000);
 setInterval(() => { if (playing() && Math.random() < 0.40) spawnDino(); }, 8000);
 setInterval(() => { if (playing() && Math.random() < 0.35) spawnPuppy(); }, 9000);
+// While painting: just an occasional shooting star — lively but not distracting
+setInterval(() => { if (S.started && S.mode === 'paint' && Math.random() < 0.5) shootingStars(1); }, 8000);
 
 // ── CLOUDS ──
 function spawnCloud() {

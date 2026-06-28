@@ -515,8 +515,8 @@ body::before {
     <h2>Your Unicorn is Ready! 🦄</h2>
     <img id="savePreview" src="" alt="Unicorn preview">
     <p style="color:#888;font-size:0.85rem;margin-bottom:6px" id="saveName"></p>
-    <p style="color:#b06aff;font-size:0.72rem;margin-bottom:12px">📱 On a tablet/phone: tap <b>Save Picture</b>, then “Save Image” — or press &amp; hold the picture 💜</p>
-    <button class="action-btn save-btn" onclick="downloadUnicorn()">💾 Save Picture</button>
+    <p style="color:#b06aff;font-size:0.72rem;margin-bottom:12px">📱 On a tablet/phone: tap <b>Send</b>, then pick where to send or save it — or press &amp; hold the picture 💜</p>
+    <button class="action-btn save-btn" onclick="downloadUnicorn()">📤 Send</button>
     <button class="action-btn" style="background:#eee;color:#666" onclick="closeSaveModal()">Keep Playing</button>
   </div>
 </div>
@@ -829,7 +829,7 @@ const tabs = [
   { id: 'background', icon: '🖼️', label: 'Scene' },
   { id: 'effects', icon: '✨', label: 'Effects' },
   { id: 'pet', icon: '🐾', label: 'Pet' },
-  { id: 'save', icon: '💾', label: 'Save' },
+  { id: 'save', icon: '📤', label: 'Send' },
 ];
 
 const tools = {
@@ -934,12 +934,13 @@ const tools = {
     items: [
       { id: 'pet', icon: '🤗', label: 'Pet it!', cls: 'pet-btn', action: doPet },
       { id: 'twirl', icon: '💫', label: 'Twirl!', cls: 'pet-btn', action: doTwirl },
+      { id: 'reset', icon: '🔄', label: 'Start Over', cls: 'slime-btn', action: doReset },
     ]
   },
   save: {
     type: 'actions',
     items: [
-      { id: 'save', icon: '💾', label: 'Save my Unicorn!', cls: 'save-btn', action: saveUnicorn },
+      { id: 'save', icon: '📤', label: 'Send my Unicorn!', cls: 'save-btn', action: saveUnicorn },
     ]
   },
 };
@@ -1200,6 +1201,31 @@ function doTwirl() {
   showMood('💫');
   if (typeof sndSparkle === 'function') sndSparkle();
   spawnParticles(document.getElementById('unicornSvgWrap'), ['✨','💫','⭐','🦄'], 8);
+}
+
+// Reset — start over with a fresh default unicorn
+function doReset() {
+  state.unicornColor = '#ffffff';
+  state.maneColor = '#ff6fb7';
+  state.eyeStyle = 0;
+  state.accessories = [];
+  state.hasSlime = false;
+  state.hasGlitter = false;
+  state.isFluffy = false;
+  state.hornStyle = 'gold';
+  state.background = 'dreamy';
+  state.happiness = 70; state.energy = 50; state.sparkle = 30;
+  // clear all equipped / active highlights in the panels
+  document.querySelectorAll('.tool-item.equipped').forEach(e => e.classList.remove('equipped'));
+  document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.color-row').forEach(row => { const f = row.querySelector('.color-swatch'); if (f) f.classList.add('active'); });
+  applyBackground();
+  render();
+  triggerAnim('bounce');
+  showMood('✨');
+  if (typeof sndSparkle === 'function') sndSparkle();
+  spawnParticles(document.getElementById('unicornSvgWrap'), ['✨','🦄','💫'], 8);
+  persistPet();
 }
 
 // Fluffy — toggle a soft furry coat
