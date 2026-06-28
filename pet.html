@@ -132,6 +132,12 @@ body::before {
   25% { transform: rotate(-8deg) scale(1.1); }
   75% { transform: rotate(8deg) scale(1.1); }
 }
+.unicorn-container.twirl { animation: unicornTwirl 1.1s ease-in-out; }
+@keyframes unicornTwirl {
+  0%   { transform: perspective(700px) rotateY(0) scale(1); }
+  50%  { transform: perspective(700px) rotateY(180deg) scale(1.12); }
+  100% { transform: perspective(700px) rotateY(360deg) scale(1); }
+}
 .unicorn-container.coffee-drink {
   animation: coffeeDrink 1s ease;
 }
@@ -529,6 +535,17 @@ const state = {
   hasGlitter: false,
   petCount: 0,
   background: 'dreamy',
+  hornStyle: 'gold',
+  isFluffy: false,
+};
+
+// Magical horn colour styles
+const HORN_STYLES = {
+  gold:    ['#FFD700','#FFF8DC','#FFD700'],
+  rainbow: ['#ff4d6d','#ffd23f','#3ddc84','#4cc9f0','#b06aff'],
+  crystal: ['#aef3ff','#ffffff','#7fd8f5'],
+  candy:   ['#ff9ec9','#ffffff','#ff6fb7'],
+  mint:    ['#b8f5c8','#ffffff','#7ddf64'],
 };
 
 // Scene backgrounds for the pet stage
@@ -568,6 +585,24 @@ function loadPet() {
 function buildUnicornSVG() {
   const uc = state.unicornColor;
   const mc = state.maneColor;
+  // Horn colour gradient
+  const hcols = HORN_STYLES[state.hornStyle] || HORN_STYLES.gold;
+  const hornStops = hcols.map((c, i) => `<stop offset="${Math.round(i / (hcols.length - 1) * 100)}%" stop-color="${c}"/>`).join('');
+  // Fluffy / furry tufts (drawn BEHIND the body so they peek out at the edges)
+  let fluffyLayer = '';
+  if (state.isFluffy) {
+    const tufts = [];
+    const ring = (cx, cy, rx, ry, n) => {
+      for (let i = 0; i < n; i++) {
+        const a = i / n * Math.PI * 2;
+        const x = (cx + Math.cos(a) * rx).toFixed(1), y = (cy + Math.sin(a) * ry).toFixed(1);
+        tufts.push(`<circle cx="${x}" cy="${y}" r="${6 + (i % 2) * 3}" fill="${uc}" stroke="#e0d0f0" stroke-width="0.5"/>`);
+      }
+    };
+    ring(150, 232, 67, 51, 24); // body
+    ring(150, 130, 49, 43, 18); // head
+    fluffyLayer = `<g opacity="0.97">${tufts.join('')}</g>`;
+  }
   const eyeStyles = [
     // Big cute sparkly eyes (default)
     `<ellipse cx="131" cy="141" rx="11" ry="13" fill="#3a2540"/><ellipse cx="169" cy="141" rx="11" ry="13" fill="#3a2540"/>
@@ -644,6 +679,9 @@ function buildUnicornSVG() {
       <animate attributeName="r" values="130;145;130" dur="3s" repeatCount="indefinite"/>
     </circle>
 
+    <!-- FLUFFY FUR (behind body) -->
+    ${fluffyLayer}
+
     <!-- BODY -->
     <ellipse cx="150" cy="230" rx="65" ry="50" fill="${uc}" stroke="#e0d0f0" stroke-width="1.5"/>
 
@@ -682,9 +720,7 @@ function buildUnicornSVG() {
     <polygon points="150,28 142,78 158,78" fill="url(#hornGrad)" stroke="#e8c840" stroke-width="1"/>
     <defs>
       <linearGradient id="hornGrad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#FFD700"/>
-        <stop offset="50%" stop-color="#FFF8DC"/>
-        <stop offset="100%" stop-color="#FFD700"/>
+        ${hornStops}
       </linearGradient>
     </defs>
     <!-- Horn spiral -->
@@ -782,6 +818,7 @@ function updateBars() {
 // === TABS & TOOLS CONFIG ===
 const tabs = [
   { id: 'colors', icon: '🎨', label: 'Colors' },
+  { id: 'horn', icon: '🦄', label: 'Horn' },
   { id: 'hats', icon: '👑', label: 'Hats' },
   { id: 'glasses', icon: '👓', label: 'Glasses' },
   { id: 'jewels', icon: '💎', label: 'Jewels' },
@@ -800,6 +837,16 @@ const tools = {
     type: 'color-grid',
     bodyColors: ['#ffffff','#FFB6C1','#E6E6FA','#B0E0E6','#FFECD2','#F0FFF0','#FFF8DC','#FFC0CB','#DDA0DD'],
     maneColors: ['#ff6fb7','#b06aff','#6ac3ff','#ffe066','#7ddf64','#ff6b6b','#FF8C00','#E6E6FA','#333333','#FFD700'],
+  },
+  horn: {
+    type: 'items',
+    items: [
+      { id: 'gold', icon: '✨', label: 'Gold' },
+      { id: 'rainbow', icon: '🌈', label: 'Rainbow' },
+      { id: 'crystal', icon: '💎', label: 'Crystal' },
+      { id: 'candy', icon: '🍭', label: 'Candy' },
+      { id: 'mint', icon: '🌿', label: 'Mint' },
+    ]
   },
   hats: {
     type: 'items',
@@ -879,12 +926,14 @@ const tools = {
       { id: 'sparkle', icon: '✨', label: 'Sparkle!', cls: 'sparkle-btn', action: doSparkle },
       { id: 'glitter', icon: '💎', label: 'Glitter', cls: 'sparkle-btn', action: doGlitter },
       { id: 'slime', icon: '🟢', label: 'Slime!', cls: 'slime-btn', action: doSlime },
+      { id: 'fluffy', icon: '☁️', label: 'Fluffy!', cls: 'sparkle-btn', action: doFluffy },
     ]
   },
   pet: {
     type: 'actions',
     items: [
       { id: 'pet', icon: '🤗', label: 'Pet it!', cls: 'pet-btn', action: doPet },
+      { id: 'twirl', icon: '💫', label: 'Twirl!', cls: 'pet-btn', action: doTwirl },
     ]
   },
   save: {
@@ -1018,6 +1067,15 @@ function toggleAccessory(type, id, el) {
     persistPet();
     return;
   }
+  if (type === 'horn') {
+    state.hornStyle = id;
+    document.querySelectorAll('#panel-horn .tool-item').forEach(e => e.classList.remove('equipped'));
+    el.classList.add('equipped');
+    showMood('🦄');
+    spawnParticles(el, ['✨','🦄'], 4);
+    render();
+    return;
+  }
 
   if (idx >= 0 && state.accessories[idx].id === id) {
     state.accessories.splice(idx, 1);
@@ -1131,6 +1189,27 @@ function doPet() {
   state.eyeStyle = 1; // happy eyes
   render();
   setTimeout(() => { state.eyeStyle = prevEyes; render(); }, 1500);
+}
+
+// Twirl — a magical 3D-style spin so you can see your unicorn turn around
+function doTwirl() {
+  const c = document.getElementById('unicornContainer');
+  if (!c) return;
+  c.classList.remove('twirl'); void c.offsetWidth; c.classList.add('twirl');
+  setTimeout(() => c.classList.remove('twirl'), 1100);
+  showMood('💫');
+  if (typeof sndSparkle === 'function') sndSparkle();
+  spawnParticles(document.getElementById('unicornSvgWrap'), ['✨','💫','⭐','🦄'], 8);
+}
+
+// Fluffy — toggle a soft furry coat
+function doFluffy() {
+  state.isFluffy = !state.isFluffy;
+  showMood(state.isFluffy ? '☁️' : '✨');
+  triggerAnim('happy');
+  if (typeof sndSparkle === 'function') sndSparkle();
+  spawnParticles(document.getElementById('unicornSvgWrap'), ['☁️','🤍','✨'], 6);
+  render();
 }
 
 function doCoffee() {
