@@ -419,6 +419,7 @@ body.night #moon{opacity:1;transform:scale(1) rotate(0);pointer-events:auto;curs
     <button class="tool-btn" data-tool="text"><span class="t-ico">🔤</span>Text</button>
     <button class="tool-btn" data-tool="rainbow"><span class="t-ico">🌈</span>Rainbow</button>
     <button class="tool-btn" data-tool="eraser"><span class="t-ico">⬜</span>Erase</button>
+    <button class="tool-btn" id="undoBtn"><span class="t-ico">↩️</span>Undo</button>
     <button class="tool-btn" id="clearPaintBtn"><span class="t-ico">🗑️</span>Clear</button>
     <button class="tool-btn" id="shareDrawingBtn"><span class="t-ico">📤</span><span id="shareLabel">Send</span></button>
   </div>
@@ -772,6 +773,21 @@ const PaintCanvas = (() => {
     PT.lastX = px; PT.lastY = py;
   };
 
+  // ── Undo history (snapshot before each stroke) ──
+  const MAX_UNDO = 12;
+  const undoStack = [];
+  const snapshot = () => {
+    try {
+      undoStack.push(ctx.getImageData(0, 0, c.width, c.height));
+      if (undoStack.length > MAX_UNDO) undoStack.shift();
+    } catch (e) {}
+  };
+  const undo = () => {
+    if (!undoStack.length) { ctx.clearRect(0, 0, c.width, c.height); return false; }
+    try { ctx.putImageData(undoStack.pop(), 0, 0); } catch (e) {}
+    return true;
+  };
+
   // ── Public API ──
   let _lastPlace = 0;
   const start = (px, py) => {
@@ -781,6 +797,7 @@ const PaintCanvas = (() => {
       if (now - _lastPlace < 300) return;
       _lastPlace = now;
     }
+    snapshot(); // save the canvas before this stroke so it can be undone
     switch (PT.tool) {
       case 'brush':   startBrush(px, py, false); break;
       case 'rainbow': startBrush(px, py, true);  break;
@@ -803,9 +820,9 @@ const PaintCanvas = (() => {
     if (PT.tool === 'spray') stopSpray();
     else PT.drawing = false;
   };
-  const clear = () => { ctx.clearRect(0, 0, c.width, c.height); };
+  const clear = () => { snapshot(); ctx.clearRect(0, 0, c.width, c.height); };
 
-  return { start, move, stop, clear, isActive: () => PT.drawing };
+  return { start, move, stop, clear, undo, isActive: () => PT.drawing };
 })();
 
 // ── DOM Element Manager (prevents clutter) ──
@@ -1933,6 +1950,13 @@ function tapSparkle(px, py) {
       textPicker.classList.toggle('show', isText);
       if (isText) setTimeout(() => textInput.focus(), 50);
     });
+  });
+
+  // Undo button — step back one stroke
+  document.getElementById('undoBtn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    const ok = PaintCanvas.undo();
+    SFX.note(ok ? 520 : 300, 0.08, 'sine', 0.05);
   });
 
   // Clear button
