@@ -383,7 +383,7 @@ body.night #moon{opacity:1;transform:scale(1) rotate(0);pointer-events:auto;curs
 
 <!-- Milestone progress -->
 <div id="milestoneBar"><div id="milestoneFill"></div></div>
-<div id="milestoneLabel">Next: 🧚 Fairy Friend (5✨)</div>
+<div id="milestoneLabel">Next: 🎀 Bow (8✨)</div>
 
 <!-- Mode buttons -->
 <div id="modeBar">
@@ -833,17 +833,15 @@ const S = {
 };
 
 // Milestones with unlockables
+// Fewer, well-spaced surprises (non-blocking). Staggered with world unlocks
+// (12/30/55) so rewards never pile up, and the first comes quickly.
 const MILESTONES = [
-  { at: 5,   emoji: '🧚', name: 'Fairy Friend', msg: 'A fairy came to play!' },
-  { at: 10,  emoji: '🎀', name: 'Bow',         msg: 'Your unicorn got a bow!' },
-  { at: 20,  emoji: '🦋', name: 'Butterfly',   msg: 'Magic butterflies appeared!' },
-  { at: 25,  emoji: '👑', name: 'Crown',       msg: 'A royal crown appeared!' },
-  { at: 50,  emoji: '🌈', name: 'Rainbow',     msg: 'Rainbow magic unlocked!' },
-  { at: 75,  emoji: '💎', name: 'Diamond',     msg: 'A sparkling diamond!' },
-  { at: 100, emoji: '🏰', name: 'Castle',      msg: 'Your fairytale castle appeared!' },
-  { at: 130, emoji: '🏆', name: 'Champion',    msg: 'You are a Unicorn Champion!' },
-  { at: 170, emoji: '⭐', name: 'Superstar',   msg: 'SUPERSTAR mode!' },
-  { at: 220, emoji: '🦄', name: 'Unicorn Herd', msg: 'You built a unicorn herd!' },
+  { at: 8,   emoji: '🎀', name: 'Bow',          msg: 'Your unicorn got a bow!' },
+  { at: 22,  emoji: '🦋', name: 'Butterfly',    msg: 'Magic butterflies appeared!' },
+  { at: 45,  emoji: '🌈', name: 'Rainbow',      msg: 'Rainbow magic unlocked!' },
+  { at: 80,  emoji: '🏰', name: 'Castle',       msg: 'Your fairytale castle appeared!' },
+  { at: 130, emoji: '🏆', name: 'Champion',     msg: 'You are a Unicorn Champion!' },
+  { at: 200, emoji: '🦄', name: 'Unicorn Herd', msg: 'You built a unicorn herd!' },
 ];
 
 const scene = document.getElementById('gameScene');
@@ -1288,7 +1286,7 @@ const WORLDS = [
     drifters:['☁️','🌸','💗','🧚','🦋','🌈','⭐','🎈','🌷','🪽']
   },
   {
-    id:'candy', name:'Candy Land', icon:'🍭', unlock:20, dark:false, pitch:1.12,
+    id:'candy', name:'Candy Land', icon:'🍭', unlock:12, dark:false, pitch:1.12,
     bg:'linear-gradient(135deg,#fff0f5 0%,#ffd9ec 25%,#ffc8e0 45%,#ffe0b3 65%,#ffeaf4 85%,#fff0f5 100%)',
     bubbles:['🍭','🍬','🧁','🍩','🍰','🍪','🍫','🍓','🍒','🍦','🍮','🍯','🧃','🍡','🍧','🍨','🌈','⭐','🫧','💖','🍌','🍉'],
     stars:['🍬','⭐','✨','🍭','🌟','🧁','💖','🍩'],
@@ -1296,7 +1294,7 @@ const WORLDS = [
     drifters:['🍭','🍬','☁️','🍩','🌈','🧁','🍓','🍫']
   },
   {
-    id:'sea', name:'Under the Sea', icon:'🌊', unlock:40, dark:false, pitch:0.9,
+    id:'sea', name:'Under the Sea', icon:'🌊', unlock:30, dark:false, pitch:0.9,
     bg:'linear-gradient(160deg,#aef3ff 0%,#7fd8f5 25%,#4fb8e8 50%,#3a9fd6 72%,#bff3ff 100%)',
     bubbles:['🐠','🐟','🐬','🐙','🦀','🐚','🧜‍♀️','🌊','🐳','🐢','🦑','🪸','🐡','🦭','🦈','⭐','🫧','💎','🏝️','🦞'],
     stars:['⭐','🐚','✨','🫧','🌟','💎','🐠'],
@@ -1304,7 +1302,7 @@ const WORLDS = [
     drifters:['🫧','🐠','🐚','🌊','🐬','⭐','🐟','🪼']
   },
   {
-    id:'space', name:'Outer Space', icon:'🚀', unlock:60, dark:true, pitch:1.05,
+    id:'space', name:'Outer Space', icon:'🚀', unlock:55, dark:true, pitch:1.05,
     bg:'linear-gradient(160deg,#140a33 0%,#241258 32%,#3d2270 58%,#5a2d7a 82%,#140a33 100%)',
     bubbles:['🚀','🪐','⭐','🌙','👽','🛸','☄️','✨','🌟','🌠','💫','🌍','🔭','🌌','🌕','🌑','🪨','👾','🌞','💜'],
     stars:['⭐','🌟','✨','💫','🌠','🪐','🌙'],
