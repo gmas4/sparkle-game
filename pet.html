@@ -10,6 +10,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Unicorn Pet">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<script defer data-domain="sparklespop.com" src="https://plausible.io/js/script.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* === RESET & BASE === */
@@ -59,6 +60,19 @@ body::before {
   line-height: 1; transition: transform 0.15s;
 }
 .back-btn:active { transform: scale(0.9); }
+
+/* === RESET BUTTON (always visible, top-right) === */
+#resetBtn {
+  position: fixed; top: 10px; right: 10px; z-index: 60;
+  width: 46px; height: 46px; font-size: 1.3rem;
+  color: #fff; cursor: pointer;
+  background: linear-gradient(135deg, #6ac3ff, #b06aff);
+  border: 3px solid #fff; border-radius: 50%;
+  box-shadow: 0 4px 14px rgba(106,165,255,0.45);
+  display: flex; align-items: center; justify-content: center;
+  line-height: 1; transition: transform 0.15s;
+}
+#resetBtn:active { transform: scale(0.9) rotate(-90deg); }
 
 /* === HEADER === */
 .header {
@@ -474,6 +488,7 @@ body::before {
 <body>
 
 <a href="index.html" class="back-btn" title="Home">🏠</a>
+<button id="resetBtn" title="Start over">🔄</button>
 
 <!-- HEADER -->
 <div class="header">
@@ -1512,6 +1527,9 @@ showMood('🦄');
 // remember the name as she types it
 const nameInput = document.getElementById('unicornName');
 if (nameInput) nameInput.addEventListener('input', persistPet);
+// always-visible reset button
+const resetBtn = document.getElementById('resetBtn');
+if (resetBtn) resetBtn.addEventListener('click', (e) => { e.stopPropagation(); doReset(); });
 </script>
 </body>
 </html>
