@@ -88,7 +88,7 @@ iframe:not(#gameFrame),.watermark,[id*="badge"],[class*="watermark"]{display:non
 .star.collected{transition:all .4s ease-in;opacity:0;transform:scale(2)!important}
 
 /* === BUTTERFLY (flutters across, tap to catch) === */
-.butterfly{position:absolute;cursor:pointer;z-index:12;font-size:48px;filter:drop-shadow(0 4px 10px rgba(196,77,255,.4));animation:butterflyFly var(--fly-speed,9s) linear forwards}
+.butterfly{position:absolute;cursor:pointer;z-index:12;font-size:48px;filter:hue-rotate(var(--bhue,0deg)) saturate(var(--bsat,1.4)) drop-shadow(0 4px 10px rgba(196,77,255,.4));animation:butterflyFly var(--fly-speed,9s) linear forwards}
 @keyframes butterflyFly{
   0%{transform:translate(-120px,0) scaleX(var(--dir,1))}
   20%{transform:translate(20vw,-50px) scaleX(var(--dir,1))}
@@ -1717,6 +1717,8 @@ function spawnButterfly() {
   const el = document.createElement('div');
   el.className = 'butterfly';
   el.textContent = W.fliers[Math.floor(Math.random() * W.fliers.length)];
+  el.style.setProperty('--bhue', Math.floor(Math.random() * 360) + 'deg'); // random colour each time
+  el.style.setProperty('--bsat', (1.3 + Math.random() * 0.9).toFixed(2));
   const dir = Math.random() > 0.5 ? 1 : -1;
   const y = 90 + Math.random() * (innerHeight - 280);
   el.style.top = y + 'px';
