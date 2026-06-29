@@ -1314,6 +1314,18 @@ document.addEventListener('click', (e) => {
 
 // === GENTLE MAGIC SOUND ===
 let _ac;
+function unlockPetAudio() {
+  try {
+    if (!_ac) _ac = new (window.AudioContext || window.webkitAudioContext)();
+    if (_ac.state === 'suspended') _ac.resume();
+    // iOS/iPad unlock: silent 1-sample buffer inside the gesture
+    const b = _ac.createBuffer(1, 1, 22050);
+    const s = _ac.createBufferSource();
+    s.buffer = b; s.connect(_ac.destination); s.start(0);
+  } catch (e) {}
+}
+['pointerdown','touchend','click'].forEach(ev => window.addEventListener(ev, unlockPetAudio, { once: true, passive: true }));
+document.addEventListener('visibilitychange', () => { if (!document.hidden && _ac && _ac.state === 'suspended') _ac.resume(); });
 function chime(freqs, type='sine', vol=0.08, gap=70) {
   try {
     if (!_ac) _ac = new (window.AudioContext || window.webkitAudioContext)();

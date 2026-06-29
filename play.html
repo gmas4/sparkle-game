@@ -475,6 +475,12 @@ const SFX = (() => {
       ctx = new (window.AudioContext || window.webkitAudioContext)();
     }
     if (ctx.state === 'suspended') ctx.resume();
+    // iOS/iPad unlock: play a 1-sample silent buffer inside the user gesture
+    try {
+      const buf = ctx.createBuffer(1, 1, 22050);
+      const src = ctx.createBufferSource();
+      src.buffer = buf; src.connect(ctx.destination); src.start(0);
+    } catch (e) {}
   };
   const note = (f, d=0.15, type='sine', vol=0.1) => {
     if (!ctx) return;
@@ -494,6 +500,13 @@ const SFX = (() => {
   const startMusic = () => {
     if (!ctx || musicOn) return;
     musicOn = true;
+    // iOS won't make sound until the context is actually running, so build the
+    // music only once resume() has completed (resume is a no-op elsewhere).
+    if (ctx.state === 'suspended') ctx.resume().then(buildMusic).catch(buildMusic);
+    else buildMusic();
+  };
+  const buildMusic = () => {
+    if (!musicOn || !ctx) return;
     musicGain = ctx.createGain();
     musicGain.gain.setValueAtTime(0.0001, ctx.currentTime);
     musicGain.gain.linearRampToValueAtTime(1, ctx.currentTime + 2.5); // gentle fade-in
@@ -537,8 +550,13 @@ const SFX = (() => {
     setTimeout(() => nodes.forEach(n => { try { n.stop && n.stop(); } catch(e) {} }), 900);
   };
 
+  // iOS suspends audio when the tab is backgrounded — resume on return
+  const resume = () => { if (ctx && ctx.state === 'suspended') ctx.resume(); };
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) resume(); });
+
   return {
     init,
+    resume,
     note,
     slide(from, to, d=0.3, type='sine', vol=0.06) {
       if (!ctx) return;
@@ -567,6 +585,13 @@ const SFX = (() => {
     milestone(){ [523,659,784,1047,1319].forEach((n,i)=>setTimeout(()=>note(n, 0.4, 'sine', 0.08), i*100)); },
     collect() { note(1000+Math.random()*500, 0.1, 'sine', 0.06); }
   };
+})();
+
+// iOS/iPad: unlock the audio engine on the very first touch anywhere
+(function () {
+  const unlock = () => { SFX.init(); };
+  ['pointerdown', 'touchend', 'click'].forEach(ev =>
+    window.addEventListener(ev, unlock, { once: true, passive: true }));
 })();
 
 // ── Glitter Particle System ──
