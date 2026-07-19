@@ -47,7 +47,9 @@ body{
 
 .wrap{position:relative;z-index:1;max-width:720px;margin:0 auto;padding:clamp(28px,6vw,60px) 20px 50px}
 
-.back-link{display:inline-flex;align-items:center;gap:6px;color:#fff;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:clamp(13px,3vw,15px);text-decoration:none;text-shadow:0 2px 8px rgba(255,20,147,.4);margin-bottom:18px}
+.back-link{display:inline-flex;align-items:center;gap:7px;background:#fff;border-radius:999px;padding:9px 20px;color:#c2408e;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:clamp(13px,3vw,15px);text-decoration:none;box-shadow:0 5px 16px rgba(255,20,147,.2);transition:transform .18s ease,box-shadow .18s ease;margin-bottom:18px}
+.back-link:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(255,20,147,.3)}
+.back-link:active{transform:scale(.96)}
 
 .hero{text-align:center;margin-bottom:clamp(24px,5vw,36px)}
 .hero-unicorn{font-size:clamp(50px,12vw,80px);animation:bob 2.4s ease-in-out infinite;filter:drop-shadow(0 10px 30px rgba(255,20,147,.45))}
