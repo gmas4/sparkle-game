@@ -1553,5 +1553,82 @@ if (nameInput) nameInput.addEventListener('input', persistPet);
 const resetBtn = document.getElementById('resetBtn');
 if (resetBtn) resetBtn.addEventListener('click', (e) => { e.stopPropagation(); doReset(); });
 </script>
+
+<!-- ── 15-minute play reminder (shared across play surfaces) ── -->
+<div id="spTimerOverlay" class="sp-timer-overlay" style="display:none">
+  <div class="sp-timer-card">
+    <div class="sp-timer-unicorn">🦄</div>
+    <div class="sp-timer-title">15 minutes of magic! ✨</div>
+    <div class="sp-timer-desc">Great playing! Maybe stretch, get some water, or go show mummy what you made.</div>
+    <button type="button" class="sp-timer-btn" id="spTimerOkBtn">Okay! 💖</button>
+  </div>
+</div>
+<style>
+.sp-timer-overlay{position:fixed;inset:0;z-index:99999;background:rgba(90,20,70,.5);display:flex;align-items:center;justify-content:center;padding:20px;animation:spFadeIn .3s ease}
+@keyframes spFadeIn{from{opacity:0}to{opacity:1}}
+.sp-timer-card{background:#fff;border-radius:32px;padding:32px 28px;max-width:320px;text-align:center;box-shadow:0 20px 60px rgba(255,20,147,.4);border:5px solid #ffd6ea;font-family:'Fredoka','Baloo 2',sans-serif}
+.sp-timer-unicorn{font-size:64px;animation:spBob 1.6s ease-in-out infinite;filter:drop-shadow(0 8px 20px rgba(255,20,147,.4))}
+@keyframes spBob{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
+.sp-timer-title{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:22px;color:#ff1493;margin:10px 0 6px}
+.sp-timer-desc{font-size:14px;color:#8a5a80;line-height:1.5;margin-bottom:18px}
+.sp-timer-btn{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:16px;background:linear-gradient(135deg,#ff8ec4,#ff1493);color:#fff;border:none;padding:12px 30px;border-radius:999px;cursor:pointer;box-shadow:0 8px 20px rgba(255,20,147,.35)}
+</style>
+<script>
+(function(){
+  var DURATION = 15*60*1000;
+  var IDLE_RESET = 45*60*1000;
+  var KEY = 'sp_session_start';
+  var start = parseInt(localStorage.getItem(KEY) || '0', 10);
+  var now = Date.now();
+  if (!start || (now - start) > IDLE_RESET) {
+    start = now;
+    localStorage.setItem(KEY, String(start));
+  }
+  function chime(){
+    try{
+      var ctx = new (window.AudioContext || window.webkitAudioContext)();
+      [660, 880].forEach(function(freq, i){
+        var o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = 'sine'; o.frequency.value = freq;
+        g.gain.value = 0.0001;
+        o.connect(g); g.connect(ctx.destination);
+        var t = ctx.currentTime + i * 0.18;
+        g.gain.exponentialRampToValueAtTime(0.05, t + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.3);
+        o.start(t); o.stop(t + 0.32);
+      });
+    }catch(e){}
+  }
+  function showReminder(){
+    var overlay = document.getElementById('spTimerOverlay');
+    if (!overlay) return;
+    overlay.style.display = 'flex';
+    chime();
+  }
+  function scheduleCheck(){
+    var elapsed = Date.now() - start;
+    var remaining = DURATION - (elapsed % DURATION);
+    setTimeout(function(){
+      showReminder();
+      start = Date.now();
+      localStorage.setItem(KEY, String(start));
+      scheduleCheck();
+    }, remaining);
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    var btn = document.getElementById('spTimerOkBtn');
+    if (btn) btn.addEventListener('click', function(){
+      document.getElementById('spTimerOverlay').style.display = 'none';
+    });
+    var elapsedNow = Date.now() - start;
+    if (elapsedNow >= DURATION) {
+      showReminder();
+      start = Date.now();
+      localStorage.setItem(KEY, String(start));
+    }
+    scheduleCheck();
+  });
+})();
+</script>
 </body>
 </html>

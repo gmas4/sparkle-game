@@ -81,6 +81,7 @@ h1{z-index:1;font-family:'Baloo 2',sans-serif;font-weight:800;text-align:center;
   animation:cardPop .6s ease-out both;
 }
 .card:nth-child(2){animation-delay:.12s}
+.card:nth-child(3){animation-delay:.24s}
 @keyframes cardPop{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
 .card:hover{transform:translateY(-6px) scale(1.03)}
 .card:active{transform:scale(.95)}
@@ -91,11 +92,15 @@ h1{z-index:1;font-family:'Baloo 2',sans-serif;font-weight:800;text-align:center;
 .card.play .label{color:#ff1493}
 .card.pet{border-color:#c79bff}
 .card.pet .label{color:#9a4dff}
+.card.sticker{border-color:#ffcf5c}
+.card.sticker .label{color:#e08a00}
 .card.play{animation-name:cardPop,glowPink}
 @keyframes glowPink{0%,100%{box-shadow:0 10px 30px rgba(255,20,147,.3)}50%{box-shadow:0 10px 40px rgba(255,20,147,.55),0 0 40px rgba(255,140,210,.5)}}
 .card.play{animation:cardPop .6s ease-out both, glowPink 2s ease-in-out infinite 1s}
 .card.pet{animation:cardPop .6s ease-out .12s both, glowPurple 2s ease-in-out infinite 1.2s}
 @keyframes glowPurple{0%,100%{box-shadow:0 10px 30px rgba(176,106,255,.3)}50%{box-shadow:0 10px 40px rgba(176,106,255,.55),0 0 40px rgba(199,155,255,.5)}}
+.card.sticker{animation:cardPop .6s ease-out .24s both, glowGold 2s ease-in-out infinite 1.4s}
+@keyframes glowGold{0%,100%{box-shadow:0 10px 30px rgba(255,190,60,.3)}50%{box-shadow:0 10px 40px rgba(255,190,60,.55),0 0 40px rgba(255,207,92,.5)}}
 
 .footer-hint{z-index:1;font-size:clamp(11px,2.4vw,13px);color:rgba(255,255,255,.75);text-align:center}
 
@@ -122,6 +127,11 @@ h1{z-index:1;font-family:'Baloo 2',sans-serif;font-weight:800;text-align:center;
     <div class="emoji">🦄</div>
     <div class="label">My Pet</div>
     <div class="desc">Make & care for your unicorn</div>
+  </a>
+  <a class="card sticker" href="stickers.html">
+    <div class="emoji">🏷️</div>
+    <div class="label">Make Stickers</div>
+    <div class="desc">Design your very own sticker</div>
   </a>
 </div>
 

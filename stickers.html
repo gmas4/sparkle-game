@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>✨ Make Stickers ✨</title>
+<meta name="description" content="Design your very own sticker — pick a shape, a color, and decorate it however you like!">
+<meta name="theme-color" content="#ffcf5c">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>%F0%9F%8F%B7%EF%B8%8F</text></svg>">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Stickers">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta property="og:title" content="✨ Make Stickers ✨">
+<meta property="og:description" content="Design your very own SparklePop sticker!">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://sparklespop.com/stickers.html">
+<meta property="og:image" content="https://sparklespop.com/social-preview.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<script type="text/javascript">
+  (function(c,l,a,r,i,t,y){
+    c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+    t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+    y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+  })(window, document, "clarity", "script", "xe17nzw0s7");
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;min-height:100%;touch-action:manipulation;overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
+body{
+  font-family:'Fredoka','Baloo 2',sans-serif;
+  background:linear-gradient(135deg,#fff3d6 0%,#ffe0a3 18%,#ffcf5c 36%,#ff9ec4 60%,#d9a7ff 82%,#fff0f5 100%);
+  background-size:400% 400%;animation:auroraShift 22s ease infinite;
+  min-height:100vh;position:relative;overflow-x:hidden;
+  display:flex;flex-direction:column;align-items:center;padding:18px 16px 40px;
+  color:#5a2e55;
+}
+@keyframes auroraShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+
+.twinkles{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:
+  radial-gradient(2px 2px at 15% 20%,#fff,transparent),
+  radial-gradient(2px 2px at 70% 30%,#fff5fb,transparent),
+  radial-gradient(1.5px 1.5px at 40% 70%,#fff,transparent),
+  radial-gradient(2px 2px at 85% 65%,#ffe9f6,transparent),
+  radial-gradient(1.5px 1.5px at 25% 85%,#fff,transparent);
+  animation:twinkle 3.5s ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:.4}50%{opacity:1}}
+
+#floaters{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.floater{position:absolute;font-size:clamp(20px,4vw,32px);opacity:.65;animation:floatUp var(--ft,8s) ease-in-out infinite;filter:drop-shadow(0 4px 10px rgba(255,150,20,.25))}
+@keyframes floatUp{0%{transform:translateY(25px) rotate(-10deg);opacity:0}15%{opacity:.65}85%{opacity:.65}100%{transform:translateY(-45px) rotate(10deg);opacity:0}}
+
+.back-link{z-index:1;align-self:flex-start;display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.35);border:1.5px solid rgba(255,255,255,.5);border-radius:24px;padding:7px 16px;text-decoration:none;color:#8a4d00;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:clamp(12px,2.8vw,14px);margin-bottom:8px}
+
+h1{z-index:1;font-family:'Baloo 2',sans-serif;font-weight:800;text-align:center;line-height:1.1;
+  font-size:clamp(28px,7vw,42px);color:#fff;text-shadow:0 4px 16px rgba(224,138,0,.5);margin-bottom:2px}
+.subtitle{z-index:1;font-size:clamp(13px,3vw,16px);color:rgba(255,255,255,.95);text-align:center;margin-bottom:16px;font-weight:600}
+
+.sticker-frame{z-index:1;position:relative;margin-bottom:16px}
+#stickerCanvas{
+  width:clamp(220px,62vw,320px);height:clamp(220px,62vw,320px);
+  border-radius:50%;
+  box-shadow:0 16px 40px rgba(180,100,0,.35);
+  background:#fff;
+  touch-action:none;
+  cursor:pointer;
+}
+
+.panel{z-index:1;width:100%;max-width:420px;background:rgba(255,255,255,.92);border-radius:28px;border:4px solid #fff;box-shadow:0 10px 30px rgba(180,100,0,.2);padding:16px 16px 18px;margin-bottom:12px}
+.panel-label{font-family:'Baloo 2',sans-serif;font-weight:700;color:#e08a00;font-size:13px;margin-bottom:8px;text-align:center}
+.swatch-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+
+.shape-btn{font-size:30px;line-height:1;width:52px;height:52px;border-radius:16px;background:#fff7ea;border:3px solid #ffe4b3;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .12s ease}
+.shape-btn.selected{border-color:#ff1493;background:#fff0f8;transform:scale(1.08)}
+.shape-btn:active{transform:scale(.92)}
+
+.color-btn{width:38px;height:38px;border-radius:50%;border:3px solid #fff;box-shadow:0 3px 8px rgba(0,0,0,.15);cursor:pointer;transition:transform .12s ease}
+.color-btn.selected{border-color:#ff1493;transform:scale(1.15)}
+.color-btn:active{transform:scale(.9)}
+
+.deco-btn{font-size:26px;line-height:1;width:46px;height:46px;border-radius:50%;background:#fff7ea;border:3px solid #ffe4b3;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .12s ease}
+.deco-btn.selected{border-color:#9a4dff;background:#f5ecff;transform:scale(1.1);animation:decoPulse 1s ease-in-out infinite}
+@keyframes decoPulse{0%,100%{box-shadow:0 0 0 0 rgba(154,77,255,.4)}50%{box-shadow:0 0 0 8px rgba(154,77,255,0)}}
+.deco-btn:active{transform:scale(.92)}
+
+.hint{z-index:1;font-size:clamp(12px,2.8vw,14px);color:rgba(255,255,255,.95);text-align:center;margin-bottom:14px;font-weight:600}
+
+.actions{z-index:1;display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:10px}
+.act-btn{
+  display:inline-flex;align-items:center;gap:8px;text-decoration:none;border:none;cursor:pointer;
+  font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(14px,3.4vw,17px);
+  padding:13px 24px;border-radius:999px;transition:transform .15s ease;
+}
+.act-btn:active{transform:scale(.95)}
+.act-new{background:#fff;color:#9a4dff;border:2.5px solid #e8d4ff !important}
+.act-save{background:linear-gradient(135deg,#ff8ec4,#ff1493);color:#fff;box-shadow:0 8px 20px rgba(255,20,147,.35)}
+
+.footer-hint{z-index:1;font-size:clamp(11px,2.4vw,13px);color:rgba(255,255,255,.85);text-align:center;margin-top:6px}
+
+.pop-burst{position:fixed;pointer-events:none;font-size:18px;z-index:999;animation:popBurst .7s ease-out forwards}
+@keyframes popBurst{0%{transform:translate(-50%,-50%) scale(.5);opacity:1}100%{transform:translate(calc(-50% + var(--bx)),calc(-50% + var(--by))) scale(1.2);opacity:0}}
+</style>
+</head>
+<body>
+<div class="twinkles"></div>
+<div id="floaters"></div>
+
+<a class="back-link" href="play-hub.html">← Back</a>
+
+<h1>Make Stickers 🏷️</h1>
+<p class="subtitle">Pick a shape, pick a color, and decorate it your way!</p>
+
+<div class="sticker-frame">
+  <canvas id="stickerCanvas" width="480" height="480"></canvas>
+</div>
+
+<p class="hint">👆 Tap a sticker below, then tap your canvas to add it!</p>
+
+<div class="panel">
+  <div class="panel-label">🐾 Pick a shape</div>
+  <div class="swatch-row" id="shapeRow"></div>
+</div>
+
+<div class="panel">
+  <div class="panel-label">🎨 Pick a color</div>
+  <div class="swatch-row" id="colorRow"></div>
+</div>
+
+<div class="panel">
+  <div class="panel-label">✨ Add decorations</div>
+  <div class="swatch-row" id="decoRow"></div>
+</div>
+
+<div class="actions">
+  <button type="button" class="act-btn act-new" id="newStickerBtn">🔄 New Sticker</button>
+  <button type="button" class="act-btn act-save" id="saveStickerBtn">💾 Save Sticker</button>
+</div>
+
+<p class="footer-hint">✨ sparklespop.com ✨</p>
+
+<script>
+(function(){
+  const SHAPES = ['⭐','🐱','🦄','❤️','☁️','🌈','🐬','🍦','🌙','🐣'];
+  const COLORS = ['#ffd6ea','#ffe4b3','#d9f2c4','#c4e8ff','#e8d4ff','#ffffff','#ffb6d9','#b3e8ff'];
+  const DECOS  = ['✨','💖','⭐','🎀','👀','🌟','💎','🧡','🦋','🌸'];
+
+  const canvas = document.getElementById('stickerCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height, CX = W/2, CY = H/2, R = W/2 - 8;
+
+  const state = { base: SHAPES[0], bg: COLORS[0], decorations: [] };
+  let armedDeco = DECOS[0];
+
+  function render(){
+    ctx.clearRect(0,0,W,H);
+    // backdrop circle
+    ctx.beginPath();
+    ctx.arc(CX,CY,R,0,Math.PI*2);
+    ctx.fillStyle = state.bg;
+    ctx.fill();
+    // dashed sticker-cutout ring
+    ctx.save();
+    ctx.setLineDash([16,12]);
+    ctx.lineWidth = 6;
+    ctx.strokeStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(CX,CY,R-6,0,Math.PI*2);
+    ctx.stroke();
+    ctx.restore();
+    // base shape
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,.18)';
+    ctx.shadowBlur = 14;
+    ctx.font = (W*0.42) + 'px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(state.base, CX, CY);
+    ctx.restore();
+    // decorations
+    state.decorations.forEach(function(d){
+      ctx.save();
+      ctx.translate(d.x, d.y);
+      ctx.rotate(d.rot);
+      ctx.font = (W*0.11*d.scale) + 'px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(d.emoji, 0, 0);
+      ctx.restore();
+    });
+  }
+
+  function buildRow(container, items, onSelect, opts){
+    opts = opts || {};
+    items.forEach(function(item, i){
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = opts.colorMode ? 'color-btn' : (opts.decoMode ? 'deco-btn' : 'shape-btn');
+      if (opts.colorMode) btn.style.background = item;
+      else btn.textContent = item;
+      if (i === 0 && !opts.decoMode) btn.classList.add('selected');
+      if (opts.decoMode && item === armedDeco) btn.classList.add('selected');
+      btn.addEventListener('click', function(){
+        Array.from(container.children).forEach(function(c){ c.classList.remove('selected'); });
+        btn.classList.add('selected');
+        onSelect(item);
+      });
+      container.appendChild(btn);
+    });
+  }
+
+  const shapeRow = document.getElementById('shapeRow');
+  const colorRow = document.getElementById('colorRow');
+  const decoRow  = document.getElementById('decoRow');
+
+  buildRow(shapeRow, SHAPES, function(v){ state.base = v; render(); });
+  buildRow(colorRow, COLORS, function(v){ state.bg = v; render(); }, { colorMode:true });
+  buildRow(decoRow, DECOS, function(v){ armedDeco = v; }, { decoMode:true });
+
+  function popSound(){
+    try{
+      const ctx2 = new (window.AudioContext || window.webkitAudioContext)();
+      const o = ctx2.createOscillator(), g = ctx2.createGain();
+      o.type = 'sine'; o.frequency.value = 520;
+      g.gain.value = 0.0001;
+      o.connect(g); g.connect(ctx2.destination);
+      const t = ctx2.currentTime;
+      g.gain.exponentialRampToValueAtTime(0.06, t + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
+      o.start(t); o.stop(t + 0.2);
+    }catch(e){}
+  }
+
+  function placeAt(clientX, clientY){
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = W / rect.width, scaleY = H / rect.height;
+    const x = (clientX - rect.left) * scaleX;
+    const y = (clientY - rect.top) * scaleY;
+    state.decorations.push({
+      emoji: armedDeco,
+      x: x, y: y,
+      rot: (Math.random()*30 - 15) * Math.PI/180,
+      scale: 0.85 + Math.random()*0.3
+    });
+    render();
+    popSound();
+  }
+
+  canvas.addEventListener('click', function(e){ placeAt(e.clientX, e.clientY); });
+  canvas.addEventListener('touchstart', function(e){
+    if (!e.touches || !e.touches[0]) return;
+    e.preventDefault();
+    placeAt(e.touches[0].clientX, e.touches[0].clientY);
+  }, { passive:false });
+
+  document.getElementById('newStickerBtn').addEventListener('click', function(){
+    const shapeIdx = Math.floor(Math.random()*SHAPES.length);
+    const colorIdx = Math.floor(Math.random()*COLORS.length);
+    state.base = SHAPES[shapeIdx];
+    state.bg = COLORS[colorIdx];
+    state.decorations = [];
+    Array.from(shapeRow.children).forEach(function(c,i){ c.classList.toggle('selected', i === shapeIdx); });
+    Array.from(colorRow.children).forEach(function(c,i){ c.classList.toggle('selected', i === colorIdx); });
+    render();
+    burst(window.innerWidth/2, window.innerHeight*0.35);
+  });
+
+  function burst(cx, cy){
+    const EM = ['✨','🎉','🌟','💫'];
+    for (let i=0;i<8;i++){
+      const el = document.createElement('div');
+      el.className = 'pop-burst';
+      el.textContent = EM[i % EM.length];
+      const angle = (Math.PI*2*i/8) + Math.random()*0.4;
+      const dist = 40 + Math.random()*30;
+      el.style.left = cx + 'px';
+      el.style.top = cy + 'px';
+      el.style.setProperty('--bx', Math.cos(angle)*dist + 'px');
+      el.style.setProperty('--by', Math.sin(angle)*dist + 'px');
+      document.body.appendChild(el);
+      setTimeout(function(){ el.remove(); }, 720);
+    }
+  }
+
+  document.getElementById('saveStickerBtn').addEventListener('click', function(){
+    const pad = 70;
+    const off = document.createElement('canvas');
+    off.width = W;
+    off.height = H + pad;
+    const octx = off.getContext('2d');
+    octx.fillStyle = '#fff';
+    octx.fillRect(0,0,off.width,off.height);
+    octx.drawImage(canvas, 0, 0);
+    octx.textAlign = 'center';
+    octx.fillStyle = '#ff1493';
+    octx.font = "bold 22px 'Baloo 2', sans-serif";
+    octx.fillText('Made with ✨ SparklePop', W/2, H + 30);
+    octx.fillStyle = '#9a4dff';
+    octx.font = "bold 16px 'Baloo 2', sans-serif";
+    octx.fillText('sparklespop.com · 📷 @sparklespop4', W/2, H + 54);
+
+    const dataUrl = off.toDataURL('image/png');
+    burst(window.innerWidth/2, window.innerHeight*0.3);
+
+    fetch(dataUrl).then(function(r){ return r.blob(); }).then(function(blob){
+      const file = new File([blob], 'my-sparklepop-sticker.png', { type: 'image/png' });
+      if (navigator.canShare && navigator.canShare({ files:[file] })) {
+        navigator.share({ files:[file], title:'My SparklePop Sticker', text:'Made with SparklePop! sparklespop.com' }).catch(function(){ downloadFallback(dataUrl); });
+      } else {
+        downloadFallback(dataUrl);
+      }
+    }).catch(function(){ downloadFallback(dataUrl); });
+  });
+
+  function downloadFallback(dataUrl){
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = 'my-sparklepop-sticker.png';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
+  render();
+})();
+</script>
+
+<script>
+// floating decorative emojis
+(function(){
+  const box = document.getElementById('floaters');
+  const EM = ['✨','🏷️','🌟','💎','🎀','⭐','🧡','💫'];
+  for(let i=0;i<10;i++){
+    const f=document.createElement('div');
+    f.className='floater';
+    f.textContent=EM[i%EM.length];
+    f.style.left=(4+Math.random()*92)+'%';
+    f.style.top=(8+Math.random()*84)+'%';
+    f.style.setProperty('--ft',(7+Math.random()*6)+'s');
+    f.style.animationDelay=(-Math.random()*7)+'s';
+    box.appendChild(f);
+  }
+})();
+</script>
+
+<!-- ── 15-minute play reminder (shared across play surfaces) ── -->
+<div id="spTimerOverlay" class="sp-timer-overlay" style="display:none">
+  <div class="sp-timer-card">
+    <div class="sp-timer-unicorn">🦄</div>
+    <div class="sp-timer-title">15 minutes of magic! ✨</div>
+    <div class="sp-timer-desc">Great playing! Maybe stretch, get some water, or go show mummy what you made.</div>
+    <button type="button" class="sp-timer-btn" id="spTimerOkBtn">Okay! 💖</button>
+  </div>
+</div>
+<style>
+.sp-timer-overlay{position:fixed;inset:0;z-index:99999;background:rgba(90,20,70,.5);display:flex;align-items:center;justify-content:center;padding:20px;animation:spFadeIn .3s ease}
+@keyframes spFadeIn{from{opacity:0}to{opacity:1}}
+.sp-timer-card{background:#fff;border-radius:32px;padding:32px 28px;max-width:320px;text-align:center;box-shadow:0 20px 60px rgba(255,20,147,.4);border:5px solid #ffd6ea;font-family:'Fredoka','Baloo 2',sans-serif}
+.sp-timer-unicorn{font-size:64px;animation:spBob 1.6s ease-in-out infinite;filter:drop-shadow(0 8px 20px rgba(255,20,147,.4))}
+@keyframes spBob{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
+.sp-timer-title{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:22px;color:#ff1493;margin:10px 0 6px}
+.sp-timer-desc{font-size:14px;color:#8a5a80;line-height:1.5;margin-bottom:18px}
+.sp-timer-btn{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:16px;background:linear-gradient(135deg,#ff8ec4,#ff1493);color:#fff;border:none;padding:12px 30px;border-radius:999px;cursor:pointer;box-shadow:0 8px 20px rgba(255,20,147,.35)}
+</style>
+<script>
+(function(){
+  var DURATION = 15*60*1000;
+  var IDLE_RESET = 45*60*1000;
+  var KEY = 'sp_session_start';
+  var start = parseInt(localStorage.getItem(KEY) || '0', 10);
+  var now = Date.now();
+  if (!start || (now - start) > IDLE_RESET) {
+    start = now;
+    localStorage.setItem(KEY, String(start));
+  }
+  function chime(){
+    try{
+      var ctx3 = new (window.AudioContext || window.webkitAudioContext)();
+      [660, 880].forEach(function(freq, i){
+        var o = ctx3.createOscillator(), g = ctx3.createGain();
+        o.type = 'sine'; o.frequency.value = freq;
+        g.gain.value = 0.0001;
+        o.connect(g); g.connect(ctx3.destination);
+        var t = ctx3.currentTime + i * 0.18;
+        g.gain.exponentialRampToValueAtTime(0.05, t + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.3);
+        o.start(t); o.stop(t + 0.32);
+      });
+    }catch(e){}
+  }
+  function showReminder(){
+    var overlay = document.getElementById('spTimerOverlay');
+    if (!overlay) return;
+    overlay.style.display = 'flex';
+    chime();
+  }
+  function scheduleCheck(){
+    var elapsed = Date.now() - start;
+    var remaining = DURATION - (elapsed % DURATION);
+    setTimeout(function(){
+      showReminder();
+      start = Date.now();
+      localStorage.setItem(KEY, String(start));
+      scheduleCheck();
+    }, remaining);
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    var btn = document.getElementById('spTimerOkBtn');
+    if (btn) btn.addEventListener('click', function(){
+      document.getElementById('spTimerOverlay').style.display = 'none';
+    });
+    var elapsedNow = Date.now() - start;
+    if (elapsedNow >= DURATION) {
+      showReminder();
+      start = Date.now();
+      localStorage.setItem(KEY, String(start));
+    }
+    scheduleCheck();
+  });
+})();
+</script>
+</body>
+</html>
