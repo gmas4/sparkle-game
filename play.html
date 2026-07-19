@@ -669,7 +669,16 @@ const STAMP_EMOJIS = [
 const PaintCanvas = (() => {
   const c = document.getElementById('paintCanvas');
   const ctx = c.getContext('2d');
-  const resize = () => { c.width = innerWidth; c.height = innerHeight; };
+  // Resizing a canvas clears it. On mobile, opening the text keyboard fires a
+  // resize — which used to wipe the painting. Preserve the artwork across resizes.
+  const resize = () => {
+    const w = innerWidth, h = innerHeight;
+    if (c.width === w && c.height === h) return;      // nothing actually changed
+    let snap = null;
+    try { if (c.width && c.height) snap = ctx.getImageData(0, 0, c.width, c.height); } catch (e) {}
+    c.width = w; c.height = h;
+    if (snap) { try { ctx.putImageData(snap, 0, 0); } catch (e) {} }
+  };
   addEventListener('resize', resize); resize();
 
   // ── Brush / Rainbow ──
