@@ -104,7 +104,13 @@ h1{font-family:'Baloo 2',sans-serif;font-weight:800;line-height:1.05;
 .story-badge:active{transform:scale(.92)}
 .burst-heart{position:fixed;pointer-events:none;font-size:20px;z-index:999;animation:burstFloat .9s ease-out forwards}
 @keyframes burstFloat{0%{transform:translate(-50%,-50%) scale(.6);opacity:1}100%{transform:translate(calc(-50% + var(--bx)),calc(-50% + var(--by))) scale(1.3);opacity:0}}
-.story-photo{display:block;width:clamp(150px,42vw,200px);height:auto;aspect-ratio:1;object-fit:cover;border-radius:50%;margin:4px auto 20px;box-shadow:0 10px 28px rgba(255,20,147,.3);border:4px solid #fff}
+.photo-btn{display:block;margin:4px auto 20px;padding:0;border:none;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent;position:relative}
+.story-photo{display:block;width:clamp(150px,42vw,200px);height:auto;aspect-ratio:1;object-fit:cover;border-radius:50%;margin:0 auto;box-shadow:0 10px 28px rgba(255,20,147,.3);border:4px solid #fff;transition:transform .2s ease}
+.photo-btn:active .story-photo{transform:scale(.93)}
+.photo-btn.wiggling .story-photo{animation:photoWiggle .6s ease}
+@keyframes photoWiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-6deg) scale(1.05)}75%{transform:rotate(6deg) scale(1.05)}}
+.photo-bubble{position:absolute;left:50%;top:-14px;transform:translate(-50%,-100%) scale(.6);background:#fff;color:#ff1493;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:14px;padding:8px 16px;border-radius:999px;border:2.5px solid #ffb6d9;box-shadow:0 8px 20px rgba(255,20,147,.3);white-space:nowrap;opacity:0;pointer-events:none;animation:bubblePop 1.6s ease forwards}
+@keyframes bubblePop{0%{opacity:0;transform:translate(-50%,-100%) scale(.6)}15%{opacity:1;transform:translate(-50%,-115%) scale(1.05)}25%{transform:translate(-50%,-110%) scale(1)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-130%) scale(.95)}}
 .story h2{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(24px,5.5vw,32px);color:#ff1493;margin-bottom:14px;line-height:1.2}
 .story p{font-size:clamp(15px,3.4vw,17px);line-height:1.65;color:#5a2e55;margin-bottom:14px}
 .story p:last-child{margin-bottom:0}
@@ -171,7 +177,9 @@ footer{text-align:center;margin-top:clamp(24px,5vw,36px)}
   </section>
 
   <section class="card-section story">
-    <img class="story-photo" src="anya-and-giti.jpg" alt="Giti and her daughter Anya, hand-illustrated in a warm, sparkly style" width="200" height="200" loading="lazy">
+    <button type="button" class="photo-btn" id="familyPhotoBtn">
+      <img class="story-photo" src="anya-and-giti.jpg" alt="Giti and her daughter Anya, hand-illustrated in a warm, sparkly style" width="200" height="200" loading="lazy">
+    </button>
     <button type="button" class="story-badge" id="storyBadgeBtn">💖 Our story</button>
     <h2>Hi, I'm Giti — a mom who made this for her daughter.</h2>
     <p>SparklePop began as a few taps and swirls of color, built one evening so my daughter had somewhere gentle and joyful to play — no ads, no pressure, nothing scary. Just sparkles and a little world that was entirely hers.</p>
@@ -255,6 +263,41 @@ footer{text-align:center;margin-top:clamp(24px,5vw,36px)}
       h.textContent = HEARTS[i % HEARTS.length];
       const angle = (Math.PI*2*i/8) + Math.random()*0.4;
       const dist = 44 + Math.random()*30;
+      h.style.left = cx + 'px';
+      h.style.top = cy + 'px';
+      h.style.setProperty('--bx', Math.cos(angle)*dist + 'px');
+      h.style.setProperty('--by', Math.sin(angle)*dist + 'px');
+      document.body.appendChild(h);
+      setTimeout(()=>h.remove(), 950);
+    }
+  });
+})();
+
+(function(){
+  const btn = document.getElementById('familyPhotoBtn');
+  if(!btn) return;
+  const CONFETTI = ['🎉','✨','🌈','💖','🦄','🧡'];
+  const GREETINGS = ['Hi from us! 👋','That\'s us! 💕','Anya says hi!','Hehe, hi! 🦄'];
+  btn.addEventListener('click', function(){
+    btn.classList.remove('wiggling');
+    void btn.offsetWidth;
+    btn.classList.add('wiggling');
+    setTimeout(()=>btn.classList.remove('wiggling'), 650);
+
+    const bubble = document.createElement('div');
+    bubble.className = 'photo-bubble';
+    bubble.textContent = GREETINGS[Math.floor(Math.random()*GREETINGS.length)];
+    btn.appendChild(bubble);
+    setTimeout(()=>bubble.remove(), 1650);
+
+    const rect = btn.getBoundingClientRect();
+    const cx = rect.left + rect.width/2, cy = rect.top + rect.height/2;
+    for(let i=0;i<10;i++){
+      const h = document.createElement('div');
+      h.className = 'burst-heart';
+      h.textContent = CONFETTI[i % CONFETTI.length];
+      const angle = (Math.PI*2*i/10) + Math.random()*0.35;
+      const dist = 55 + Math.random()*40;
       h.style.left = cx + 'px';
       h.style.top = cy + 'px';
       h.style.setProperty('--bx', Math.cos(angle)*dist + 'px');
