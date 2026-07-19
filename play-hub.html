@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>✨ Sparkle Magic — Play ✨</title>
+<meta name="description" content="Sparkle Magic — a magical world for little ones. Play sparkle games, or make and care for your very own unicorn pet!">
+<meta name="theme-color" content="#ff69b4">
+
+<!-- Favicon -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>%F0%9F%A6%84</text></svg>">
+
+<!-- Add to Home Screen -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Sparkle">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+<!-- Social share -->
+<meta property="og:title" content="✨ Sparkle Magic ✨">
+<meta property="og:description" content="Play sparkle games, or make and care for your very own unicorn pet!">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://sparklespop.com/play-hub.html">
+<meta property="og:image" content="https://sparklespop.com/social-preview.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="✨ Sparkle Magic ✨">
+<meta name="twitter:image" content="https://sparklespop.com/social-preview.png">
+
+<script type="text/javascript">
+  (function(c,l,a,r,i,t,y){
+    c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+    t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+    y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+  })(window, document, "clarity", "script", "xe17nzw0s7");
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;touch-action:manipulation;overscroll-behavior:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+body{
+  font-family:'Fredoka','Baloo 2',sans-serif;
+  background:linear-gradient(135deg,#ffe0f0 0%,#ffb6d9 18%,#ff8ec4 36%,#d9a7ff 54%,#a7c8ff 72%,#fff0f5 100%);
+  background-size:400% 400%;animation:auroraShift 20s ease infinite;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:clamp(10px,3vh,26px);padding:20px;position:relative;
+}
+@keyframes auroraShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+
+/* twinkles */
+.twinkles{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:
+  radial-gradient(2px 2px at 15% 20%,#fff,transparent),
+  radial-gradient(2px 2px at 70% 30%,#fff5fb,transparent),
+  radial-gradient(1.5px 1.5px at 40% 70%,#fff,transparent),
+  radial-gradient(2px 2px at 85% 65%,#ffe9f6,transparent),
+  radial-gradient(1.5px 1.5px at 25% 85%,#fff,transparent);
+  animation:twinkle 3.5s ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:.4}50%{opacity:1}}
+
+/* floating emojis */
+#floaters{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.floater{position:absolute;font-size:clamp(24px,5vw,40px);opacity:.85;animation:floatUp var(--ft,7s) ease-in-out infinite;filter:drop-shadow(0 4px 10px rgba(255,20,147,.3))}
+@keyframes floatUp{0%{transform:translateY(25px) rotate(-10deg);opacity:0}15%{opacity:.85}85%{opacity:.85}100%{transform:translateY(-45px) rotate(10deg);opacity:0}}
+
+.hero-unicorn{font-size:clamp(70px,16vw,120px);z-index:1;animation:bob 2s ease-in-out infinite;filter:drop-shadow(0 10px 30px rgba(255,20,147,.5))}
+@keyframes bob{0%,100%{transform:rotate(-5deg) scale(1)}50%{transform:rotate(5deg) scale(1.05)}}
+
+h1{z-index:1;font-family:'Baloo 2',sans-serif;font-weight:800;text-align:center;line-height:1.05;
+  font-size:clamp(34px,9vw,64px);color:#fff;text-shadow:0 4px 16px rgba(255,20,147,.5);animation:floatH 3s ease-in-out infinite}
+@keyframes floatH{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.subtitle{z-index:1;font-size:clamp(14px,3vw,18px);color:rgba(255,255,255,.9);text-align:center;margin-top:-6px}
+
+.cards{z-index:1;display:flex;gap:clamp(14px,5vw,30px);flex-wrap:wrap;justify-content:center;margin-top:6px}
+.card{
+  width:clamp(140px,40vw,210px);min-height:clamp(150px,32vh,230px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  text-decoration:none;border-radius:32px;padding:22px 14px;cursor:pointer;
+  background:rgba(255,255,255,.92);border:5px solid #fff;
+  box-shadow:0 10px 30px rgba(255,20,147,.3);
+  transition:transform .18s ease, box-shadow .18s ease;
+  animation:cardPop .6s ease-out both;
+}
+.card:nth-child(2){animation-delay:.12s}
+@keyframes cardPop{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
+.card:hover{transform:translateY(-6px) scale(1.03)}
+.card:active{transform:scale(.95)}
+.card .emoji{font-size:clamp(54px,12vw,84px);line-height:1;filter:drop-shadow(0 6px 14px rgba(255,20,147,.35))}
+.card .label{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(18px,4.5vw,26px)}
+.card .desc{font-size:clamp(11px,2.6vw,14px);color:#a06; text-align:center;opacity:.8;line-height:1.2}
+.card.play{border-color:#ff8ec4}
+.card.play .label{color:#ff1493}
+.card.pet{border-color:#c79bff}
+.card.pet .label{color:#9a4dff}
+.card.play{animation-name:cardPop,glowPink}
+@keyframes glowPink{0%,100%{box-shadow:0 10px 30px rgba(255,20,147,.3)}50%{box-shadow:0 10px 40px rgba(255,20,147,.55),0 0 40px rgba(255,140,210,.5)}}
+.card.play{animation:cardPop .6s ease-out both, glowPink 2s ease-in-out infinite 1s}
+.card.pet{animation:cardPop .6s ease-out .12s both, glowPurple 2s ease-in-out infinite 1.2s}
+@keyframes glowPurple{0%,100%{box-shadow:0 10px 30px rgba(176,106,255,.3)}50%{box-shadow:0 10px 40px rgba(176,106,255,.55),0 0 40px rgba(199,155,255,.5)}}
+
+.footer-hint{z-index:1;font-size:clamp(11px,2.4vw,13px);color:rgba(255,255,255,.75);text-align:center}
+
+/* Back to story link — parent-facing, bottom of page */
+.back-link{z-index:1;display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.18);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1.5px solid rgba(255,255,255,.35);border-radius:24px;padding:7px 16px;text-decoration:none;color:#fff;font-family:'Fredoka','Baloo 2',sans-serif;font-size:clamp(12px,2.8vw,15px);font-weight:600;opacity:.8;transition:opacity .2s, transform .2s;margin-top:4px}
+.back-link:hover,.back-link:active{opacity:1;transform:scale(1.04)}
+</style>
+</head>
+<body>
+<div class="twinkles"></div>
+<div id="floaters"></div>
+
+<div class="hero-unicorn">🦄</div>
+<h1>Sparkle Magic</h1>
+<p class="subtitle">Pick your magic, little one! ✨</p>
+
+<div class="cards">
+  <a class="card play" href="play.html">
+    <div class="emoji">✨</div>
+    <div class="label">Play</div>
+    <div class="desc">Tap, paint & explore magic worlds</div>
+  </a>
+  <a class="card pet" href="pet.html">
+    <div class="emoji">🦄</div>
+    <div class="label">My Pet</div>
+    <div class="desc">Make & care for your unicorn</div>
+  </a>
+</div>
+
+<p class="footer-hint">✨ sparklespop.com ✨</p>
+<a class="back-link" href="index.html">← Back to our story</a>
+
+<script>
+// floating magical emojis
+(function(){
+  const box = document.getElementById('floaters');
+  const EM = ['✨','🦄','🌈','💖','⭐','🧚','🦋','👑','💎','🌸','🪄','🌟','🎀','🍭','🏰','🐬','🚀','🪐'];
+  for(let i=0;i<16;i++){
+    const f=document.createElement('div');
+    f.className='floater';
+    f.textContent=EM[i%EM.length];
+    f.style.left=(4+Math.random()*92)+'%';
+    f.style.top=(8+Math.random()*84)+'%';
+    f.style.setProperty('--ft',(5+Math.random()*5)+'s');
+    f.style.animationDelay=(-Math.random()*5)+'s';
+    box.appendChild(f);
+  }
+})();
+</script>
+</body>
+</html>

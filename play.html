@@ -2012,9 +2012,11 @@ function tapSparkle(px, py) {
     const step = 44;
     for (let x = step/2; x < W; x += step) { o.fillText(border[(x/step|0)%3], x, 22); o.fillText(border[(x/step|0)%3], x, H-46); }
     for (let y = step/2; y < H; y += step) { o.fillText(border[(y/step|0)%3], 22, y); o.fillText(border[(y/step|0)%3], W-22, y); }
-    // bottom caption
-    o.fillStyle = '#ff1493'; o.font = "bold 22px 'Baloo 2', sans-serif";
-    o.fillText('Made with ✨ Sparkle Unicorn Magic Garden · sparklespop.com', W/2, H - 20);
+    // bottom caption — two lines: game credit + instagram handle
+    o.fillStyle = '#ff1493'; o.font = "bold 20px 'Baloo 2', sans-serif";
+    o.fillText('Made with ✨ Sparkle Unicorn Magic Garden · sparklespop.com', W/2, H - 36);
+    o.fillStyle = '#9a4dff'; o.font = "bold 17px 'Baloo 2', sans-serif";
+    o.fillText('Follow us 📷 @sparklespop on Instagram', W/2, H - 16);
     if (unicornName) { o.fillStyle = '#9a4dff'; o.font = "bold 26px 'Baloo 2', sans-serif"; o.fillText(`Painted by ${unicornName} 🎨`, W/2, 60); }
 
     const finish = () => { SFX.milestone(); floatText('Sent! 💖', innerWidth/2, innerHeight*0.4, { color:'#fff', duration:1500 }); };

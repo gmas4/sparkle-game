@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>✨ Sparkle Magic ✨</title>
-<meta name="description" content="Sparkle Magic — a magical world for little ones. Play sparkle games, or make and care for your very own unicorn pet!">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>✨ SparklePop — A Little World of Magic, Made by a Mom for Her Daughter ✨</title>
+<meta name="description" content="SparklePop is a free, ad-free play space for toddlers — painting, unicorns, and gentle magic. Made by a mom for her daughter, and shared with every family who wants the same.">
 <meta name="theme-color" content="#ff69b4">
 
 <!-- Favicon -->
@@ -14,17 +14,17 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Sparkle">
+<meta name="apple-mobile-web-app-title" content="SparklePop">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 
 <!-- Social share -->
-<meta property="og:title" content="✨ Sparkle Magic ✨">
-<meta property="og:description" content="Play sparkle games, or make and care for your very own unicorn pet!">
+<meta property="og:title" content="✨ SparklePop ✨">
+<meta property="og:description" content="A little world of magic, made by a mom for her daughter — free, ad-free play for toddlers.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://sparklespop.com">
 <meta property="og:image" content="https://sparklespop.com/social-preview.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="✨ Sparkle Magic ✨">
+<meta name="twitter:title" content="✨ SparklePop ✨">
 <meta name="twitter:image" content="https://sparklespop.com/social-preview.png">
 
 <script type="text/javascript">
@@ -37,13 +37,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;height:100%;overflow:hidden;touch-action:manipulation;overscroll-behavior:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
 body{
   font-family:'Fredoka','Baloo 2',sans-serif;
   background:linear-gradient(135deg,#ffe0f0 0%,#ffb6d9 18%,#ff8ec4 36%,#d9a7ff 54%,#a7c8ff 72%,#fff0f5 100%);
-  background-size:400% 400%;animation:auroraShift 20s ease infinite;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:clamp(10px,3vh,26px);padding:20px;position:relative;
+  background-size:400% 400%;animation:auroraShift 25s ease infinite;
+  color:#5a2e55;
+  min-height:100vh;
+  position:relative;
+  overflow-x:hidden;
 }
 @keyframes auroraShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
 
@@ -57,85 +59,170 @@ body{
   animation:twinkle 3.5s ease-in-out infinite}
 @keyframes twinkle{0%,100%{opacity:.4}50%{opacity:1}}
 
-/* floating emojis */
 #floaters{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
-.floater{position:absolute;font-size:clamp(24px,5vw,40px);opacity:.85;animation:floatUp var(--ft,7s) ease-in-out infinite;filter:drop-shadow(0 4px 10px rgba(255,20,147,.3))}
-@keyframes floatUp{0%{transform:translateY(25px) rotate(-10deg);opacity:0}15%{opacity:.85}85%{opacity:.85}100%{transform:translateY(-45px) rotate(10deg);opacity:0}}
+.floater{position:absolute;font-size:clamp(20px,4vw,34px);opacity:.7;animation:floatUp var(--ft,9s) ease-in-out infinite;filter:drop-shadow(0 4px 10px rgba(255,20,147,.25))}
+@keyframes floatUp{0%{transform:translateY(25px) rotate(-10deg);opacity:0}15%{opacity:.7}85%{opacity:.7}100%{transform:translateY(-45px) rotate(10deg);opacity:0}}
 
-.hero-unicorn{font-size:clamp(70px,16vw,120px);z-index:1;animation:bob 2s ease-in-out infinite;filter:drop-shadow(0 10px 30px rgba(255,20,147,.5))}
-@keyframes bob{0%,100%{transform:rotate(-5deg) scale(1)}50%{transform:rotate(5deg) scale(1.05)}}
+.wrap{position:relative;z-index:1;max-width:720px;margin:0 auto;padding:clamp(28px,6vw,60px) 20px 40px}
 
-h1{z-index:1;font-family:'Baloo 2',sans-serif;font-weight:800;text-align:center;line-height:1.05;
-  font-size:clamp(34px,9vw,64px);color:#fff;text-shadow:0 4px 16px rgba(255,20,147,.5);animation:floatH 3s ease-in-out infinite}
-@keyframes floatH{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-.subtitle{z-index:1;font-size:clamp(14px,3vw,18px);color:rgba(255,255,255,.9);text-align:center;margin-top:-6px}
+/* Hero */
+.hero{text-align:center;margin-bottom:clamp(28px,6vw,48px)}
+.hero-unicorn{font-size:clamp(60px,14vw,96px);animation:bob 2.4s ease-in-out infinite;filter:drop-shadow(0 10px 30px rgba(255,20,147,.45))}
+@keyframes bob{0%,100%{transform:rotate(-4deg) scale(1)}50%{transform:rotate(4deg) scale(1.04)}}
+h1{font-family:'Baloo 2',sans-serif;font-weight:800;line-height:1.05;
+  font-size:clamp(38px,10vw,64px);color:#fff;text-shadow:0 4px 16px rgba(255,20,147,.5);margin-top:6px}
+.hero-tagline{font-size:clamp(15px,3.2vw,20px);color:rgba(255,255,255,.95);margin-top:10px;font-weight:600;max-width:480px;margin-left:auto;margin-right:auto;line-height:1.4}
 
-.cards{z-index:1;display:flex;gap:clamp(14px,5vw,30px);flex-wrap:wrap;justify-content:center;margin-top:6px}
-.card{
-  width:clamp(140px,40vw,210px);min-height:clamp(150px,32vh,230px);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
-  text-decoration:none;border-radius:32px;padding:22px 14px;cursor:pointer;
-  background:rgba(255,255,255,.92);border:5px solid #fff;
-  box-shadow:0 10px 30px rgba(255,20,147,.3);
-  transition:transform .18s ease, box-shadow .18s ease;
-  animation:cardPop .6s ease-out both;
+.cta-row{margin-top:clamp(20px,4vw,28px);display:flex;justify-content:center}
+.cta{
+  display:inline-flex;align-items:center;gap:10px;
+  background:#fff;color:#ff1493;font-family:'Baloo 2',sans-serif;font-weight:800;
+  font-size:clamp(17px,4vw,21px);text-decoration:none;
+  padding:16px 34px;border-radius:999px;
+  box-shadow:0 12px 30px rgba(255,20,147,.4);
+  border:4px solid #fff;
+  animation:pulse 2.4s ease-in-out infinite;
+  transition:transform .15s ease;
 }
-.card:nth-child(2){animation-delay:.12s}
-@keyframes cardPop{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
-.card:hover{transform:translateY(-6px) scale(1.03)}
-.card:active{transform:scale(.95)}
-.card .emoji{font-size:clamp(54px,12vw,84px);line-height:1;filter:drop-shadow(0 6px 14px rgba(255,20,147,.35))}
-.card .label{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(18px,4.5vw,26px)}
-.card .desc{font-size:clamp(11px,2.6vw,14px);color:#a06; text-align:center;opacity:.8;line-height:1.2}
-.card.play{border-color:#ff8ec4}
-.card.play .label{color:#ff1493}
-.card.pet{border-color:#c79bff}
-.card.pet .label{color:#9a4dff}
-.card.play{animation-name:cardPop,glowPink}
-@keyframes glowPink{0%,100%{box-shadow:0 10px 30px rgba(255,20,147,.3)}50%{box-shadow:0 10px 40px rgba(255,20,147,.55),0 0 40px rgba(255,140,210,.5)}}
-.card.play{animation:cardPop .6s ease-out both, glowPink 2s ease-in-out infinite 1s}
-.card.pet{animation:cardPop .6s ease-out .12s both, glowPurple 2s ease-in-out infinite 1.2s}
-@keyframes glowPurple{0%,100%{box-shadow:0 10px 30px rgba(176,106,255,.3)}50%{box-shadow:0 10px 40px rgba(176,106,255,.55),0 0 40px rgba(199,155,255,.5)}}
+.cta:hover{transform:translateY(-3px) scale(1.03)}
+.cta:active{transform:scale(.96)}
+@keyframes pulse{0%,100%{box-shadow:0 12px 30px rgba(255,20,147,.4)}50%{box-shadow:0 14px 40px rgba(255,20,147,.6),0 0 40px rgba(255,140,210,.4)}}
 
-.footer-hint{z-index:1;font-size:clamp(11px,2.4vw,13px);color:rgba(255,255,255,.75);text-align:center}
+/* Section cards */
+.card-section{
+  background:rgba(255,255,255,.94);
+  border-radius:32px;
+  border:4px solid #fff;
+  box-shadow:0 10px 34px rgba(255,20,147,.22);
+  padding:clamp(24px,5vw,40px);
+  margin-bottom:clamp(20px,4vw,28px);
+}
+
+/* Story section */
+.story-badge{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#ffe0f0,#ffd0ea);color:#c2408e;font-weight:700;font-size:13px;padding:6px 16px;border-radius:999px;margin-bottom:16px}
+.story h2{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(24px,5.5vw,32px);color:#ff1493;margin-bottom:14px;line-height:1.2}
+.story p{font-size:clamp(15px,3.4vw,17px);line-height:1.65;color:#5a2e55;margin-bottom:14px}
+.story p:last-child{margin-bottom:0}
+.signature{font-family:'Baloo 2',sans-serif;font-weight:700;color:#9a4dff;font-size:clamp(16px,3.6vw,18px);margin-top:6px}
+
+/* Feature grid */
+.features h2{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(22px,5vw,28px);color:#9a4dff;margin-bottom:18px;text-align:center}
+.feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:480px){.feature-grid{grid-template-columns:1fr}}
+.feature{background:linear-gradient(135deg,#fff7fb,#fdeefc);border-radius:22px;padding:18px 16px;text-align:center;border:2px solid #ffe0f0}
+.feature .emoji{font-size:34px;margin-bottom:8px}
+.feature .ftitle{font-family:'Baloo 2',sans-serif;font-weight:700;color:#ff1493;font-size:15px;margin-bottom:4px}
+.feature .fdesc{font-size:13px;color:#8a5a80;line-height:1.4}
+
+/* Trust badges */
+.trust{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:20px}
+.badge{display:flex;align-items:center;gap:6px;background:#fff;border:2px solid #ffd6ea;color:#c2408e;font-weight:700;font-size:clamp(12px,2.8vw,14px);padding:8px 16px;border-radius:999px}
+
+/* Contact section */
+.contact h2{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(22px,5vw,28px);color:#ff1493;margin-bottom:10px;text-align:center}
+.contact p{font-size:clamp(14px,3.2vw,16px);color:#5a2e55;text-align:center;line-height:1.6;margin-bottom:20px}
+.contact-buttons{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;text-decoration:none;
+  font-family:'Baloo 2',sans-serif;font-weight:700;font-size:clamp(14px,3.2vw,16px);
+  padding:13px 24px;border-radius:999px;transition:transform .15s ease;
+}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:scale(.96)}
+.btn-primary{background:linear-gradient(135deg,#ff8ec4,#ff1493);color:#fff;box-shadow:0 8px 20px rgba(255,20,147,.35)}
+.btn-secondary{background:#fff;color:#9a4dff;border:2px solid #e8d4ff}
+
+/* Footer */
+footer{text-align:center;margin-top:clamp(24px,5vw,36px)}
+.footer-hint{font-size:clamp(12px,2.6vw,14px);color:rgba(90,46,85,.65);margin-bottom:10px}
+.ig-follow{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.5);border:1.5px solid rgba(255,20,147,.25);border-radius:24px;padding:7px 16px 7px 12px;text-decoration:none;color:#c2408e;font-family:'Fredoka','Baloo 2',sans-serif;font-size:clamp(12px,2.8vw,14px);font-weight:600;transition:opacity .2s, transform .2s}
+.ig-follow:hover{transform:scale(1.04)}
 </style>
 </head>
 <body>
 <div class="twinkles"></div>
 <div id="floaters"></div>
 
-<div class="hero-unicorn">🦄</div>
-<h1>Sparkle Magic</h1>
-<p class="subtitle">Pick your magic, little one! ✨</p>
+<div class="wrap">
 
-<div class="cards">
-  <a class="card play" href="play.html">
-    <div class="emoji">✨</div>
-    <div class="label">Play</div>
-    <div class="desc">Tap, paint & explore magic worlds</div>
-  </a>
-  <a class="card pet" href="pet.html">
-    <div class="emoji">🦄</div>
-    <div class="label">My Pet</div>
-    <div class="desc">Make & care for your unicorn</div>
-  </a>
+  <section class="hero">
+    <div class="hero-unicorn">🦄</div>
+    <h1>SparklePop</h1>
+    <p class="hero-tagline">A little world of magic, painting & unicorns — made for tiny hands and big imaginations.</p>
+    <div class="cta-row">
+      <a class="cta" href="play-hub.html">✨ Start Playing</a>
+    </div>
+  </section>
+
+  <section class="card-section story">
+    <span class="story-badge">💖 Our story</span>
+    <h2>Hi, I'm Giti — a mom who made this for her daughter.</h2>
+    <p>SparklePop started as something small: a few taps and swirls of color on a screen, built one evening so my daughter would have somewhere gentle and joyful to play — no ads popping up, no pressure to buy anything, nothing scary. Just sparkles, unicorns, and a little world that was entirely hers.</p>
+    <p>She loved it so much that I kept building. A pet to name and take care of. New colors to paint with. Little surprises to discover. Watching her giggle at a screen full of stars is honestly the whole reason this exists.</p>
+    <p>Then I thought — if it makes her this happy, maybe it can do the same for other toddlers too. So I'm sharing it, for free, with your family.</p>
+    <p class="signature">With love,<br>Giti 🦄</p>
+  </section>
+
+  <section class="card-section features">
+    <h2>What's inside</h2>
+    <div class="feature-grid">
+      <div class="feature">
+        <div class="emoji">✨</div>
+        <div class="ftitle">Play &amp; Paint</div>
+        <div class="fdesc">Tap, swirl, and paint magical worlds full of color and sparkle.</div>
+      </div>
+      <div class="feature">
+        <div class="emoji">🦄</div>
+        <div class="ftitle">My Unicorn Pet</div>
+        <div class="fdesc">Name and care for a very own unicorn friend.</div>
+      </div>
+      <div class="feature">
+        <div class="emoji">🎁</div>
+        <div class="ftitle">Gentle Surprises</div>
+        <div class="fdesc">Little milestones and rewards, sized for toddler attention spans.</div>
+      </div>
+      <div class="feature">
+        <div class="emoji">👶</div>
+        <div class="ftitle">Made for ages 1–4</div>
+        <div class="fdesc">Simple, big taps and soft sounds — no reading required.</div>
+      </div>
+    </div>
+    <div class="trust">
+      <span class="badge">🚫 No ads</span>
+      <span class="badge">🚫 No subscriptions</span>
+      <span class="badge">🔒 No data collected</span>
+      <span class="badge">💝 Free forever</span>
+    </div>
+  </section>
+
+  <section class="card-section contact">
+    <h2>Got an idea for a game?</h2>
+    <p>If your little one has a fantasy world they keep talking about — a game, a pet, a character, anything — I'd genuinely love to hear it. Send me the idea and maybe it'll be the next thing we build together.</p>
+    <div class="contact-buttons">
+      <a class="btn btn-primary" href="mailto:gitika.masand@gmail.com?subject=A%20game%20idea%20for%20SparklePop!&body=Hi%20Giti%2C%0A%0AMy%20child%27s%20idea%20is...">💌 Send Us Your Idea</a>
+      <a class="btn btn-secondary" href="https://instagram.com/sparklespop" target="_blank" rel="noopener">📷 DM on Instagram</a>
+    </div>
+  </section>
+
+  <footer>
+    <p class="footer-hint">✨ sparklespop.com ✨</p>
+    <a class="ig-follow" href="https://instagram.com/sparklespop" target="_blank" rel="noopener">📷 Follow us @sparklespop</a>
+  </footer>
+
 </div>
 
-<p class="footer-hint">✨ sparklespop.com ✨</p>
-
 <script>
-// floating magical emojis
 (function(){
   const box = document.getElementById('floaters');
-  const EM = ['✨','🦄','🌈','💖','⭐','🧚','🦋','👑','💎','🌸','🪄','🌟','🎀','🍭','🏰','🐬','🚀','🪐'];
-  for(let i=0;i<16;i++){
+  const EM = ['✨','🦄','🌈','💖','⭐','🧚','🦋','👑','💎','🌸','🪄','🌟','🎀','🍭'];
+  for(let i=0;i<12;i++){
     const f=document.createElement('div');
     f.className='floater';
     f.textContent=EM[i%EM.length];
     f.style.left=(4+Math.random()*92)+'%';
     f.style.top=(8+Math.random()*84)+'%';
-    f.style.setProperty('--ft',(5+Math.random()*5)+'s');
-    f.style.animationDelay=(-Math.random()*5)+'s';
+    f.style.setProperty('--ft',(7+Math.random()*6)+'s');
+    f.style.animationDelay=(-Math.random()*7)+'s';
     box.appendChild(f);
   }
 })();
