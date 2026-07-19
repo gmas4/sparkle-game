@@ -92,6 +92,9 @@ h1{z-index:1;font-family:'Baloo 2',sans-serif;font-weight:800;text-align:center;
 .chip{font-family:'Baloo 2',sans-serif;font-weight:700;font-size:clamp(12px,3vw,14px);color:#8a4d00;background:rgba(255,255,255,.9);border:2.5px solid #ffe4b3;border-radius:999px;padding:8px 14px;cursor:pointer;transition:transform .12s ease}
 .chip:active{transform:scale(.93)}
 .chip:hover{transform:translateY(-1px)}
+.chip.sel{border-color:#9a4dff;background:#f5ecff;transform:scale(1.08)}
+.deco-pick{font-size:22px;padding:7px 12px}
+.deco-tip{z-index:1;font-size:clamp(12px,2.9vw,14px);color:rgba(255,255,255,.95);text-align:center;font-weight:700;margin-bottom:8px}
 
 .actions{z-index:1;display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:10px}
 .act-btn{
@@ -133,6 +136,9 @@ h1{z-index:1;font-family:'Baloo 2',sans-serif;font-weight:800;text-align:center;
 </div>
 
 <div class="chips" id="chipRow"></div>
+
+<p class="deco-tip">✨ Tap a sparkle below, then tap your sticker to add it!</p>
+<div class="chips" id="decoRow"></div>
 
 <div class="actions">
   <button type="button" class="act-btn act-new" id="surpriseBtn">🎲 Surprise me!</button>
@@ -183,7 +189,8 @@ h1{z-index:1;font-family:'Baloo 2',sans-serif;font-weight:800;text-align:center;
   const canvas = document.getElementById('stickerCanvas');
   const ctx = canvas.getContext('2d');
   const W = canvas.width, H = canvas.height, CX = W/2, CY = H/2, R = W/2 - 8;
-  let sticker = { subject:'✨', color:'#e0c4ff', rainbow:false, decos:['✨','⭐','💖'], caption:'' };
+  let sticker = { subject:'✨', color:'#e0c4ff', rainbow:false, decos:['✨','⭐','💖'], caption:'', placed:[] };
+  let selectedDeco = '✨';
 
   function roundRect(c,x,y,w,h,r){ c.beginPath(); c.moveTo(x+r,y); c.arcTo(x+w,y,x+w,y+h,r); c.arcTo(x+w,y+h,x,y+h,r); c.arcTo(x,y+h,x,y,r); c.arcTo(x,y,x+w,y,r); c.closePath(); }
 
@@ -217,6 +224,12 @@ h1{z-index:1;font-family:'Baloo 2',sans-serif;font-weight:800;text-align:center;
     ctx.save(); ctx.shadowColor='rgba(0,0,0,.18)'; ctx.shadowBlur=16;
     ctx.font=(W*0.44)+"px sans-serif"; ctx.textAlign='center'; ctx.textBaseline='middle';
     ctx.fillText(sticker.subject || '✨', CX, CY - R*0.08); ctx.restore();
+    // decorations the child tapped on herself
+    (sticker.placed||[]).forEach(function(d){
+      ctx.save(); ctx.translate(d.x,d.y); ctx.rotate(d.rot);
+      ctx.font=(W*0.13*d.scale)+"px sans-serif"; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(d.emoji,0,0); ctx.restore();
+    });
     // caption ribbon
     if (sticker.caption){
       let cap = sticker.caption; if (cap.length>26) cap = cap.slice(0,25)+'…';
@@ -237,7 +250,8 @@ h1{z-index:1;font-family:'Baloo 2',sans-serif;font-weight:800;text-align:center;
       color: m.color || (m.rainbow ? null : '#e0c4ff'),
       rainbow: m.rainbow,
       decos: m.decos && m.decos.length ? m.decos : ['✨','⭐','💖'],
-      caption: m.caption || ''
+      caption: m.caption || '',
+      placed: []
     };
     render();
   }
@@ -344,6 +358,29 @@ h1{z-index:1;font-family:'Baloo 2',sans-serif;font-weight:800;text-align:center;
     if (e.key==='Enter'){ const v=e.target.value.trim(); if(v) makeSticker(v, true); }
   });
 
+  // ── tap the sticker to add a decoration yourself ──
+  const DECO_PICKS = ['✨','👑','⭐','💖','🌈','🎀','🦋','🌸','💎','🌙'];
+  const decoRow = document.getElementById('decoRow');
+  DECO_PICKS.forEach(function(em, i){
+    const bb = document.createElement('button'); bb.type='button'; bb.className='chip deco-pick'+(i===0?' sel':''); bb.textContent = em;
+    bb.addEventListener('click', function(){
+      selectedDeco = em;
+      Array.from(decoRow.children).forEach(x=>x.classList.remove('sel')); bb.classList.add('sel');
+    });
+    decoRow.appendChild(bb);
+  });
+  function placeDeco(clientX, clientY){
+    const rect = canvas.getBoundingClientRect();
+    const x = (clientX - rect.left) * (W/rect.width), y = (clientY - rect.top) * (H/rect.height);
+    sticker.placed = sticker.placed || [];
+    sticker.placed.push({ emoji:selectedDeco, x:x, y:y, rot:(Math.random()*30-15)*Math.PI/180, scale:0.85+Math.random()*0.3 });
+    render();
+    burst(clientX, clientY);
+  }
+  canvas.style.cursor = 'pointer';
+  canvas.addEventListener('click', function(e){ placeDeco(e.clientX, e.clientY); });
+  canvas.addEventListener('touchstart', function(e){ if(!e.touches||!e.touches[0]) return; e.preventDefault(); placeDeco(e.touches[0].clientX, e.touches[0].clientY); }, { passive:false });
+
   // quick-pick idea chips (great for tiny hands & no-voice devices)
   const CHIPS = ['🦄 rainbow unicorn','🐱 pink cat with a crown','🦋 blue butterfly','🐶 puppy with stars',
                  '🧜‍♀️ purple mermaid','❤️ red heart with sparkles','🐉 green dragon','🌈 rainbow'];
@@ -420,7 +457,7 @@ h1{z-index:1;font-family:'Baloo 2',sans-serif;font-weight:800;text-align:center;
 <div id="spTimerOverlay" class="sp-timer-overlay" style="display:none">
   <div class="sp-timer-card">
     <div class="sp-timer-unicorn">🦄</div>
-    <div class="sp-timer-title">15 minutes of magic! ✨</div>
+    <div class="sp-timer-title">10 minutes of magic! ✨</div>
     <div class="sp-timer-desc">Great playing! Maybe stretch, get some water, or go show mummy what you made.</div>
     <button type="button" class="sp-timer-btn" id="spTimerOkBtn">Okay! 💖</button>
   </div>
@@ -437,7 +474,7 @@ h1{z-index:1;font-family:'Baloo 2',sans-serif;font-weight:800;text-align:center;
 </style>
 <script>
 (function(){
-  var DURATION = 15*60*1000;
+  var DURATION = 10*60*1000;
   var IDLE_RESET = 45*60*1000;
   var KEY = 'sp_session_start';
   var start = parseInt(localStorage.getItem(KEY) || '0', 10);

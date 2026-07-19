@@ -2328,7 +2328,7 @@ document.getElementById('factCard').addEventListener('click', function(){
 <div id="spTimerOverlay" class="sp-timer-overlay" style="display:none">
   <div class="sp-timer-card">
     <div class="sp-timer-unicorn">🦄</div>
-    <div class="sp-timer-title">15 minutes of magic! ✨</div>
+    <div class="sp-timer-title">10 minutes of magic! ✨</div>
     <div class="sp-timer-desc">Great playing! Maybe stretch, get some water, or go show mummy what you made.</div>
     <button type="button" class="sp-timer-btn" id="spTimerOkBtn">Okay! 💖</button>
   </div>
@@ -2345,7 +2345,7 @@ document.getElementById('factCard').addEventListener('click', function(){
 </style>
 <script>
 (function(){
-  var DURATION = 15*60*1000;
+  var DURATION = 10*60*1000;
   var IDLE_RESET = 45*60*1000;
   var KEY = 'sp_session_start';
   var start = parseInt(localStorage.getItem(KEY) || '0', 10);

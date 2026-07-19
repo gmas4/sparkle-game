@@ -82,6 +82,7 @@ h1{z-index:1;font-family:'Baloo 2',sans-serif;font-weight:800;text-align:center;
 }
 .card:nth-child(2){animation-delay:.12s}
 .card:nth-child(3){animation-delay:.24s}
+.card:nth-child(4){animation-delay:.36s}
 @keyframes cardPop{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
 .card:hover{transform:translateY(-6px) scale(1.03)}
 .card:active{transform:scale(.95)}
@@ -102,6 +103,10 @@ h1{z-index:1;font-family:'Baloo 2',sans-serif;font-weight:800;text-align:center;
 @keyframes glowPurple{0%,100%{box-shadow:0 10px 30px rgba(176,106,255,.3)}50%{box-shadow:0 10px 40px rgba(176,106,255,.55),0 0 40px rgba(199,155,255,.5)}}
 .card.sticker{animation:cardPop .6s ease-out .24s both, glowGold 2s ease-in-out infinite 1.4s}
 @keyframes glowGold{0%,100%{box-shadow:0 10px 30px rgba(255,190,60,.3)}50%{box-shadow:0 10px 40px rgba(255,190,60,.55),0 0 40px rgba(255,207,92,.5)}}
+.card.paint{border-color:#6ac3ff}
+.card.paint .label{color:#1a8ae0}
+.card.paint{animation:cardPop .6s ease-out .36s both, glowBlue 2s ease-in-out infinite 1.6s}
+@keyframes glowBlue{0%,100%{box-shadow:0 10px 30px rgba(106,195,255,.3)}50%{box-shadow:0 10px 40px rgba(106,195,255,.55),0 0 40px rgba(150,215,255,.5)}}
 
 .footer-hint{z-index:1;font-size:clamp(11px,2.4vw,13px);color:rgba(255,255,255,.75);text-align:center}
 
@@ -134,6 +139,11 @@ h1{z-index:1;font-family:'Baloo 2',sans-serif;font-weight:800;text-align:center;
     <div class="emoji">🏷️</div>
     <div class="label">Make Stickers</div>
     <div class="desc">Design your Sticker</div>
+  </a>
+  <a class="card paint" href="paint.html">
+    <div class="emoji">🎨</div>
+    <div class="label">Paint</div>
+    <div class="desc">A clean canvas, just for drawing</div>
   </a>
 </div>
 
