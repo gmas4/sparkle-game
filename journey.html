@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>✨ How SparklePop Grew ✨</title>
+<meta name="description" content="The story of how SparklePop grew, one idea from Anya at a time — plus what's coming next.">
+<meta name="theme-color" content="#ff69b4">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>%F0%9F%A6%84</text></svg>">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="SparklePop">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta property="og:title" content="✨ How SparklePop Grew ✨">
+<meta property="og:description" content="Every feature started with something Anya asked for. Here's the story — and what's next.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://sparklespop.com/journey.html">
+<meta property="og:image" content="https://sparklespop.com/social-preview.png">
+<meta name="twitter:card" content="summary_large_image">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Fredoka','Baloo 2',sans-serif;
+  background:linear-gradient(135deg,#ffe0f0 0%,#ffb6d9 18%,#ff8ec4 36%,#d9a7ff 54%,#a7c8ff 72%,#fff0f5 100%);
+  background-size:400% 400%;animation:auroraShift 25s ease infinite;
+  color:#5a2e55;
+  min-height:100vh;
+  position:relative;
+  overflow-x:hidden;
+}
+@keyframes auroraShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+
+.twinkles{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:
+  radial-gradient(2px 2px at 15% 20%,#fff,transparent),
+  radial-gradient(2px 2px at 70% 30%,#fff5fb,transparent),
+  radial-gradient(1.5px 1.5px at 40% 70%,#fff,transparent),
+  radial-gradient(2px 2px at 85% 65%,#ffe9f6,transparent),
+  radial-gradient(1.5px 1.5px at 25% 85%,#fff,transparent);
+  animation:twinkle 3.5s ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:.4}50%{opacity:1}}
+
+#floaters{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.floater{position:absolute;font-size:clamp(20px,4vw,34px);opacity:.7;animation:floatUp var(--ft,9s) ease-in-out infinite;filter:drop-shadow(0 4px 10px rgba(255,20,147,.25))}
+@keyframes floatUp{0%{transform:translateY(25px) rotate(-10deg);opacity:0}15%{opacity:.7}85%{opacity:.7}100%{transform:translateY(-45px) rotate(10deg);opacity:0}}
+
+.wrap{position:relative;z-index:1;max-width:720px;margin:0 auto;padding:clamp(28px,6vw,60px) 20px 50px}
+
+.back-link{display:inline-flex;align-items:center;gap:6px;color:#fff;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:clamp(13px,3vw,15px);text-decoration:none;text-shadow:0 2px 8px rgba(255,20,147,.4);margin-bottom:18px}
+
+.hero{text-align:center;margin-bottom:clamp(24px,5vw,36px)}
+.hero-unicorn{font-size:clamp(50px,12vw,80px);animation:bob 2.4s ease-in-out infinite;filter:drop-shadow(0 10px 30px rgba(255,20,147,.45))}
+@keyframes bob{0%,100%{transform:rotate(-4deg) scale(1)}50%{transform:rotate(4deg) scale(1.04)}}
+h1{font-family:'Baloo 2',sans-serif;font-weight:800;line-height:1.1;
+  font-size:clamp(30px,8vw,50px);color:#fff;text-shadow:0 4px 16px rgba(255,20,147,.5);margin-top:6px}
+.hero-tagline{font-size:clamp(14px,3vw,18px);color:rgba(255,255,255,.95);margin-top:10px;font-weight:600;max-width:480px;margin-left:auto;margin-right:auto;line-height:1.45}
+
+.card-section{
+  background:rgba(255,255,255,.94);
+  border-radius:32px;
+  border:4px solid #fff;
+  box-shadow:0 10px 34px rgba(255,20,147,.22);
+  padding:clamp(22px,5vw,38px);
+  margin-bottom:clamp(20px,4vw,28px);
+}
+.section-badge{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#ffe0f0,#ffd0ea);color:#c2408e;font-weight:700;font-size:13px;padding:6px 16px;border-radius:999px;margin-bottom:16px}
+.card-section h2{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(22px,5.2vw,30px);color:#ff1493;margin-bottom:10px;line-height:1.2}
+.card-section > p.intro{font-size:clamp(14px,3.2vw,16px);line-height:1.6;color:#5a2e55;margin-bottom:22px}
+
+/* Timeline */
+.timeline{position:relative;padding-left:28px}
+.timeline::before{content:'';position:absolute;left:9px;top:6px;bottom:6px;width:3px;border-radius:3px;background:linear-gradient(180deg,#ff8ec4,#c79bff,#a7c8ff)}
+.tl-item{position:relative;padding-bottom:26px}
+.tl-item:last-child{padding-bottom:0}
+.tl-dot{position:absolute;left:-28px;top:2px;width:20px;height:20px;border-radius:50%;background:#fff;border:4px solid #ff1493;box-shadow:0 3px 8px rgba(255,20,147,.35)}
+.tl-date{font-family:'Baloo 2',sans-serif;font-weight:700;color:#9a4dff;font-size:clamp(11px,2.6vw,13px);letter-spacing:.02em;margin-bottom:2px}
+.tl-title{font-family:'Baloo 2',sans-serif;font-weight:800;color:#ff1493;font-size:clamp(16px,3.8vw,19px);margin-bottom:4px;line-height:1.25}
+.tl-desc{font-size:clamp(13px,3vw,15px);line-height:1.5;color:#5a2e55}
+.tl-tag{display:inline-block;margin-top:6px;background:#fff0f8;color:#c2408e;border:1.5px solid #ffd6ea;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px}
+
+/* Wishlist */
+.wish-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:480px){.wish-grid{grid-template-columns:1fr}}
+.wish{background:linear-gradient(135deg,#fff7fb,#fdeefc);border-radius:20px;padding:16px;border:2px solid #ffe0f0}
+.wish .w-emoji{font-size:28px;margin-bottom:6px}
+.wish .w-title{font-family:'Baloo 2',sans-serif;font-weight:700;color:#9a4dff;font-size:14px;margin-bottom:3px}
+.wish .w-desc{font-size:12.5px;color:#8a5a80;line-height:1.4}
+
+.featured-wish{display:flex;gap:14px;align-items:flex-start;background:linear-gradient(135deg,#fff0f8,#f5e8ff);border:2.5px solid #ffb6d9;border-radius:22px;padding:18px 18px;margin-bottom:16px;box-shadow:0 6px 18px rgba(255,20,147,.18)}
+.featured-wish .fw-emoji{font-size:36px;line-height:1}
+.featured-wish .fw-new{display:inline-block;background:#ff1493;color:#fff;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:999px;margin-bottom:5px;letter-spacing:.03em}
+.featured-wish .fw-title{font-family:'Baloo 2',sans-serif;font-weight:800;color:#ff1493;font-size:clamp(15px,3.6vw,17px);margin-bottom:4px}
+.featured-wish .fw-quote{font-style:italic;color:#9a4dff;font-size:13px;margin-bottom:5px}
+.featured-wish .fw-desc{font-size:12.5px;color:#8a5a80;line-height:1.5}
+
+.cta-box{text-align:center;margin-top:22px}
+.cta-box a{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(14px,3.4vw,17px);padding:14px 26px;border-radius:999px;background:linear-gradient(135deg,#ff8ec4,#ff1493);color:#fff;box-shadow:0 8px 20px rgba(255,20,147,.35);transition:transform .15s ease}
+.cta-box a:hover{transform:translateY(-2px)}
+
+footer{text-align:center;margin-top:clamp(20px,4vw,30px)}
+.footer-hint{font-size:clamp(12px,2.6vw,14px);color:rgba(90,46,85,.65)}
+</style>
+</head>
+<body>
+<div class="twinkles"></div>
+<div id="floaters"></div>
+
+<div class="wrap">
+
+  <a class="back-link" href="index.html">← Back to our story</a>
+
+  <section class="hero">
+    <div class="hero-unicorn">🦄</div>
+    <h1>How SparklePop grew</h1>
+    <p class="hero-tagline">Every sparkle started with Anya laughing at something, asking for something, or getting bored of something. Here's the story so far — and what she's asked for next.</p>
+  </section>
+
+  <section class="card-section">
+    <span class="section-badge">🕰️ The story so far</span>
+    <h2>Our timeline</h2>
+    <p class="intro">A little history, one giggle at a time.</p>
+    <div class="timeline">
+
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-date">June 25, 2026</div>
+        <div class="tl-title">🌱 SparklePop is born</div>
+        <div class="tl-desc">The very first version — just a few taps, some colors, and a whole lot of sparkle.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-date">June 26, 2026</div>
+        <div class="tl-title">🏡 A home for everything</div>
+        <div class="tl-desc">Built a little hub so Anya could pick between Play and her Unicorn Pet — plus new worlds to explore so she'd never get bored.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-date">June 26, 2026</div>
+        <div class="tl-title">🦄 Meet the Unicorn Pet</div>
+        <div class="tl-desc">A brand new way to play: name your own unicorn, feed it, and watch it grow.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-date">June 27, 2026</div>
+        <div class="tl-title">🎨 Spray paint and rainbows arrive</div>
+        <div class="tl-desc">Anya wanted to spray paint the rainbow — so we built a spray tool and a rainbow color mode. Paintings have looked like actual magic ever since.</div>
+        <span class="tl-tag">💡 Anya's idea</span>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-date">June 27, 2026</div>
+        <div class="tl-title">🥚 Surprises everywhere</div>
+        <div class="tl-desc">Surprise eggs, snow on the moon, a dancing unicorn, a secret puppy party, and a tiny baby companion.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-date">June 27–28, 2026</div>
+        <div class="tl-title">👑 The unicorn gets a glow-up</div>
+        <div class="tl-desc">Glasses, jewels, a fluffy coat, new horns, a castle to visit, and a much cuter face.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-date">June 28, 2026</div>
+        <div class="tl-title">🎁 Fewer, better surprises</div>
+        <div class="tl-desc">We slowed the rewards down and spaced them out, so every one feels special instead of rushed.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-date">June 29, 2026</div>
+        <div class="tl-title">🦋 Butterflies in every color</div>
+        <div class="tl-desc">Butterflies now flutter by in random colors — plus we fixed the sound so it works properly on Anya's iPad.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-date">July 19, 2026</div>
+        <div class="tl-title">💌 This story, out loud</div>
+        <div class="tl-desc">A page so every family knows SparklePop was made by a mom for her daughter — not a company.</div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="card-section">
+    <span class="section-badge">🌟 Coming up</span>
+    <h2>What's next</h2>
+    <p class="intro">The wishlist so far — some from Anya, some from us. Got a better idea? We'd love to hear it.</p>
+
+    <div class="featured-wish">
+      <div class="fw-emoji">🎙️</div>
+      <div>
+        <span class="fw-new">Anya's newest idea</span>
+        <div class="fw-title">Make your own stickers — just by talking</div>
+        <div class="fw-quote">"Mama, I wanna make my own stickers!"</div>
+        <div class="fw-desc">Anya's latest ask: say out loud what you want — "a sparkly cat," "a rainbow dinosaur" — and watch it turn into a sticker you can use in your paintings. No typing, no reading, just talking and imagining.</div>
+      </div>
+    </div>
+
+    <div class="wish-grid">
+      <div class="wish">
+        <div class="w-emoji">🌊</div>
+        <div class="w-title">New worlds</div>
+        <div class="w-desc">An Ocean Garden, a Space Garden, and a Jungle Garden to explore and paint in.</div>
+      </div>
+      <div class="wish">
+        <div class="w-emoji">✨</div>
+        <div class="w-title">More brushes</div>
+        <div class="w-desc">A glitter brush and a stamp brush — hearts, stars, and dinosaurs.</div>
+      </div>
+      <div class="wish">
+        <div class="w-emoji">🧜</div>
+        <div class="w-title">New friends</div>
+        <div class="w-desc">A baby dragon and a mermaid to join the unicorn.</div>
+      </div>
+      <div class="wish">
+        <div class="w-emoji">🎁</div>
+        <div class="w-title">Daily surprise</div>
+        <div class="w-desc">A little gift waiting for you each new day you visit.</div>
+      </div>
+      <div class="wish">
+        <div class="w-emoji">❄️</div>
+        <div class="w-title">Seasons</div>
+        <div class="w-desc">Snow in winter, blossoms in spring — the world changes with the calendar.</div>
+      </div>
+      <div class="wish">
+        <div class="w-emoji">💌</div>
+        <div class="w-title">Your idea here</div>
+        <div class="w-desc">Send us what your little one is asking for — it might be the next one on this list.</div>
+      </div>
+    </div>
+    <div class="cta-box">
+      <a href="index.html#contact">💌 Send us your idea</a>
+    </div>
+  </section>
+
+  <footer>
+    <p class="footer-hint">✨ sparklespop.com ✨</p>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  const box = document.getElementById('floaters');
+  const EM = ['✨','🦄','🌈','💖','⭐','🧚','🦋','👑','💎','🌸','🪄','🌟','🎀','🍭'];
+  for(let i=0;i<10;i++){
+    const f=document.createElement('div');
+    f.className='floater';
+    f.textContent=EM[i%EM.length];
+    f.style.left=(4+Math.random()*92)+'%';
+    f.style.top=(8+Math.random()*84)+'%';
+    f.style.setProperty('--ft',(7+Math.random()*6)+'s');
+    f.style.animationDelay=(-Math.random()*7)+'s';
+    box.appendChild(f);
+  }
+})();
+</script>
+</body>
+</html>
