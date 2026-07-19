@@ -100,7 +100,10 @@ h1{font-family:'Baloo 2',sans-serif;font-weight:800;line-height:1.05;
 }
 
 /* Story section */
-.story-badge{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#ffe0f0,#ffd0ea);color:#c2408e;font-weight:700;font-size:13px;padding:6px 16px;border-radius:999px;margin-bottom:16px}
+.story-badge{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#ffe0f0,#ffd0ea);color:#c2408e;font-weight:700;font-size:13px;padding:6px 16px;border-radius:999px;margin-bottom:16px;border:none;cursor:pointer;font-family:'Fredoka','Baloo 2',sans-serif;transition:transform .12s ease;-webkit-tap-highlight-color:transparent}
+.story-badge:active{transform:scale(.92)}
+.burst-heart{position:fixed;pointer-events:none;font-size:20px;z-index:999;animation:burstFloat .9s ease-out forwards}
+@keyframes burstFloat{0%{transform:translate(-50%,-50%) scale(.6);opacity:1}100%{transform:translate(calc(-50% + var(--bx)),calc(-50% + var(--by))) scale(1.3);opacity:0}}
 .story-photo{display:block;width:clamp(150px,42vw,200px);height:auto;aspect-ratio:1;object-fit:cover;border-radius:50%;margin:4px auto 20px;box-shadow:0 10px 28px rgba(255,20,147,.3);border:4px solid #fff}
 .story h2{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(24px,5.5vw,32px);color:#ff1493;margin-bottom:14px;line-height:1.2}
 .story p{font-size:clamp(15px,3.4vw,17px);line-height:1.65;color:#5a2e55;margin-bottom:14px}
@@ -119,6 +122,13 @@ h1{font-family:'Baloo 2',sans-serif;font-weight:800;line-height:1.05;
 /* Trust badges */
 .trust{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:20px}
 .badge{display:flex;align-items:center;gap:6px;background:#fff;border:2px solid #ffd6ea;color:#c2408e;font-weight:700;font-size:clamp(12px,2.8vw,14px);padding:8px 16px;border-radius:999px}
+
+/* Journey link — sits on the gradient between cards */
+.journey-row{text-align:center;margin-bottom:clamp(20px,4vw,28px);position:relative;z-index:1}
+.journey-link{display:inline-flex;align-items:center;gap:8px;background:#fff;color:#9a4dff;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(14px,3.4vw,17px);text-decoration:none;padding:13px 26px;border-radius:999px;border:3px solid #e8d4ff;box-shadow:0 8px 22px rgba(154,77,255,.28);transition:transform .15s ease,box-shadow .15s ease;animation:journeyGlow 2.6s ease-in-out infinite}
+.journey-link:hover{transform:translateY(-2px) scale(1.03)}
+.journey-link:active{transform:scale(.97)}
+@keyframes journeyGlow{0%,100%{box-shadow:0 8px 22px rgba(154,77,255,.28)}50%{box-shadow:0 10px 30px rgba(154,77,255,.5),0 0 26px rgba(199,155,255,.45)}}
 
 /* Contact section */
 .contact h2{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(22px,5vw,28px);color:#ff1493;margin-bottom:10px;text-align:center}
@@ -162,7 +172,7 @@ footer{text-align:center;margin-top:clamp(24px,5vw,36px)}
 
   <section class="card-section story">
     <img class="story-photo" src="anya-and-giti.jpg" alt="Giti and her daughter Anya, hand-illustrated in a warm, sparkly style" width="200" height="200" loading="lazy">
-    <span class="story-badge">💖 Our story</span>
+    <button type="button" class="story-badge" id="storyBadgeBtn">💖 Our story</button>
     <h2>Hi, I'm Giti — a mom who made this for her daughter.</h2>
     <p>SparklePop began as a few taps and swirls of color, built one evening so my daughter had somewhere gentle and joyful to play — no ads, no pressure, nothing scary. Just sparkles and a little world that was entirely hers.</p>
     <p>She loved it so much I kept building: a pet to care for, new colors, little surprises. Now I'm sharing it with your family too, for free.</p>
@@ -195,8 +205,8 @@ footer{text-align:center;margin-top:clamp(24px,5vw,36px)}
     </div>
   </section>
 
-  <p style="text-align:center;margin-bottom:clamp(20px,4vw,28px);z-index:1;position:relative">
-    <a href="journey.html" style="color:#fff;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:clamp(14px,3.2vw,16px);text-decoration:none;text-shadow:0 2px 8px rgba(255,20,147,.4)">🕰️ See how SparklePop grew (and what's next) →</a>
+  <p class="journey-row">
+    <a class="journey-link" href="journey.html">🕰️ See how SparklePop grew (and what's next) →</a>
   </p>
 
   <section class="card-section contact" id="contact">
@@ -230,6 +240,29 @@ footer{text-align:center;margin-top:clamp(24px,5vw,36px)}
     f.style.animationDelay=(-Math.random()*7)+'s';
     box.appendChild(f);
   }
+})();
+
+(function(){
+  const btn = document.getElementById('storyBadgeBtn');
+  if(!btn) return;
+  const HEARTS = ['💖','✨','💕','🌟'];
+  btn.addEventListener('click', function(){
+    const rect = btn.getBoundingClientRect();
+    const cx = rect.left + rect.width/2, cy = rect.top + rect.height/2;
+    for(let i=0;i<8;i++){
+      const h = document.createElement('div');
+      h.className = 'burst-heart';
+      h.textContent = HEARTS[i % HEARTS.length];
+      const angle = (Math.PI*2*i/8) + Math.random()*0.4;
+      const dist = 44 + Math.random()*30;
+      h.style.left = cx + 'px';
+      h.style.top = cy + 'px';
+      h.style.setProperty('--bx', Math.cos(angle)*dist + 'px');
+      h.style.setProperty('--by', Math.sin(angle)*dist + 'px');
+      document.body.appendChild(h);
+      setTimeout(()=>h.remove(), 950);
+    }
+  });
 })();
 </script>
 </body>
