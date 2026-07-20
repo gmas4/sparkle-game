@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>✨ Paint ✨</title>
-<meta name="description" content="A clean, calm painting space for little artists — brushes, a rainbow brush, stamps, and sparkles. No clutter, just paint.">
+<meta name="description" content="A clean, calm painting space for little artists — brushes, a rainbow brush, text for greeting cards, stamps, and sparkles. Make a card and send it!">
 <meta name="theme-color" content="#ffd6ea">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>%F0%9F%8E%A8</text></svg>">
 <meta name="mobile-web-app-capable" content="yes">
@@ -55,6 +55,7 @@ html,body{width:100%;height:100%;overflow:hidden;touch-action:none;overscroll-be
 .swatch{width:34px;height:34px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.18);cursor:pointer;transition:transform .12s ease;flex:0 0 auto}
 .swatch.sel{border-color:#333;transform:scale(1.18)}
 .swatch:active{transform:scale(.9)}
+.swatch.rainbow{background:conic-gradient(#ff1493,#ff8c00,#ffd23f,#6ddf6d,#3fb6ff,#9a4dff,#ff1493)}
 
 .tool{width:46px;height:46px;border-radius:16px;border:3px solid #ffe0f0;background:#fff;cursor:pointer;
   font-size:24px;line-height:1;display:flex;align-items:center;justify-content:center;transition:transform .12s ease;flex:0 0 auto}
@@ -67,6 +68,16 @@ html,body{width:100%;height:100%;overflow:hidden;touch-action:none;overscroll-be
 /* stamp picker (only visible when the stamp tool is active) */
 #stampRow{display:none}
 #stampRow.show{display:flex}
+
+/* text picker (only visible when the text tool is active) — for making greeting cards */
+#textRow{display:none;flex-direction:column;gap:6px;align-items:center;max-width:340px}
+#textRow.show{display:flex}
+#textInput{font-family:'Fredoka',sans-serif;font-size:16px;border:2px solid #ff69b4;border-radius:14px;padding:8px 12px;width:260px;max-width:74vw;text-align:center;color:#ff1493;outline:none;background:#fff}
+#textInput::placeholder{color:#ffa6d4}
+.text-opts{display:flex;gap:5px;flex-wrap:wrap;justify-content:center}
+.font-btn,.tsize-btn{font-size:13px;border:2px solid #ffb6d9;border-radius:12px;padding:5px 12px;background:#fff;cursor:pointer;color:#ff1493;font-weight:700;white-space:nowrap;flex:0 0 auto}
+.font-btn.active,.tsize-btn.active{background:linear-gradient(135deg,#ff69b4,#ff1493);color:#fff;border-color:#fff}
+.text-hint{font-size:11px;color:#b06aff;font-weight:700}
 
 .flash{position:fixed;pointer-events:none;font-size:20px;z-index:30;animation:flashUp .7s ease-out forwards}
 @keyframes flashUp{0%{transform:translate(-50%,-50%) scale(.5);opacity:1}100%{transform:translate(-50%,-140%) scale(1.2);opacity:0}}
@@ -81,12 +92,18 @@ html,body{width:100%;height:100%;overflow:hidden;touch-action:none;overscroll-be
   <div class="bar-row" id="stampRow">
     <!-- stamp emojis injected here -->
   </div>
+  <div class="bar-row" id="textRow">
+    <input id="textInput" type="text" maxlength="40" placeholder="Type your words…" autocomplete="off">
+    <div class="text-opts" id="fontOpts"></div>
+    <div class="text-opts" id="tsizeOpts"></div>
+    <div class="text-hint">Now tap the card to place it ✨</div>
+  </div>
   <div class="bar-row" id="colorRow">
     <!-- color swatches injected here -->
   </div>
   <div class="bar-row" id="toolRow">
     <button class="tool sel" id="tBrush"  type="button" title="Brush">🖌️</button>
-    <button class="tool"     id="tRainbow" type="button" title="Rainbow">🌈</button>
+    <button class="tool"     id="tText"   type="button" title="Text"><span style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:20px;color:#ff1493;line-height:1">Aa</span></button>
     <button class="tool"     id="tStamp"  type="button" title="Stamps">⭐</button>
     <button class="tool"     id="tEraser" type="button" title="Eraser">🧽</button>
     <button class="tool size-dot" id="tSize" type="button" title="Brush size"><i style="width:16px;height:16px"></i></button>
@@ -114,7 +131,8 @@ html,body{width:100%;height:100%;overflow:hidden;touch-action:none;overscroll-be
   addEventListener('resize', resize); resize();
 
   const SIZES = [8, 16, 28];
-  const state = { tool:'brush', color:'#ff1493', size:16, sizeIdx:1, hue:0, drawing:false, lastX:0, lastY:0, stamp:'⭐' };
+  const state = { tool:'brush', color:'#ff1493', size:16, sizeIdx:1, hue:0, drawing:false, lastX:0, lastY:0,
+                  stamp:'⭐', text:'', font:"'Fredoka', sans-serif", fontSize:56 };
 
   // ── undo history ──
   const undo = [];
@@ -132,7 +150,7 @@ html,body{width:100%;height:100%;overflow:hidden;touch-action:none;overscroll-be
       ctx.strokeStyle = 'rgba(0,0,0,1)';
     } else {
       ctx.globalCompositeOperation = 'source-over';
-      if (state.tool === 'rainbow'){ state.hue = (state.hue + 6) % 360; ctx.strokeStyle = 'hsl('+state.hue+',85%,60%)'; }
+      if (state.color === 'rainbow'){ state.hue = (state.hue + 6) % 360; ctx.strokeStyle = 'hsl('+state.hue+',85%,60%)'; }
       else ctx.strokeStyle = state.color;
     }
     ctx.beginPath();
@@ -152,6 +170,24 @@ html,body{width:100%;height:100%;overflow:hidden;touch-action:none;overscroll-be
     sparkle(x, y);
   }
 
+  function placeText(x, y){
+    const t = (state.text || '').trim();
+    if (!t) return;
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.save();
+    ctx.font = 'bold ' + state.fontSize + 'px ' + state.font;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    // white outline so words pop on any colour — like the old greeting-card text
+    ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+    ctx.strokeText(t, x, y);
+    ctx.fillStyle = state.color === 'rainbow'
+      ? 'hsl('+(state.hue = (state.hue + 40) % 360)+',100%,55%)'
+      : state.color;
+    ctx.fillText(t, x, y);
+    ctx.restore();
+    sparkle(x, y);
+  }
+
   function pointFromEvent(e){
     const r = canvas.getBoundingClientRect();
     return { x: e.clientX - r.left, y: e.clientY - r.top };
@@ -162,6 +198,7 @@ html,body{width:100%;height:100%;overflow:hidden;touch-action:none;overscroll-be
     const p = pointFromEvent(e);
     pushUndo();
     if (state.tool === 'stamp'){ placeStamp(p.x, p.y); return; }
+    if (state.tool === 'text'){ placeText(p.x, p.y); const ti=document.getElementById('textInput'); if(ti) ti.blur(); return; }
     state.drawing = true; state.lastX = p.x; state.lastY = p.y;
     lineTo(p.x + 0.01, p.y + 0.01); // a dot on a single tap
   });
@@ -183,16 +220,19 @@ html,body{width:100%;height:100%;overflow:hidden;touch-action:none;overscroll-be
     document.body.appendChild(el); setTimeout(()=>el.remove(), 700);
   }
 
-  // ── colors ──
-  const COLORS = ['#ff1493','#ff5ba0','#ff8c42','#ffd23f','#6ddf6d','#3fb6ff','#9a4dff','#8a5a44','#333333','#ffffff'];
+  // ── colors ── ('rainbow' cycles through every colour, for the brush AND for text)
+  const COLORS = ['rainbow','#ff1493','#ff5ba0','#ff8c42','#ffd23f','#6ddf6d','#3fb6ff','#9a4dff','#8a5a44','#333333','#ffffff'];
   const colorRow = document.getElementById('colorRow');
   COLORS.forEach(function(c, i){
-    const s = document.createElement('button'); s.type='button'; s.className='swatch'+(i===0?' sel':'');
-    s.style.background = c;
+    const s = document.createElement('button'); s.type='button';
+    const isRainbow = (c === 'rainbow');
+    s.className='swatch'+(isRainbow?' rainbow':'')+(c===state.color?' sel':'');
+    if (!isRainbow) s.style.background = c;
+    if (isRainbow) s.title = 'Rainbow';
     s.addEventListener('click', function(){
       state.color = c;
-      // choosing a color implies you want to draw, not erase/stamp
-      if (state.tool === 'eraser' || state.tool === 'stamp' || state.tool === 'rainbow') selectTool('brush');
+      // choosing a color implies you want to draw/write, not erase or stamp
+      if (state.tool === 'eraser' || state.tool === 'stamp') selectTool('brush');
       Array.from(colorRow.children).forEach(x=>x.classList.remove('sel'));
       s.classList.add('sel');
     });
@@ -213,17 +253,52 @@ html,body{width:100%;height:100%;overflow:hidden;touch-action:none;overscroll-be
     stampRow.appendChild(s);
   });
 
+  // ── text picker (fonts + sizes for making greeting cards) ──
+  const textRow = document.getElementById('textRow');
+  const textInput = document.getElementById('textInput');
+  textInput.addEventListener('input', function(e){ state.text = e.target.value; });
+  textInput.addEventListener('pointerdown', function(e){ e.stopPropagation(); });
+  const FONTS = [
+    { label:'Round',  css:"'Fredoka', sans-serif" },
+    { label:'Chunky', css:"'Baloo 2', cursive" },
+    { label:'Comic',  css:"'Comic Sans MS', 'Baloo 2', cursive" },
+    { label:'Fancy',  css:"'Brush Script MT', cursive" }
+  ];
+  const TEXT_SIZES = [ {label:'Small',px:34}, {label:'Medium',px:56}, {label:'Big',px:84} ];
+  const fontOpts = document.getElementById('fontOpts');
+  FONTS.forEach(function(f, i){
+    const b = document.createElement('button'); b.type='button';
+    b.className = 'font-btn'+(i===0?' active':''); b.textContent = f.label; b.style.fontFamily = f.css;
+    b.addEventListener('click', function(){
+      Array.from(fontOpts.children).forEach(x=>x.classList.remove('active'));
+      b.classList.add('active'); state.font = f.css;
+    });
+    fontOpts.appendChild(b);
+  });
+  const tsizeOpts = document.getElementById('tsizeOpts');
+  TEXT_SIZES.forEach(function(s, i){
+    const b = document.createElement('button'); b.type='button';
+    b.className = 'tsize-btn'+(i===1?' active':''); b.textContent = s.label;
+    b.addEventListener('click', function(){
+      Array.from(tsizeOpts.children).forEach(x=>x.classList.remove('active'));
+      b.classList.add('active'); state.fontSize = s.px;
+    });
+    tsizeOpts.appendChild(b);
+  });
+
   // ── tools ──
-  const toolBtns = { brush:'tBrush', rainbow:'tRainbow', stamp:'tStamp', eraser:'tEraser' };
+  const toolBtns = { brush:'tBrush', text:'tText', stamp:'tStamp', eraser:'tEraser' };
   function selectTool(name){
     state.tool = name;
     Object.entries(toolBtns).forEach(function(pair){
       document.getElementById(pair[1]).classList.toggle('sel', pair[0]===name);
     });
     stampRow.classList.toggle('show', name==='stamp');
+    textRow.classList.toggle('show', name==='text');
+    if (name==='text') setTimeout(function(){ textInput.focus(); }, 50);
   }
   document.getElementById('tBrush').addEventListener('click', ()=>selectTool('brush'));
-  document.getElementById('tRainbow').addEventListener('click', ()=>selectTool('rainbow'));
+  document.getElementById('tText').addEventListener('click', ()=>selectTool('text'));
   document.getElementById('tStamp').addEventListener('click', ()=>selectTool('stamp'));
   document.getElementById('tEraser').addEventListener('click', ()=>selectTool('eraser'));
 
