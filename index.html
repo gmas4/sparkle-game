@@ -89,6 +89,28 @@ h1{font-family:'Baloo 2',sans-serif;font-weight:800;line-height:1.05;
 .cta:active{transform:scale(.96)}
 @keyframes pulse{0%,100%{box-shadow:0 12px 30px rgba(255,20,147,.4)}50%{box-shadow:0 14px 40px rgba(255,20,147,.6),0 0 40px rgba(255,140,210,.4)}}
 
+/* Learning egg */
+.egg-zone{text-align:center;margin-bottom:clamp(24px,5vw,36px)}
+.magic-egg{background:none;border:none;cursor:pointer;padding:6px;-webkit-tap-highlight-color:transparent;line-height:1}
+.egg-emoji{display:inline-block;font-size:clamp(52px,12vw,76px);filter:drop-shadow(0 8px 20px rgba(255,20,147,.4));animation:eggBob 2.2s ease-in-out infinite;transition:transform .15s ease}
+@keyframes eggBob{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-6px) rotate(4deg)}}
+.magic-egg:hover .egg-emoji{transform:scale(1.08)}
+.magic-egg:active .egg-emoji{transform:scale(.9)}
+.egg-emoji.hatching{animation:eggShake .6s ease}
+@keyframes eggShake{0%,100%{transform:rotate(0)}15%{transform:rotate(-14deg) scale(1.05)}30%{transform:rotate(12deg) scale(1.08)}45%{transform:rotate(-10deg)}60%{transform:rotate(8deg)}75%{transform:rotate(-5deg)}}
+.egg-hint{margin-top:8px;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:clamp(14px,3.2vw,17px);color:#fff;text-shadow:0 2px 10px rgba(255,20,147,.45)}
+.fact-card{margin:16px auto 0;max-width:440px;background:rgba(255,255,255,.96);border:4px solid #fff;border-radius:26px;
+  box-shadow:0 12px 34px rgba(255,20,147,.28);padding:22px 22px 20px;animation:factPop .4s cubic-bezier(.2,1.3,.4,1)}
+.fact-card[hidden]{display:none}
+@keyframes factPop{0%{opacity:0;transform:translateY(10px) scale(.9)}100%{opacity:1;transform:translateY(0) scale(1)}}
+.fact-emoji{display:block;font-size:clamp(40px,9vw,54px);margin-bottom:8px;animation:bob 2.4s ease-in-out infinite}
+.fact-text{font-family:'Fredoka','Baloo 2',sans-serif;font-size:clamp(16px,3.8vw,19px);line-height:1.5;color:#5a2e55;font-weight:600;margin-bottom:16px}
+.fact-again{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(14px,3.4vw,16px);color:#fff;
+  background:linear-gradient(135deg,#ff8ec4,#ff1493);border:none;border-radius:999px;padding:11px 24px;cursor:pointer;
+  box-shadow:0 8px 20px rgba(255,20,147,.35);transition:transform .15s ease;-webkit-tap-highlight-color:transparent}
+.fact-again:hover{transform:translateY(-2px) scale(1.03)}
+.fact-again:active{transform:scale(.95)}
+
 /* Section cards */
 .card-section{
   background:rgba(255,255,255,.94);
@@ -180,6 +202,18 @@ footer{text-align:center;margin-top:clamp(24px,5vw,36px)}
       <a class="cta" href="play-hub.html">✨ Start Playing</a>
     </div>
     <p class="cta-trust">Free · no ads · nothing to buy</p>
+  </section>
+
+  <section class="egg-zone">
+    <button type="button" class="magic-egg" id="magicEgg" aria-label="Tap the magic egg for a fun fact">
+      <span class="egg-emoji" id="eggEmoji">🥚</span>
+    </button>
+    <p class="egg-hint" id="eggHint">Tap the magic egg to learn a fun fact! ✨</p>
+    <div class="fact-card" id="factCard" hidden>
+      <span class="fact-emoji" id="factEmoji">🐣</span>
+      <p class="fact-text" id="factText"></p>
+      <button type="button" class="fact-again" id="factAgain">Hatch another! 🥚</button>
+    </div>
   </section>
 
   <section class="card-section story">
@@ -289,6 +323,78 @@ footer{text-align:center;margin-top:clamp(24px,5vw,36px)}
       setTimeout(()=>h.remove(), 950);
     }
   });
+})();
+
+// Learning egg — tap to hatch a random kid-friendly fun fact 🥚→🐣
+(function(){
+  const egg = document.getElementById('magicEgg');
+  const eggEmoji = document.getElementById('eggEmoji');
+  const hint = document.getElementById('eggHint');
+  const card = document.getElementById('factCard');
+  const factEmoji = document.getElementById('factEmoji');
+  const factText = document.getElementById('factText');
+  const again = document.getElementById('factAgain');
+  if(!egg) return;
+
+  const FACTS = [
+    ['🦩','A group of flamingos is called a "flamboyance"!'],
+    ['🦋','Butterflies taste with their feet!'],
+    ['🍯','Honey never goes bad — ever!'],
+    ['🐙','An octopus has three hearts and blue blood!'],
+    ['☀️','The Sun is so big that a million Earths could fit inside it!'],
+    ['🌈','A rainbow is really a full circle — we usually only see half of it!'],
+    ['🦦','Sea otters hold hands while they sleep so they don\'t float apart!'],
+    ['🐌','A snail can sleep for up to three whole years!'],
+    ['🐝','Bees can recognise human faces!'],
+    ['🦈','Sharks are older than trees — they\'ve been around 400 million years!'],
+    ['🐮','Cows have best friends and get sad when they\'re apart!'],
+    ['💖','Your heart beats about 100,000 times every single day!'],
+    ['🦄','The unicorn is the national animal of Scotland!'],
+    ['🐧','A penguin says "I love you" by giving a pebble!'],
+    ['🐘','Elephants can\'t jump — but they\'re great swimmers!'],
+    ['🦘','A baby kangaroo is as tiny as a jelly bean when it\'s born!'],
+    ['🌙','You\'d weigh six times lighter on the Moon — hello, giant bouncy jumps!'],
+    ['🐱','Cats can make over 100 different sounds!'],
+  ];
+
+  let lastIdx = -1;
+  function pickFact(){
+    let i;
+    do { i = Math.floor(Math.random()*FACTS.length); } while (i === lastIdx && FACTS.length > 1);
+    lastIdx = i;
+    return FACTS[i];
+  }
+  function confetti(el){
+    const rect = el.getBoundingClientRect();
+    const cx = rect.left + rect.width/2, cy = rect.top + rect.height/2;
+    const bits = ['✨','🥚','🐣','⭐','💛','🌟'];
+    for(let k=0;k<10;k++){
+      const h = document.createElement('div');
+      h.className = 'burst-heart';
+      h.textContent = bits[k % bits.length];
+      const angle = (Math.PI*2*k/10) + Math.random()*0.4;
+      const dist = 50 + Math.random()*36;
+      h.style.left = cx + 'px'; h.style.top = cy + 'px';
+      h.style.setProperty('--bx', Math.cos(angle)*dist + 'px');
+      h.style.setProperty('--by', Math.sin(angle)*dist + 'px');
+      document.body.appendChild(h);
+      setTimeout(()=>h.remove(), 950);
+    }
+  }
+  function hatch(){
+    const [em, txt] = pickFact();
+    eggEmoji.classList.remove('hatching'); void eggEmoji.offsetWidth; eggEmoji.classList.add('hatching');
+    eggEmoji.textContent = '🐣';
+    setTimeout(()=>{ eggEmoji.textContent = '🥚'; }, 900);
+    factEmoji.textContent = em;
+    factText.textContent = txt;
+    if (card.hidden){ card.hidden = false; }
+    else { card.style.animation = 'none'; void card.offsetWidth; card.style.animation = ''; }
+    if (hint) hint.textContent = 'Did you know? 🌟';
+    confetti(egg);
+  }
+  egg.addEventListener('click', hatch);
+  again.addEventListener('click', hatch);
 })();
 
 // Email fallback — mailto: does nothing on laptops with no default mail app,
