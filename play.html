@@ -115,7 +115,7 @@ iframe:not(#gameFrame),.watermark,[id*="badge"],[class*="watermark"]{display:non
 .dino.caught{transition:all .5s ease-in;opacity:0;transform:scale(2) rotate(-30deg)!important}
 
 /* === PUPPY (runs along the bottom) === */
-.puppy{position:absolute;cursor:pointer;z-index:12;font-size:50px;filter:drop-shadow(0 5px 10px rgba(255,150,90,.4));animation:puppyRun var(--walk-speed,5s) linear forwards}
+.puppy{position:absolute;cursor:pointer;z-index:12;font-size:64px;filter:drop-shadow(0 5px 10px rgba(255,150,90,.4));animation:puppyRun var(--walk-speed,8s) linear forwards}
 @keyframes puppyRun{
   0%{transform:translateX(-110px) translateY(0) scaleX(var(--dir,1))}
   10%{transform:translateX(8vw) translateY(-14px) scaleX(var(--dir,1))}
@@ -1393,7 +1393,8 @@ const worldToast = document.getElementById('worldToast');
 const worldPicker = document.getElementById('worldPicker');
 const worldGrid = document.getElementById('worldGrid');
 const worldClose = document.getElementById('worldClose');
-S.unlockedWorlds = ['garden'];
+// Every world is open from the start — free to explore, no collecting/grind.
+S.unlockedWorlds = WORLDS.map(function(w){ return w.id; });
 let _toastT;
 function showWorldToast(text) {
   worldToast.textContent = text;
@@ -1423,7 +1424,7 @@ function buildWorldGrid() {
     worldGrid.appendChild(card);
   });
 }
-function openPicker() { SFX.init(); buildWorldGrid(); worldPicker.classList.add('show'); }
+function openPicker() { SFX.init(); worldBtn.classList.remove('glow'); buildWorldGrid(); worldPicker.classList.add('show'); }
 function closePicker() { worldPicker.classList.remove('show'); }
 function travel(w) {
   closePicker();
@@ -1444,6 +1445,7 @@ function checkWorldUnlocks() {
 worldBtn.addEventListener('click', (e) => { e.stopPropagation(); openPicker(); });
 worldClose.addEventListener('click', (e) => { e.stopPropagation(); closePicker(); });
 worldPicker.addEventListener('click', (e) => { if (e.target === worldPicker) closePicker(); });
+worldBtn.classList.add('glow'); // invite little explorers to tap 🌍 and travel
 
 // ── BUBBLES ──
 function spawnBubble() {
@@ -1870,7 +1872,7 @@ function spawnPuppy() {
   el.style.top = (innerHeight * 0.74 + Math.random() * (innerHeight * 0.16)) + 'px';
   el.style.left = '0px';
   el.style.setProperty('--dir', dir);
-  el.style.setProperty('--walk-speed', (4.5 + Math.random() * 1.5) + 's');
+  el.style.setProperty('--walk-speed', (8 + Math.random() * 4) + 's');
   scene.appendChild(el);
 
   const catchPuppy = (e) => {
@@ -1880,12 +1882,14 @@ function spawnPuppy() {
     Glitter.burst(cx, cy, 20);
     bark();
     addSparkles(4);
-    floatText('WOOF! 🐾', cx, r.top, { color:'#ffd76b' });
+    const nextParty = 2 - ((puppiesCaught + 1) % 2);
+    const hint = nextParty === 1 ? 'WOOF! One more! 🐾' : 'WOOF! 🐾';
+    floatText(hint, cx, r.top, { color:'#ffd76b' });
     pawPrints(cx, cy);
     el.classList.add('caught');
     setTimeout(() => { el.remove(); DOMManager.remove('puppies'); }, 400);
     puppiesCaught++;
-    if (puppiesCaught % 3 === 0) puppyParty();
+    if (puppiesCaught % 2 === 0) puppyParty();
   };
   el.addEventListener('pointerdown', catchPuppy);
   el.addEventListener('touchstart', (e) => { e.preventDefault(); catchPuppy(e); }, {passive:false});
@@ -1894,7 +1898,7 @@ function spawnPuppy() {
   setTimeout(() => { if (el.parentNode && !el.classList.contains('caught')) { el.remove(); DOMManager.remove('puppies'); } }, dur + 200);
 }
 function puppyParty() {
-  floatText('PUPPY PARTY! 🐶🐾', innerWidth/2, innerHeight*0.4, { size:'34px', color:'#fff', duration:2000 });
+  floatText('PUPPY PARTY! 🐶🐾', innerWidth/2, innerHeight*0.4, { size:'48px', color:'#ffd76b', duration:2500 });
   fallingMagic(['🐶','🐾','💕'], 25);
   SFX.milestone();
   for (let i = 0; i < 10; i++) {
@@ -2264,7 +2268,7 @@ setInterval(() => { if (playing() && Math.random() < 0.4) spawnEgg(); }, 10000);
 setInterval(() => { if (playing() && Math.random() < 0.6) spawnStar(); }, 4000);
 setInterval(() => { if (playing() && Math.random() < 0.55) spawnButterfly(); }, 6000);
 setInterval(() => { if (playing() && Math.random() < 0.40) spawnDino(); }, 8000);
-setInterval(() => { if (playing() && Math.random() < 0.35) spawnPuppy(); }, 9000);
+setInterval(() => { if (playing() && Math.random() < 0.70) spawnPuppy(); }, 5000);
 // While painting: just an occasional shooting star — lively but not distracting
 setInterval(() => { if (S.started && S.mode === 'paint' && Math.random() < 0.5) shootingStars(1); }, 8000);
 
