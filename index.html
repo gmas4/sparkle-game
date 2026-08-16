@@ -89,6 +89,16 @@ h1{font-family:'Baloo 2',sans-serif;font-weight:800;line-height:1.05;
 .cta:active{transform:scale(.96)}
 @keyframes pulse{0%,100%{box-shadow:0 12px 30px rgba(255,20,147,.4)}50%{box-shadow:0 14px 40px rgba(255,20,147,.6),0 0 40px rgba(255,140,210,.4)}}
 
+/* Hero Instagram follow — prominent, so families can follow along */
+.hero-ig{display:inline-flex;align-items:center;gap:8px;margin-top:16px;
+  background:linear-gradient(135deg,#feda75,#fa7e1e 25%,#d62976 55%,#962fbf 80%,#4f5bd5);
+  color:#fff;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(14px,3.2vw,16px);
+  text-decoration:none;padding:12px 24px;border-radius:999px;border:2.5px solid rgba(255,255,255,.9);
+  box-shadow:0 8px 24px rgba(214,41,118,.45);transition:transform .15s ease,box-shadow .15s ease}
+.hero-ig span{font-weight:700;opacity:.95}
+.hero-ig:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 12px 30px rgba(214,41,118,.6)}
+.hero-ig:active{transform:scale(.97)}
+
 /* Learning egg */
 .egg-zone{text-align:center;margin-bottom:clamp(24px,5vw,36px)}
 .magic-egg{background:none;border:none;cursor:pointer;padding:6px;-webkit-tap-highlight-color:transparent;line-height:1}
@@ -202,6 +212,7 @@ footer{text-align:center;margin-top:clamp(24px,5vw,36px)}
       <a class="cta" href="play-hub.html">✨ Start Playing</a>
     </div>
     <p class="cta-trust">Free · no ads · nothing to buy</p>
+    <a class="hero-ig" href="https://instagram.com/sparklespop4" target="_blank" rel="noopener">📷 Follow our journey <span>@sparklespop4</span></a>
   </section>
 
   <section class="egg-zone">

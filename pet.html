@@ -1558,31 +1558,51 @@ if (resetBtn) resetBtn.addEventListener('click', (e) => { e.stopPropagation(); d
 <div id="spTimerOverlay" class="sp-timer-overlay" style="display:none">
   <div class="sp-timer-card">
     <div class="sp-timer-unicorn">🦄</div>
-    <div class="sp-timer-title">10 minutes of magic! ✨</div>
-    <div class="sp-timer-desc">Great playing! Maybe stretch, get some water, or go show mummy what you made.</div>
-    <button type="button" class="sp-timer-btn" id="spTimerOkBtn">Okay! 💖</button>
+    <div class="sp-timer-title">You played for 15 minutes! 🎉</div>
+    <div class="sp-timer-desc">Here's the magic you learnt today ✨</div>
+    <div class="sp-fact-list" id="spFactList"></div>
+    <a class="sp-timer-btn" id="spTimerOkBtn" href="index.html">Show Mummy! 💖</a>
   </div>
 </div>
 <style>
 .sp-timer-overlay{position:fixed;inset:0;z-index:99999;background:rgba(90,20,70,.5);display:flex;align-items:center;justify-content:center;padding:20px;animation:spFadeIn .3s ease}
 @keyframes spFadeIn{from{opacity:0}to{opacity:1}}
-.sp-timer-card{background:#fff;border-radius:32px;padding:32px 28px;max-width:320px;text-align:center;box-shadow:0 20px 60px rgba(255,20,147,.4);border:5px solid #ffd6ea;font-family:'Fredoka','Baloo 2',sans-serif}
+.sp-timer-card{background:#fff;border-radius:32px;padding:32px 28px;max-width:340px;text-align:center;box-shadow:0 20px 60px rgba(255,20,147,.4);border:5px solid #ffd6ea;font-family:'Fredoka','Baloo 2',sans-serif}
 .sp-timer-unicorn{font-size:64px;animation:spBob 1.6s ease-in-out infinite;filter:drop-shadow(0 8px 20px rgba(255,20,147,.4))}
 @keyframes spBob{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
 .sp-timer-title{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:22px;color:#ff1493;margin:10px 0 6px}
-.sp-timer-desc{font-size:14px;color:#8a5a80;line-height:1.5;margin-bottom:18px}
-.sp-timer-btn{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:16px;background:linear-gradient(135deg,#ff8ec4,#ff1493);color:#fff;border:none;padding:12px 30px;border-radius:999px;cursor:pointer;box-shadow:0 8px 20px rgba(255,20,147,.35)}
+.sp-timer-desc{font-size:14px;color:#8a5a80;line-height:1.5;margin-bottom:14px}
+.sp-fact-list{text-align:left;margin:0 0 18px;display:flex;flex-direction:column;gap:8px;max-height:38vh;overflow-y:auto}
+.sp-fact{background:#fff0f8;border:1.5px solid #ffd6ea;border-radius:14px;padding:9px 12px;font-size:14px;color:#5a2e55;line-height:1.4;font-weight:600}
+.sp-timer-btn{display:inline-block;text-decoration:none;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:16px;background:linear-gradient(135deg,#ff8ec4,#ff1493);color:#fff;border:none;padding:12px 30px;border-radius:999px;cursor:pointer;box-shadow:0 8px 20px rgba(255,20,147,.35)}
 </style>
 <script>
 (function(){
-  var DURATION = 10*60*1000;
-  var IDLE_RESET = 45*60*1000;
-  var KEY = 'sp_session_start';
-  var start = parseInt(localStorage.getItem(KEY) || '0', 10);
+  var DURATION = 15*60*1000;   // 15 minutes of play, then playtime is over
+  var REST     = 60*60*1000;   // rest this long before play unlocks again
+  var KEY  = 'sp_session_start';
+  var FKEY = 'sp_session_facts';
   var now = Date.now();
-  if (!start || (now - start) > IDLE_RESET) {
+  var start = parseInt(localStorage.getItem(KEY) || '0', 10);
+
+  // Fresh session if never started, or the rest period is fully over.
+  if (!start || (now - start) >= (DURATION + REST)) {
     start = now;
     localStorage.setItem(KEY, String(start));
+    localStorage.removeItem(FKEY);   // new session -> forget old facts
+  }
+
+  // Always have something magical to teach, even if no eggs were opened.
+  var BACKUP_FACTS = [
+    "Butterflies taste with their feet! Wow!",
+    "Bees make sweet honey for us. Yum yum!",
+    "The moon shines at night to say goodnight!",
+    "Snails move very very slowly. So slow!",
+    "A baby cow is called a calf. Moo!"
+  ];
+  function facts(){
+    try { var a = JSON.parse(localStorage.getItem(FKEY) || '[]'); return Array.isArray(a) ? a : []; }
+    catch(e){ return []; }
   }
   function chime(){
     try{
@@ -1599,34 +1619,48 @@ if (resetBtn) resetBtn.addEventListener('click', (e) => { e.stopPropagation(); d
       });
     }catch(e){}
   }
-  function showReminder(){
+  var _voices = [];
+  function _loadVoices(){ try { _voices = (window.speechSynthesis && speechSynthesis.getVoices()) || []; } catch(e){} }
+  _loadVoices();
+  if (window.speechSynthesis) { try { speechSynthesis.addEventListener('voiceschanged', _loadVoices); } catch(e){} }
+  function speak(text){
+    try{
+      if (!window.speechSynthesis) return;
+      speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      u.rate = 0.85; u.pitch = 1.12; u.volume = 0.9;
+      var prefs = [/Samantha/i,/Google US English/i,/Google UK English Female/i,/Karen/i,/Victoria/i,/female/i];
+      for (var i=0;i<prefs.length;i++){ var v=_voices.find(function(x){ return prefs[i].test(x.name); }); if(v){ u.voice=v; break; } }
+      speechSynthesis.speak(u);
+    }catch(e){}
+  }
+  function endPlaytime(){
     var overlay = document.getElementById('spTimerOverlay');
-    if (!overlay) return;
+    if (!overlay || overlay.style.display === 'flex') return;
+    var list = facts();
+    if (!list.length) list = [ BACKUP_FACTS[Math.floor(Math.random() * BACKUP_FACTS.length)] ];
+    list = list.slice(0, 6);
+    var box = document.getElementById('spFactList');
+    if (box){
+      box.innerHTML = '';
+      list.forEach(function(f){
+        var d = document.createElement('div');
+        d.className = 'sp-fact';
+        d.textContent = '✨ ' + f;
+        box.appendChild(d);
+      });
+    }
     overlay.style.display = 'flex';
     chime();
-  }
-  function scheduleCheck(){
-    var elapsed = Date.now() - start;
-    var remaining = DURATION - (elapsed % DURATION);
-    setTimeout(function(){
-      showReminder();
-      start = Date.now();
-      localStorage.setItem(KEY, String(start));
-      scheduleCheck();
-    }, remaining);
+    speak('You played for fifteen minutes! Here is the magic you learnt today. ' + list.join('. '));
   }
   document.addEventListener('DOMContentLoaded', function(){
-    var btn = document.getElementById('spTimerOkBtn');
-    if (btn) btn.addEventListener('click', function(){
-      document.getElementById('spTimerOverlay').style.display = 'none';
-    });
-    var elapsedNow = Date.now() - start;
-    if (elapsedNow >= DURATION) {
-      showReminder();
-      start = Date.now();
-      localStorage.setItem(KEY, String(start));
+    var elapsed = Date.now() - start;
+    if (elapsed >= DURATION) {
+      endPlaytime();                                // time already used up -> locked recap
+    } else {
+      setTimeout(endPlaytime, DURATION - elapsed);  // lock the moment 15 min runs out
     }
-    scheduleCheck();
   });
 })();
 </script>
