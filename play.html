@@ -438,9 +438,6 @@ body.night #moon{opacity:1;transform:scale(1) rotate(0);pointer-events:auto;curs
 <!-- Music toggle -->
 <button id="musicBtn" title="Music on/off">🎵</button>
 
-<!-- Magic button -->
-<button id="magicBtn">🦄 MAGIC (0/50)</button>
-
 <!-- Celebration overlay -->
 <div id="celebration">
   <div class="cel-emoji" id="celEmoji">🎉</div>
@@ -903,7 +900,6 @@ const MILESTONES = [
 const scene = document.getElementById('gameScene');
 const sparkleEl = document.getElementById('sparkleCount');
 const unicornEl = document.getElementById('unicornCount');
-const magicBtn = document.getElementById('magicBtn');
 const titleScreen = document.getElementById('titleScreen');
 const milestoneFill = document.getElementById('milestoneFill');
 const milestoneLabel = document.getElementById('milestoneLabel');
@@ -1266,12 +1262,8 @@ function triggerMilestone(m) {
 // ── Magic Meter ──
 function updateMagicMeter(n) {
   S.magicMeter += n;
-  if (S.magicMeter >= 50) {
-    magicBtn.classList.add('ready');
-    magicBtn.textContent = '🦄 MEGA MAGIC! 🦄';
-  } else {
-    magicBtn.textContent = `🦄 MAGIC (${S.magicMeter}/50)`;
-  }
+  // Meter full — auto-cast the big surprise (no counter button needed).
+  if (S.magicMeter >= 50) doMagicBurst();
 }
 
 function doMagicBurst() {
@@ -1281,8 +1273,6 @@ function doMagicBurst() {
   if (isMega) {
     // MEGA BURST — full-screen spell + TWO surprise spells at once
     S.magicMeter = 0;
-    magicBtn.classList.remove('ready');
-    magicBtn.textContent = '🦄 MAGIC (0/50)';
 
     const burst = document.createElement('div');
     burst.className = 'mega-burst';
@@ -1314,8 +1304,6 @@ function doMagicBurst() {
   }
 }
 
-magicBtn.addEventListener('click', (e) => { e.stopPropagation(); doMagicBurst(); });
-magicBtn.addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); doMagicBurst(); }, {passive: false});
 
 // ── MUSIC TOGGLE ──
 const musicBtn = document.getElementById('musicBtn');

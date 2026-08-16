@@ -99,6 +99,22 @@ h1{font-family:'Baloo 2',sans-serif;font-weight:800;line-height:1.05;
 .hero-ig:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 12px 30px rgba(214,41,118,.6)}
 .hero-ig:active{transform:scale(.97)}
 
+/* Save-to-device buttons — so parents can keep SparklePop handy */
+.save-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+.save-btn{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.92);color:#c2408e;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(12.5px,2.9vw,14px);border:2.5px solid #fff;border-radius:999px;padding:10px 18px;cursor:pointer;box-shadow:0 6px 18px rgba(255,20,147,.25);transition:transform .15s ease;-webkit-tap-highlight-color:transparent}
+.save-btn:hover{transform:translateY(-2px) scale(1.03)}
+.save-btn:active{transform:scale(.96)}
+.save-help{position:fixed;inset:0;z-index:1000;background:rgba(90,20,70,.5);display:flex;align-items:center;justify-content:center;padding:20px}
+.save-help-card{position:relative;background:#fff;border-radius:26px;padding:30px 24px 26px;max-width:350px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(255,20,147,.4);border:4px solid #ffd6ea;font-family:'Fredoka','Baloo 2',sans-serif}
+.save-help-x{position:absolute;top:12px;right:14px;background:none;border:none;font-size:20px;color:#c2408e;cursor:pointer;line-height:1;padding:4px}
+.save-help-emoji{font-size:46px;margin-bottom:8px}
+.save-help-title{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:19px;color:#ff1493;margin-bottom:12px;line-height:1.25}
+.save-help-body{font-size:14px;color:#5a2e55;line-height:1.6;text-align:left}
+.save-help-body ol{margin:0;padding-left:22px}
+.save-help-body li{margin-bottom:8px}
+.save-help-body p{margin:0}
+.save-help-body b{color:#c2408e}
+
 /* Learning egg */
 .egg-zone{text-align:center;margin-bottom:clamp(24px,5vw,36px)}
 .magic-egg{background:none;border:none;cursor:pointer;padding:6px;-webkit-tap-highlight-color:transparent;line-height:1}
@@ -213,6 +229,10 @@ footer{text-align:center;margin-top:clamp(24px,5vw,36px)}
     </div>
     <p class="cta-trust">Free · no ads · nothing to buy</p>
     <a class="hero-ig" href="https://instagram.com/sparklespop4" target="_blank" rel="noopener">📷 Follow our journey <span>@sparklespop4</span></a>
+    <div class="save-row">
+      <button type="button" class="save-btn" id="addHomeBtn">📲 Add to Home Screen</button>
+      <button type="button" class="save-btn" id="bookmarkBtn">🔖 Bookmark</button>
+    </div>
   </section>
 
   <section class="egg-zone">
@@ -460,6 +480,64 @@ footer{text-align:center;margin-top:clamp(24px,5vw,36px)}
       if(navigator.clipboard){ navigator.clipboard.writeText(EMAIL).catch(()=>{}); }
     });
   }
+})();
+</script>
+
+<!-- Save-to-device help modal -->
+<div id="saveHelp" class="save-help" style="display:none">
+  <div class="save-help-card">
+    <button type="button" class="save-help-x" id="saveHelpClose" aria-label="Close">✕</button>
+    <div class="save-help-emoji" id="saveHelpEmoji">📲</div>
+    <h3 class="save-help-title" id="saveHelpTitle"></h3>
+    <div class="save-help-body" id="saveHelpBody"></div>
+  </div>
+</div>
+<script>
+(function(){
+  // Capture the Android/Chrome install prompt if the browser offers it.
+  var deferred = null;
+  window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); deferred = e; });
+
+  var modal   = document.getElementById('saveHelp');
+  var titleEl = document.getElementById('saveHelpTitle');
+  var bodyEl  = document.getElementById('saveHelpBody');
+  var emojiEl = document.getElementById('saveHelpEmoji');
+  function open(emoji, title, html){ emojiEl.textContent = emoji; titleEl.textContent = title; bodyEl.innerHTML = html; modal.style.display = 'flex'; }
+  function close(){ modal.style.display = 'none'; }
+  document.getElementById('saveHelpClose').addEventListener('click', close);
+  modal.addEventListener('click', function(e){ if (e.target === modal) close(); });
+
+  var ua = navigator.userAgent || '';
+  var isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  var isAndroid = /Android/.test(ua);
+  var isMac = /Macintosh|Mac OS X/.test(ua) && !isIOS;
+
+  document.getElementById('addHomeBtn').addEventListener('click', function(){
+    if (deferred){ deferred.prompt(); deferred.userChoice.finally(function(){ deferred = null; }); return; }
+    if (isIOS){
+      open('📲','Add SparklePop to your Home Screen',
+        '<ol><li>Tap the <b>Share</b> button <b>⬆️</b> at the bottom of Safari.</li><li>Scroll down and tap <b>“Add to Home Screen”</b>.</li><li>Tap <b>Add</b> — done! 🎉</li></ol>');
+    } else if (isAndroid){
+      open('📲','Add SparklePop to your Home Screen',
+        '<ol><li>Tap the <b>⋮</b> menu at the top right of Chrome.</li><li>Tap <b>“Add to Home screen”</b> (or “Install app”).</li><li>Tap <b>Add</b> — done! 🎉</li></ol>');
+    } else {
+      open('📲','Add SparklePop to your phone',
+        '<p>Open <b>sparklespop.com</b> on your phone or tablet, then choose <b>“Add to Home Screen”</b> from the browser menu. 💖</p>');
+    }
+  });
+
+  document.getElementById('bookmarkBtn').addEventListener('click', function(){
+    if (isIOS){
+      open('🔖','Bookmark SparklePop',
+        '<ol><li>Tap the <b>Share</b> button <b>⬆️</b> in Safari.</li><li>Tap <b>“Add Bookmark”</b>, then <b>Save</b> 💖</li></ol>');
+    } else if (isAndroid){
+      open('🔖','Bookmark SparklePop',
+        '<ol><li>Tap the <b>⋮</b> menu in Chrome.</li><li>Tap the <b>☆ star</b> to bookmark this page 💖</li></ol>');
+    } else {
+      open('🔖','Bookmark SparklePop',
+        '<p>Press <b>' + (isMac ? '⌘ + D' : 'Ctrl + D') + '</b> on your keyboard to bookmark this page 💖</p>');
+    }
+  });
 })();
 </script>
 </body>

@@ -48,16 +48,16 @@ html,body{width:100%;height:100%;overflow:hidden;touch-action:none;overscroll-be
 #bar{position:fixed;left:0;right:0;bottom:0;z-index:20;
   padding:8px 8px calc(env(safe-area-inset-bottom,0) + 8px);
   display:flex;flex-direction:column;align-items:center;gap:7px;pointer-events:none}
-.bar-row{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;pointer-events:auto;
+.bar-row{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;pointer-events:auto;
   background:rgba(255,255,255,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
   border:2px solid rgba(255,105,180,.35);border-radius:22px;padding:7px 9px;box-shadow:0 6px 22px rgba(255,20,147,.2);max-width:100%}
 
-.swatch{width:34px;height:34px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.18);cursor:pointer;transition:transform .12s ease;flex:0 0 auto}
+.swatch{width:50px;height:50px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.18);cursor:pointer;transition:transform .12s ease;flex:0 0 auto}
 .swatch.sel{border-color:#333;transform:scale(1.18)}
 .swatch:active{transform:scale(.9)}
 .swatch.rainbow{background:conic-gradient(#ff1493,#ff8c00,#ffd23f,#6ddf6d,#3fb6ff,#9a4dff,#ff1493)}
 
-.tool{width:46px;height:46px;border-radius:16px;border:3px solid #ffe0f0;background:#fff;cursor:pointer;
+.tool{width:50px;height:50px;border-radius:16px;border:3px solid #ffe0f0;background:#fff;cursor:pointer;
   font-size:24px;line-height:1;display:flex;align-items:center;justify-content:center;transition:transform .12s ease;flex:0 0 auto}
 .tool.sel{border-color:#ff1493;background:#fff0f8;transform:scale(1.06)}
 .tool:active{transform:scale(.9)}
@@ -81,6 +81,16 @@ html,body{width:100%;height:100%;overflow:hidden;touch-action:none;overscroll-be
 
 .flash{position:fixed;pointer-events:none;font-size:20px;z-index:30;animation:flashUp .7s ease-out forwards}
 @keyframes flashUp{0%{transform:translate(-50%,-50%) scale(.5);opacity:1}100%{transform:translate(-50%,-140%) scale(1.2);opacity:0}}
+
+/* "Start over?" guard — so a stray tap can't wipe the whole picture */
+.clear-confirm{position:fixed;inset:0;z-index:40;background:rgba(90,20,70,.45);display:flex;align-items:center;justify-content:center;padding:20px}
+.clear-card{background:#fff;border-radius:28px;padding:26px 24px;max-width:300px;width:100%;text-align:center;box-shadow:0 18px 50px rgba(255,20,147,.4);border:4px solid #ffd6ea;font-family:'Fredoka','Baloo 2',sans-serif}
+.clear-emoji{font-size:48px;margin-bottom:6px}
+.clear-title{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:22px;color:#ff1493;margin-bottom:4px}
+.clear-desc{font-size:14px;color:#8a5a80;margin-bottom:16px;line-height:1.4}
+.clear-no,.clear-yes{display:block;width:100%;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:16px;border-radius:999px;padding:14px;cursor:pointer;border:none;margin-top:8px}
+.clear-no{background:linear-gradient(135deg,#ff8ec4,#ff1493);color:#fff;box-shadow:0 8px 20px rgba(255,20,147,.35)}
+.clear-yes{background:#f4e9f2;color:#9a5a85}
 </style>
 </head>
 <body>
@@ -113,10 +123,37 @@ html,body{width:100%;height:100%;overflow:hidden;touch-action:none;overscroll-be
   </div>
 </div>
 
+<div id="clearConfirm" class="clear-confirm" style="display:none">
+  <div class="clear-card">
+    <div class="clear-emoji">🗑️</div>
+    <div class="clear-title">Start over?</div>
+    <div class="clear-desc">This clears your whole picture.</div>
+    <button type="button" class="clear-no" id="clearNo">No, keep my picture 💖</button>
+    <button type="button" class="clear-yes" id="clearYes">Yes, start over</button>
+  </div>
+</div>
+
 <script>
 (function(){
   const canvas = document.getElementById('paintCanvas');
   const ctx = canvas.getContext('2d');
+
+  // ── auto-save: never lose a painting to a stray tap or accidental exit ──
+  const SAVE_KEY = 'sp_paint_canvas';
+  let _saveT = null;
+  function autoSave(){
+    clearTimeout(_saveT);
+    _saveT = setTimeout(function(){
+      try { localStorage.setItem(SAVE_KEY, canvas.toDataURL('image/png')); } catch(e){}
+    }, 500);
+  }
+  function restoreSaved(){
+    let data = null; try { data = localStorage.getItem(SAVE_KEY); } catch(e){}
+    if (!data) return;
+    const img = new Image();
+    img.onload = function(){ try { ctx.drawImage(img, 0, 0); } catch(e){} };
+    img.src = data;
+  }
 
   // Resizing a canvas clears it — preserve the artwork across resizes
   // (e.g. rotating the device or the browser bars showing/hiding).
@@ -129,6 +166,7 @@ html,body{width:100%;height:100%;overflow:hidden;touch-action:none;overscroll-be
     if (snap){ try{ ctx.putImageData(snap,0,0); }catch(e){} }
   }
   addEventListener('resize', resize); resize();
+  restoreSaved();   // bring back the painting from last time
 
   const SIZES = [8, 16, 28];
   const state = { tool:'brush', color:'#ff1493', size:16, sizeIdx:1, hue:0, drawing:false, lastX:0, lastY:0,
@@ -197,8 +235,8 @@ html,body{width:100%;height:100%;overflow:hidden;touch-action:none;overscroll-be
     e.preventDefault();
     const p = pointFromEvent(e);
     pushUndo();
-    if (state.tool === 'stamp'){ placeStamp(p.x, p.y); return; }
-    if (state.tool === 'text'){ placeText(p.x, p.y); const ti=document.getElementById('textInput'); if(ti) ti.blur(); return; }
+    if (state.tool === 'stamp'){ placeStamp(p.x, p.y); autoSave(); return; }
+    if (state.tool === 'text'){ placeText(p.x, p.y); const ti=document.getElementById('textInput'); if(ti) ti.blur(); autoSave(); return; }
     state.drawing = true; state.lastX = p.x; state.lastY = p.y;
     lineTo(p.x + 0.01, p.y + 0.01); // a dot on a single tap
   });
@@ -209,7 +247,7 @@ html,body{width:100%;height:100%;overflow:hidden;touch-action:none;overscroll-be
     const evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
     for (const ev of evs){ const p = pointFromEvent(ev); lineTo(p.x, p.y); }
   });
-  function endStroke(){ state.drawing = false; ctx.globalCompositeOperation = 'source-over'; }
+  function endStroke(){ state.drawing = false; ctx.globalCompositeOperation = 'source-over'; autoSave(); }
   canvas.addEventListener('pointerup', endStroke);
   canvas.addEventListener('pointercancel', endStroke);
   canvas.addEventListener('pointerleave', endStroke);
@@ -315,11 +353,22 @@ html,body{width:100%;height:100%;overflow:hidden;touch-action:none;overscroll-be
     if (!undo.length) return;
     const img = undo.pop();
     try{ ctx.putImageData(img, 0, 0); }catch(e){}
+    autoSave();
   });
 
+  // "Start over" asks first — one stray tap should never wipe a whole painting.
+  const clearConfirm = document.getElementById('clearConfirm');
   document.getElementById('tClear').addEventListener('click', function(){
+    clearConfirm.style.display = 'flex';
+  });
+  document.getElementById('clearNo').addEventListener('click', function(){
+    clearConfirm.style.display = 'none';
+  });
+  document.getElementById('clearYes').addEventListener('click', function(){
+    clearConfirm.style.display = 'none';
     pushUndo();
     ctx.clearRect(0,0,canvas.width,canvas.height);
+    autoSave();
   });
 
   // ── save / share ──
