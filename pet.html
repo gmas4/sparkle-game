@@ -1462,6 +1462,11 @@ function saveUnicorn() {
       ectx.textAlign = 'center';
       ectx.fillText(name, 300, 660);
 
+      // Follow-us caption (baked into the shared image, like the other games)
+      ectx.font = '600 20px Fredoka, sans-serif';
+      ectx.fillStyle = '#c2408e';
+      ectx.fillText('sparklespop.com · 📷 @sparklespop4', 300, 690);
+
       // Show modal
       const dataUrl = exportCanvas.toDataURL('image/png');
       document.getElementById('savePreview').src = dataUrl;
