@@ -1616,10 +1616,28 @@ function hatchCreature(cx, cy) {
   addSparkles(c.reward);
   if (c.unicorn) addUnicorns(1);
   const hatched = document.createElement('div');
-  hatched.style.cssText = `position:absolute;left:${cx-40}px;top:${cy-40}px;font-size:80px;pointer-events:none;z-index:16;animation:hatchPop .8s ease-out forwards`;
+  hatched.style.cssText = `position:absolute;left:${cx-40}px;top:${cy-40}px;font-size:80px;z-index:16;cursor:pointer;animation:hatchPop .8s ease-out forwards`;
   hatched.textContent = c.emoji;
   scene.appendChild(hatched);
-  setTimeout(() => hatched.remove(), 800);
+  // ── PROTOTYPE: the hatchling STAYS for the rest of the session and responds to taps ──
+  // After the hatch pop, settle into the existing gentle idle bob.
+  hatched.addEventListener('animationend', () => {
+    hatched.style.animation = 'babyBob 2.4s ease-in-out infinite';
+  }, { once: true });
+  // On tap: a happy hop + existing glitter, soft sound, and a tiny floating heart — then back to idle.
+  const petHatchling = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    hatched.style.animation = 'babyJump .4s ease';
+    setTimeout(() => { hatched.style.animation = 'babyBob 2.4s ease-in-out infinite'; }, 400);
+    const r = hatched.getBoundingClientRect();
+    const hx = r.left + r.width/2, hy = r.top + r.height/2;
+    Glitter.burst(hx, hy, 12);
+    SFX.note(1200, 0.06, 'sine', 0.06);
+    floatText('💖', hx, hy - 30, { size: '22px' });
+  };
+  hatched.addEventListener('pointerdown', petHatchling);
+  hatched.addEventListener('touchstart', (e) => { e.preventDefault(); petHatchling(e); }, { passive: false });
   floatText(c.msg, cx, cy - 40, { color:'#fff' });
   c.fx(cx, cy);
   setTimeout(() => showFact(), 900);
@@ -2287,9 +2305,9 @@ function spawnCloud() {
 setInterval(spawnCloud, 12000);
 setTimeout(spawnCloud, 500);
 
-// ── Hatch pop animation (injected) ──
+// ── Hatch pop animation (injected) ── settles in place & stays visible so the hatchling can remain
 const hatchStyle = document.createElement('style');
-hatchStyle.textContent = `@keyframes hatchPop{0%{transform:scale(0) rotate(-20deg);opacity:0}30%{transform:scale(1.5) rotate(10deg);opacity:1}60%{transform:scale(1.2) rotate(-5deg);opacity:1}100%{transform:scale(1) translateY(-30px) rotate(0);opacity:0}}`;
+hatchStyle.textContent = `@keyframes hatchPop{0%{transform:scale(0) rotate(-20deg);opacity:0}30%{transform:scale(1.5) rotate(10deg);opacity:1}60%{transform:scale(1.2) rotate(-5deg);opacity:1}100%{transform:scale(1) translateY(0) rotate(0);opacity:1}}`;
 document.head.appendChild(hatchStyle);
 </script>
 
