@@ -170,6 +170,10 @@ body.castle-mode #castleBg{opacity:.85}
 .score-item{font-family:'Baloo 2',sans-serif;font-size:18px;font-weight:800;color:#fff;text-shadow:0 2px 6px rgba(255,20,147,.5);background:linear-gradient(135deg,rgba(255,105,180,.7),rgba(255,20,147,.5));backdrop-filter:blur(10px);padding:5px 14px;border-radius:40px;border:2px solid rgba(255,255,255,.5);box-shadow:0 4px 15px rgba(255,105,180,.3);display:flex;align-items:center;gap:5px;white-space:nowrap}
 .score-val{min-width:20px;text-align:center;transition:transform .15s}
 .score-val.bump{transform:scale(1.4)}
+/* Sparkles you can watch fly into your stash — makes "collecting" visible from zero */
+.fly-spark{position:fixed;z-index:60;font-size:22px;pointer-events:none;will-change:transform,opacity;filter:drop-shadow(0 2px 7px rgba(255,20,147,.55))}
+.score-item.stash-pop{animation:stashPop .5s ease}
+@keyframes stashPop{0%,100%{transform:scale(1);box-shadow:0 4px 15px rgba(255,105,180,.3)}45%{transform:scale(1.2);box-shadow:0 6px 26px rgba(255,215,0,.85),0 0 30px rgba(255,215,0,.6)}}
 
 /* === MILESTONE BAR === */
 #milestoneBar{position:fixed;top:52px;left:50%;transform:translateX(-50%);z-index:50;width:min(300px,80vw);height:14px;background:rgba(255,255,255,.3);border-radius:10px;border:2px solid rgba(255,255,255,.5);overflow:hidden}
@@ -1161,6 +1165,37 @@ function addSparkles(n) {
 }
 function addUnicorns(n) { S.unicorns += n; unicornEl.textContent = S.unicorns; bump(unicornEl); if (S.unicorns >= 1) Baby.show(); }
 
+// Little sparkles that fly from where you earned them up into the ✨ stash, so a
+// child can SEE their magic collecting — pure celebratory juice, no scoring change.
+function flySparkles(fromX, fromY, count) {
+  if (!sparkleEl) return;
+  const tr = sparkleEl.getBoundingClientRect();
+  const tx = tr.left + tr.width / 2, ty = tr.top + tr.height / 2;
+  const stash = sparkleEl.closest('.score-item');
+  const n = Math.max(1, Math.min(count | 0, 8));
+  for (let i = 0; i < n; i++) {
+    const s = document.createElement('div');
+    s.className = 'fly-spark';
+    s.textContent = '✨';
+    s.style.left = fromX + 'px';
+    s.style.top = fromY + 'px';
+    document.body.appendChild(s);
+    const endDX = tx - fromX, endDY = ty - fromY;
+    const midDX = endDX * 0.5 + (Math.random() * 80 - 40);
+    const midDY = endDY * 0.5 - (60 + Math.random() * 50); // lift up into an arc
+    const anim = s.animate([
+      { transform: 'translate(-50%,-50%) scale(.5)', opacity: 0, offset: 0 },
+      { transform: 'translate(-50%,-50%) scale(1.1)', opacity: 1, offset: .15 },
+      { transform: `translate(calc(-50% + ${midDX}px), calc(-50% + ${midDY}px)) scale(1.15)`, opacity: 1, offset: .55 },
+      { transform: `translate(calc(-50% + ${endDX}px), calc(-50% + ${endDY}px)) scale(.35)`, opacity: .2, offset: 1 }
+    ], { duration: 620 + Math.random() * 260, delay: i * 70, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' });
+    anim.onfinish = () => {
+      s.remove();
+      if (stash) { stash.classList.remove('stash-pop'); void stash.offsetWidth; stash.classList.add('stash-pop'); }
+    };
+  }
+}
+
 // ── Floating text helper (NOM NOM, WOOF!, RAWR!, etc.) ──
 function floatText(text, x, y, opts = {}) {
   const el = document.createElement('div');
@@ -1512,6 +1547,7 @@ function spawnBubble() {
     Glitter.burst(cx, cy, 20);
     SFX.pop();
     addSparkles(1);
+    flySparkles(cx, cy, 1);
     Baby.clap();
 
     // Pop ring
@@ -1564,6 +1600,7 @@ function spawnUnicorn() {
     Glitter.burst(r.left + r.width/2, r.top + r.height/2, 30);
     SFX.sparkle();
     addSparkles(5);
+    flySparkles(r.left + r.width/2, r.top + r.height/2, 5);
     addUnicorns(1);
     floatText(unicornName ? `You caught ${unicornName}!` : 'You caught a unicorn!', r.left + r.width/2, r.top, { color:'#fff' });
     if (el._walkAnim) { try { el._walkAnim.cancel(); } catch(e){} }
