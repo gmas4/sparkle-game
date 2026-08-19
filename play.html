@@ -46,6 +46,7 @@ body.dark-world .twinkle-stars{opacity:1;filter:brightness(1.7) drop-shadow(0 0 
 /* HIDE external overlays/watermarks that might distract toddlers */
 iframe:not(#gameFrame),.watermark,[id*="badge"],[class*="watermark"]{display:none!important;pointer-events:none!important;opacity:0!important}
 
+
 /* CANVASES */
 #glitterCanvas,#paintCanvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none}
 #glitterCanvas{z-index:1}
@@ -392,10 +393,9 @@ body.night #moon{opacity:1;transform:scale(1) rotate(0);pointer-events:auto;curs
 <div id="milestoneBar"><div id="milestoneFill"></div></div>
 <div id="milestoneLabel">Next: 🎀 Bow (8✨)</div>
 
-<!-- Paint now lives on its own page (paint.html); the arcade is tap-only. -->
-<div id="modeBar">
-  <a class="pet-link" href="pet.html">🦄 My Pet</a>
-</div>
+<!-- Paint now lives on its own page (paint.html); the arcade is tap-only.
+     (My Pet lives on the hub — removed from play mode to keep the world uncluttered.) -->
+<div id="modeBar"></div>
 
 <!-- Paint mode indicator -->
 <div id="paintIndicator">🎨 Drawing Mode!</div>
@@ -455,6 +455,35 @@ body.night #moon{opacity:1;transform:scale(1) rotate(0);pointer-events:auto;curs
   <button id="playBtn">✨ TAP TO PLAY ✨</button>
   <a class="pet-link" href="pet.html" style="margin-top:10px;font-size:clamp(15px,3.5vw,20px);padding:10px 26px">🦄 Make &amp; Care for a Pet</a>
 </div>
+
+<!-- Arrival: a calm "world waking up" beat before the busy play begins -->
+<div id="arrival" aria-hidden="true">
+  <div id="arrivalUnicorn">🦄<span id="arrivalZzz">💤</span></div>
+  <div id="arrivalHint">tap to wake the magic ✨</div>
+</div>
+<style>
+/* Gentle arrival overlay — sits over the world while it's still asleep */
+#arrival{position:fixed;inset:0;z-index:80;display:none;flex-direction:column;align-items:center;justify-content:center;gap:clamp(14px,4vh,26px);cursor:pointer;background:transparent}
+#arrival.show{display:flex}
+#arrival.leaving{opacity:0;transform:scale(1.12);transition:opacity .6s ease,transform .6s ease;pointer-events:none}
+#arrivalUnicorn{position:relative;font-size:clamp(90px,26vw,180px);filter:drop-shadow(0 14px 36px rgba(255,20,147,.45));animation:sleepBreath 3.4s ease-in-out infinite}
+@keyframes sleepBreath{0%,100%{transform:scale(1) rotate(-2deg)}50%{transform:scale(1.05) rotate(2deg)}}
+#arrivalZzz{position:absolute;top:0;right:-.15em;font-size:.42em;animation:zzzFloat 3s ease-in-out infinite}
+@keyframes zzzFloat{0%{opacity:.25;transform:translateY(2px)}50%{opacity:1;transform:translateY(-12px)}100%{opacity:.25;transform:translateY(-2px)}}
+#arrivalUnicorn.waking{animation:wakeWiggle .7s ease}
+@keyframes wakeWiggle{0%,100%{transform:rotate(0) scale(1)}20%{transform:rotate(-12deg) scale(1.08)}40%{transform:rotate(10deg) scale(1.12)}60%{transform:rotate(-7deg) scale(1.06)}80%{transform:rotate(5deg) scale(1.03)}}
+#arrivalHint{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(16px,4.2vw,24px);color:#fff;text-shadow:0 3px 12px rgba(255,20,147,.55);animation:hintPulse 1.6s ease-in-out infinite}
+@keyframes hintPulse{0%,100%{opacity:.72;transform:scale(1)}50%{opacity:1;transform:scale(1.06)}}
+/* Chrome blooms in only after the world wakes */
+#scoreBar,#milestoneBar,#milestoneLabel,#modeBar,#worldBtn,#musicBtn,#homeBtn{transition:opacity .9s ease}
+body.arriving #scoreBar,
+body.arriving #milestoneBar,
+body.arriving #milestoneLabel,
+body.arriving #modeBar,
+body.arriving #worldBtn,
+body.arriving #musicBtn,
+body.arriving #homeBtn{opacity:0 !important;pointer-events:none}
+</style>
 
 <script>
 /* ================================================
@@ -2244,9 +2273,34 @@ document.getElementById('playBtn').addEventListener('click', () => {
   SFX.startMusic();
   titleScreen.classList.add('hidden');
   setTimeout(() => titleScreen.style.display = 'none', 800);
-  // Go straight into the game (naming is optional — tap the ✏️ on the score bar)
-  beginGame();
+  // A calm "world waking up" beat before the busy play begins.
+  startArrival();
 });
+
+// ── ARRIVAL: the world is asleep; the child's tap wakes it and it blooms open ──
+function startArrival() {
+  const arrival = document.getElementById('arrival');
+  const uni = document.getElementById('arrivalUnicorn');
+  document.body.classList.add('arriving');   // hide the chrome for the calm beat
+  arrival.classList.add('show');
+  let woken = false;
+  function wake() {
+    if (woken) return;
+    woken = true;
+    uni.classList.add('waking');
+    try { SFX.sparkle(); } catch (e) {}
+    try { Glitter.burst(innerWidth / 2, innerHeight / 2, 26); } catch (e) {}
+    setTimeout(() => {
+      arrival.classList.add('leaving');
+      document.body.classList.remove('arriving');   // chrome blooms back in
+      setTimeout(() => { arrival.classList.remove('show'); }, 650);
+      beginGame();
+    }, 620);
+  }
+  arrival.addEventListener('click', wake);
+  // Safety net: a child should never get stuck on the sleeping screen.
+  setTimeout(wake, 6000);
+}
 
 function beginGame() {
   if (S.started) return;
