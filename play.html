@@ -453,7 +453,6 @@ body.night #moon{opacity:1;transform:scale(1) rotate(0);pointer-events:auto;curs
   <h1>Sparkle Unicorn<br>Magic Garden</h1>
   <p class="title-hint">Tap bubbles, catch unicorns, paint with sparkles — and travel to candy, ocean & space worlds! 🌍</p>
   <button id="playBtn">✨ TAP TO PLAY ✨</button>
-  <a class="pet-link" href="pet.html" style="margin-top:10px;font-size:clamp(15px,3.5vw,20px);padding:10px 26px">🦄 Make &amp; Care for a Pet</a>
 </div>
 
 <!-- Arrival: a calm "world waking up" beat before the busy play begins -->
@@ -1422,8 +1421,9 @@ const worldToast = document.getElementById('worldToast');
 const worldPicker = document.getElementById('worldPicker');
 const worldGrid = document.getElementById('worldGrid');
 const worldClose = document.getElementById('worldClose');
-// Every world is open from the start — free to explore, no collecting/grind.
-S.unlockedWorlds = WORLDS.map(function(w){ return w.id; });
+// Only the first land is open; the others reveal one at a time as sparkles are
+// collected (see checkWorldUnlocks) — so the world grows and stays surprising.
+S.unlockedWorlds = WORLDS.filter(function(w){ return w.unlock === 0; }).map(function(w){ return w.id; });
 let _toastT;
 function showWorldToast(text) {
   worldToast.textContent = text;
@@ -1465,9 +1465,13 @@ function checkWorldUnlocks() {
     if (w.unlock > 0 && S.sparkles >= w.unlock && !S.unlockedWorlds.includes(w.id)) {
       S.unlockedWorlds.push(w.id);
       worldBtn.classList.add('glow');
-      showWorldToast(`${w.icon} ${w.name} unlocked! Tap 🌍`);
+      // A visible surprise a pre-reader can understand: the new land's symbol
+      // blooms big on screen, the 🌍 button pulses to invite the journey.
+      giantBloom(w.icon);
+      showWorldToast(`${w.icon} A new land! Tap 🌍`);
       SFX.milestone();
       shootingStars(6);
+      for (let i = 0; i < 4; i++) setTimeout(() => Glitter.burst(Math.random()*innerWidth, Math.random()*innerHeight, 22), i*90);
     }
   });
 }
